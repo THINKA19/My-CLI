@@ -1,0 +1,44 @@
+{
+  "name": "@dengzhibo/create-vitepress-template",
+  "type": "module",
+  "version": "0.0.1",
+  "private": false,
+  "description": "基于 VitePress 的开箱即用文档脚手架",
+  "author": "THINKA <your-email@example.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "homepage": "https://github.com/dengzhibo/create-vitepress-template#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dengzhibo/create-vitepress-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dengzhibo/create-vitepress-template/issues"
+  },
+  "keywords": [
+    "vitepress",
+    "cli",
+    "scaffold",
+    "template",
+    "documentation"
+  ],
+  "bin": {
+    "create-vitepress-template": "./bin/cli.js",
+    "cvt": "./bin/cli.js"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "README.md",
+    "bin",
+    "template"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node ./bin/cli.js"
+  }
+}
