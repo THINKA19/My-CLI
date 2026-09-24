@@ -1,0 +1,29 @@
+{
+  "name": "My-CLI",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "个人脚手架模板集合 - 仅用于集中管理代码，每个包独立发布",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.5.1",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "eslint": "^10.11.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,md,json}": "eslint --fix"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.22.0",
+      "onFail": "download"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+# 这个文件，几乎 100% 通用,可以原样复用
+
+#!/usr/bin/env sh
+
+# 使用 pnpm 本地依赖校验提交信息
+exec pnpm exec commitlint --edit "$1"
