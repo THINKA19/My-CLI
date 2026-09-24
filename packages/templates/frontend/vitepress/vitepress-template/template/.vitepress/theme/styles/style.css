@@ -24,7 +24,7 @@
  *
  *   The soft color must be semi transparent alpha channel. This is crucial
  *   because it allows adding multiple "soft" colors on top of each other
- *   to create an accent, such as when having inline code block inside
+ *   to create a accent, such as when having inline code block inside
  *   custom containers.
  *
  * - `default`: The color used purely for subtle indication without any
@@ -106,13 +106,13 @@
   --vp-home-hero-image-filter: blur(44px);
 }
 
-@media (min-width: 40rem) {
+@media (min-width: 640px) {
   :root {
     --vp-home-hero-image-filter: blur(56px);
   }
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   :root {
     --vp-home-hero-image-filter: blur(68px);
   }
@@ -127,5 +127,13 @@
   --vp-custom-block-tip-text: var(--vp-c-text-1);
   --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
   --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
+}
+
+/**
+ * Component: Algolia
+ * -------------------------------------------------------------------------- */
+
+.DocSearch {
+  --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 

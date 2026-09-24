@@ -38,13 +38,22 @@
 * md 文件全部放到了 src 文件夹下
 * 新增了 .gitignore 文件
 
-```
+```plain
 src/
 ├─ api-examples.md
 ├─ markdown-examples.md
 └─ index.md
 
 .gitignore
+```
+
+* 初始化VitePress自定义theme主题目录
+
+```plain
+.vitepress/
+  └─ theme/
+     ├─ index.ts
+     └─ styles/
 ```
 
 
