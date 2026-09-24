@@ -56,5 +56,19 @@ src/
      └─ styles/
 ```
 
+## v0.1.0 (2026-09-25) 
 
+### 新增
+
+前端编码规范，新增的文件
+
+* .husky 文件
+* commitlint.config.js 文件
+* eslint.config.js 文件
+
+### 修改
+
+修改内容
+
+* package.json 文件
 

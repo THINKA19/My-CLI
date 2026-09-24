@@ -7,10 +7,23 @@
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "preinstall": "npx only-allow pnpm",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^9.5.1",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "eslint": "^10.11.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
     "vitepress": "2.0.0-alpha.20"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,md,json}": "eslint --fix"
   },
   "devEngines": {
     "packageManager": {

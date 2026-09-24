@@ -12,5 +12,12 @@
 
 * vitepress 脚手架创建项目
 
+## v0.1.0 (2026-09-25) 
 
+* 前端编码规范
+  * Eslint 代码规范
+  * Husky Git 勾子配置
+  * lint-staged 与 commitlint 配置
+
+## v0.1.1 (2026-09-25) 
 
