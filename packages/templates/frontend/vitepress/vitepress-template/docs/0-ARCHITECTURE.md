@@ -72,3 +72,23 @@ src/
 
 * package.json 文件
 
+## v0.1.1(2026-09-25) 
+
+### 新增
+
+工程化配置，构建基础设施
+
+* .vscode 文件
+* .editorconfig 文件
+* .env 环境变量
+* .gitattributes
+* .npmignore、.npmrc、.nvmrc 文件
+* LICENSE 文件
+* pnpm-workspace.yaml 文件
+* tsconfig.json 文件
+
+### 修改
+
+修改内容
+
+* package.json 文件

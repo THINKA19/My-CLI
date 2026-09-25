@@ -9,21 +9,28 @@
     "build": "vitepress build",
     "preview": "vitepress preview",
     "preinstall": "npx only-allow pnpm",
+    "typecheck": "vue-tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "vue": "^3.5.43"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
+    "@types/node": "^26.6.2",
     "eslint": "^10.11.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",
-    "vitepress": "2.0.0-alpha.20"
+    "typescript": "^5.7.3",
+    "vitepress": "2.0.0-alpha.20",
+    "vue-tsc": "^3.3.11"
   },
   "lint-staged": {
-    "*.{js,ts,vue,md,json}": "eslint --fix"
+    "*.{js,ts,vue}": "eslint --fix"
   },
   "devEngines": {
     "packageManager": {

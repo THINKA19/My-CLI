@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    // 基础代码规范校验：实时提示 ESLint 错误与代码格式规范
+    "dbaeumer.vscode-eslint",
+
+    // Vue 3 核心官方插件：提供 Vue 语法高亮、TS 类型推导与组件补全
+    "vue.volar",
+
+    // 辅助格式化：针对 CSS、Markdown、JSON 等非 JS/TS 文件提供统一美化
+    "esbenp.prettier-vscode",
+
+    // EditorConfig 校验：确保跨编辑器/开发者的缩进与换行风格一致
+    "editorconfig.editorconfig"
+  ]
+}

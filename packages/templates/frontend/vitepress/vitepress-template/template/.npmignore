@@ -1,0 +1,8 @@
+# 排除模板中的缓存和构建产物
+template/.vitepress/cache/
+template/.vitepress/dist/
+template/node_modules/
+
+# 排除开发文件
+template/.env.local
+template/.env.*.local
