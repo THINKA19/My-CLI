@@ -92,3 +92,41 @@ src/
 修改内容
 
 * package.json 文件
+
+## v0.2.0(2026-09-25) 
+
+### 新增
+
+* 目录结构
+  * docker
+  * .github
+  * .dockerignore 
+
+```Plaintext
+├─ docker/                    # 🐳 Docker 部署目录
+│  ├─ Dockerfile              # VitePress 多阶段镜像构建脚本
+│  ├─ docker-compose.yml      # Docker 容器编排服务配置
+│  ├─ nginx.conf              # Nginx 静态服务与缓存优化配置
+│  └─ README.md               # Docker 部署与镜像构建说明
+├─ .github/                   # 🤖 GitHub 自动化工作流
+│  └─ workflows/
+│     ├─ ci.yml               # PR / Push 时的代码规范校验与构建测试
+│     ├─ deploy.yml           # 主分支提交自动打包镜像并部署至服务器
+│     └─ release.yml          # 打 Tag 发版时自动创建 GitHub Release
+└─ .dockerignore              # ⚠️ 根目录必需！构建 Docker 镜像时的排除清单
+```
+
+### 修改
+
+`package.json` 配置
+
+```js
+ "scripts": {
+    "docker:build": "docker build -f docker/Dockerfile -t my-vitepress-docs:latest .",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d --build",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "docker:logs": "docker compose -f docker/docker-compose.yml logs -f"
+  }
+```
+
+

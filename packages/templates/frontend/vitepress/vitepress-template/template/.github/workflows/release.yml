@@ -1,0 +1,86 @@
+# 工作流名称：显示在 GitHub Actions 部署面板中的标识
+name: Deploy VitePress Site
+
+# 触发条件配置 (Workflow Triggers)
+on:
+  # 当代码推送到 main 分支时自动触发 GitHub Pages 部署
+  push:
+    branches:
+      - main
+  # 允许在 GitHub 项目页面的 Actions 选项卡中手动点击触发 (Manual Trigger)
+  workflow_dispatch:
+
+# 权限配置 (Permissions Configuration)
+# GitHub Pages 官方部署架构（actions/deploy-pages）所需的 OpenID Connect (OIDC) 最小权限声明
+permissions:
+  contents: read # 允许读取仓库代码与 Commit 历史
+  pages: write # 允许向 GitHub Pages 服务写入构建产物
+  id-token: write # 允许申请 OIDC JWT Token 建立安全部署鉴权通道
+
+# 并发控制 (Concurrency Control)
+# 防止短时间内多次提交触发多个 Action 任务同时部署，导致 GitHub Pages 版本覆盖冲突
+concurrency:
+  group: pages
+  cancel-in-progress: true # 当有新任务进入队列时，自动取消正在运行的旧部署任务
+
+# 任务声明 (Jobs Definition)
+jobs:
+  deploy:
+    # 绑定 GitHub Pages 部署环境，部署成功后会在 GitHub 页面右上角展示可直接访问的 URL 链接
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest # 使用 GitHub 托管的最新 Ubuntu 系统环境
+
+    steps:
+      # Step 1: 检出仓库代码
+      # 注意：以 VitePress 部署而言，fetch-depth: 0 极为关键！
+      # 设为 0 表示完整拉取 Git 提交历史，否则 VitePress 内置的 lastUpdated（页面最后更新时间）和 Git 插件会失效
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step 2: 安装 pnpm 包管理器
+      # 显式指定 v9 社区稳定大版本，确保 CI 安装表现与本地开发环境的 pnpm-lock.yaml 策略一致
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      # Step 3: 配置 Node.js 运行环境
+      # 指定 LTS 版本 Node.js 20；配置 cache: pnpm 后，GitHub 会根据 lockfile 自动维护 pnpm store 缓存，提升后续运行速度
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # Step 4: 安装项目依赖
+      # 使用 --frozen-lockfile：保证严格依据 pnpm-lock.yaml 安装，锁定所有子依赖版本，确保构建结果幂等
+      - name: 安装项目依赖
+        run: pnpm install --frozen-lockfile
+
+      # Step 5: 构建 VitePress 静态文档产物
+      # 执行 package.json 中的打包命令(通常生成在 dist 目录下)
+      - name: 构建 VitePress 文档
+        run: pnpm run build
+
+      # Step 6: 打包并上传静态资源产物
+      # 将 VitePress 编译出的 HTML/CSS/JS 静态目录打包上报给 GitHub Pages 官方部署托管服务
+      - name: 上传 GitHub Pages 构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      # Step 7: 部署到 GitHub Pages 节点
+      # 调用官方部署 Action，将上一步 uploaded 的产物真正挂载到 GitHub Pages CDN 节点
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # 关键步骤：在执行 publish 时注入 NPM_TOKEN
+      - name: 发布到 npm
+        run: pnpm publish --no-git-checks --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # 注入环境变量供 .npmrc 读取

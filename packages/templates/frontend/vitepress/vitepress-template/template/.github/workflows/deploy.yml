@@ -1,0 +1,74 @@
+# 工作流名称：显示在 GitHub Actions 部署面板中的标识
+name: Docker CI/CD Deploy
+
+# 触发条件配置 (Workflow Triggers)
+on:
+  # 监听分支推送：仅当代码合并或直接 Push 到 main 分支时触发自动构建与部署
+  push:
+    branches: [main]
+
+# 执行任务定义 (Jobs)
+jobs:
+  build-and-deploy:
+    name: Build Docker Image and Deploy # Job 显示名称
+    runs-on: ubuntu-latest # 使用 GitHub 托管的 Ubuntu 最新系统环境
+
+    steps:
+      # Step 1: 拉取源代码
+      # 使用 GitHub 官方 Checkout Action 将仓库代码拉取到 CI 运行环境中
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Step 2: 登录 Docker Hub (或私有镜像仓库)
+      # 利用安全的 GitHub Secrets 读取凭证信息并登录，确保有权限 Push 镜像
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 3: 初始化 Docker Buildx
+      # Buildx 启用 Moby/BuildKit 引擎，支持多架构构建以及高级 Dockerfile 缓存特性
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 4: 构建并推送 Docker 镜像
+      # 指定上下文环境与 Dockerfile 相对路径，生成同时带有 latest 和 Commit SHA 的镜像标签
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # 构建上下文根目录（包含项目所有代码）
+          file: ./docker/Dockerfile # 显式指定 Dockerfile 所在相对路径
+          push: true # 构建完成后自动推送至远程仓库
+          tags: | # 同时打上两个 Tag：latest 供生产消费，SHA 供追溯回归
+            ${{ secrets.DOCKER_USERNAME }}/vitepress-docs:latest
+            ${{ secrets.DOCKER_USERNAME }}/vitepress-docs:${{ github.sha }}
+
+      # Step 5: 通过 SSH 连接远程服务器并完成滚动更新
+      # 利用 Appleboy SSH Action 使用私钥直连云服务器，执行 shell 命令更新容器
+      - name: Deploy to Remote Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }} # 服务器公网 IP 或域名
+          username: ${{ secrets.SERVER_USER }} # 登录用户名 (如 root 或 ubuntu)
+          key: ${{ secrets.SERVER_SSH_KEY }} # 存放于 GitHub Secrets 中的 SSH 私钥
+          script: |
+            # 1. 在远程服务器登录 Docker 仓库 (避免拉取私有镜像失败)
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+            # 2. 从镜像仓库拉取最新的镜像产物
+            docker pull ${{ secrets.DOCKER_USERNAME }}/vitepress-docs:latest
+
+            # 3. 停止并移除旧容器 (加 || true 避免容器不存在时报错导致 CI 中断)
+            docker stop vitepress-docs-container || true
+            docker rm vitepress-docs-container || true
+
+            # 4. 启动新容器：开启后台运行 (-d)、自启动策略 (--restart always) 并映射端口 (8080 -> 80)
+            docker run -d \
+              --name vitepress-docs-container \
+              --restart always \
+              -p 8080:80 \
+              ${{ secrets.DOCKER_USERNAME }}/vitepress-docs:latest
+
+            # 5. 清理悬空/废弃的旧镜像 (Dangling Images)，释放云服务器磁盘空间
+            docker image prune -f

@@ -1,0 +1,58 @@
+# 工作流名称：展示在 GitHub Actions 页面的标识
+name: CI Check
+
+# 触发条件配置 (Workflow Triggers)
+on:
+  # 当有代码被 push 到 main 主分支时触发
+  push:
+    branches: [main]
+  # 当针对 main 主分支创建或更新 Pull Request 时触发
+  pull_request:
+    branches: [main]
+
+# 执行任务定义 (Jobs Definition)
+jobs:
+  check:
+    name: Code Verification # Job 运行阶段的显示名称
+    runs-on: ubuntu-latest # 使用 GitHub 托管的最新 Ubuntu 运行环境
+
+    steps:
+      # Step 1: 拉取源代码
+      # 使用官方 checkout action 将当前仓库代码下载到 runner 虚拟机中
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Step 2: 安装 pnpm 包管理器
+      # 显式指定大版本为 11（锁定规范），确保 CI 环境与本地开发环境（pnpm-lock.yaml）版本策略完全一致
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      # Step 3: 配置 Node.js 运行环境并开启依赖缓存
+      # 指定 LTS 版本 Node.js 20；配置 cache: pnpm 会自动根据 pnpm-lock.yaml 生成缓存，极大加快后续构建速度
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Step 4: 安装项目依赖
+      # 使用 --frozen-lockfile 标识：强制严格按照 pnpm-lock.yaml 安装，若 lockfile 被篡改或不匹配则直接抛错终止，保证绝对幂等性
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Step 5: 运行静态代码规范校验 (ESLint)
+      # 生产环境必须卡关,确保代码质量
+      - name: Lint check
+        run: pnpm run lint
+
+      # Step 6: 运行 TypeScript 类型检查
+      # 调用 tsconfig / vue-tsc 校验全局静态类型匹配
+      - name: Type check
+        run: pnpm run typecheck
+
+      # Step 7: 运行 VitePress 预编译打包测试
+      # 验证生产打包逻辑（pnpm docs:build / pnpm build），确认 Markdown / Vue 组件渲染无断裂风险，产出 VitePress dist 静态文件
+      - name: Test Build
+        run: pnpm run build

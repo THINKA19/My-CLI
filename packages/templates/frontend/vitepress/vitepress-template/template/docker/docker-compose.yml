@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  docs:
+    # 1. 构建配置：context 指定为上级目录（项目根目录），以便正确读取 package.json 和 .dockerignore
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+
+    # 2. 镜像与容器命名
+    image: my-vitepress-docs:latest
+    container_name: vitepress-docs
+
+    # 3. 端口映射 (宿主机端口:容器内端口)
+    ports:
+      - '8080:80'
+
+    # 4. 自动重启策略：除非手动停止，否则容器挂掉或 Docker 服务重启时自动重启
+    restart: unless-stopped
+
+    # ==================== 5. 进阶优化：健康检查 ====================
+    # 自动探测容器内 Nginx 服务的存活状态,配合外部 Load Balancer 或 K8s 实现服务高可用
+    healthcheck:
+      test: [CMD-SHELL, 'curl -f http://localhost/ || exit 1']
+      interval: 30s # 每 30 秒检查一次
+      timeout: 5s # 超时时间 5 秒
+      retries: 3 # 连续失败 3 次判定为 unhealthy
+      start_period: 5s # 容器启动后等待 5 秒再开始首次检查
+
+    # ==================== 6. 进阶优化：日志轮转限制 ====================
+    # 限制容器日志的大小与数量，防止长时间运行产生大量日志挤爆服务器磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m # 单个日志文件最大 10MB
+        max-file: '3' # 最多保留 3 个历史日志文件
+
+    # ==================== 7. 进阶优化：自定义网络隔离 ====================
+    # 将文档服务挂载到专属网络中，便于日后扩展同网络下的反向代理（如 Traefik 或 Nginx Proxy Manager）
+    networks:
+      - docs-network
+
+# 声明独立网络
+networks:
+  docs-network:
+    driver: bridge
