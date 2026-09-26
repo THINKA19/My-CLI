@@ -1,3 +1,12 @@
+---
+title: 自定义页面标题 - amarkdown-examples
+description: 这是该页面的 SEO 描述信息
+layout: doc
+aside: true
+outline: [2, 3]
+editLink: true
+---
+
 # Markdown Extension Examples
 
 This page demonstrates some of the built-in markdown extensions provided by VitePress.

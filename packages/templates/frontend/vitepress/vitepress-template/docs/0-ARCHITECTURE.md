@@ -129,4 +129,18 @@ src/
   }
 ```
 
+## v0.3.0(2026-09-26) 
+
+### 新增
+
+config 配置，完成基础版
+
+* 根目录 public 文件
+* .vitepress 文件夹下 config 文件 
+
+### 修改
+
+修改内容
+
+* src 文件夹下，api-examples.md 和 markdown-examples.md
 
