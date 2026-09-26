@@ -144,3 +144,19 @@ config 配置，完成基础版
 
 * src 文件夹下，api-examples.md 和 markdown-examples.md
 
+### 修复
+
+* 1、template 文件夹下 .npmignore 文件放到根目录
+* 2、package.json 文件夹下修改
+
+```js
+"files": [
+   "!template/.vitepress/cache",  // 有了.npmignore 文件，去掉
+   "!template/node_modules",     // 有了.npmignore 文件，去掉
+   "CHANGELOG.md",
+   "README.md",
+   "bin",
+   "template"
+],
+```
+

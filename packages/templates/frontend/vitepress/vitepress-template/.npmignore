@@ -1,0 +1,13 @@
+# 排除模板中的依赖、缓存和构建产物
+template/node_modules
+template/.vitepress/cache
+template/.vitepress/dist
+
+# 排除根目录自身的依赖和缓存（如果有的话）
+node_modules
+.vitepress/cache
+.vitepress/dist
+
+# 排除本地环境变量
+template/.env.local
+template/.env.*.local

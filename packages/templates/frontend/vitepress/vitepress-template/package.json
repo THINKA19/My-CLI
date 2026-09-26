@@ -30,8 +30,6 @@
     "cvt": "./bin/cli.js"
   },
   "files": [
-    "!template/.vitepress/cache",
-    "!template/node_modules",
     "CHANGELOG.md",
     "README.md",
     "bin",
