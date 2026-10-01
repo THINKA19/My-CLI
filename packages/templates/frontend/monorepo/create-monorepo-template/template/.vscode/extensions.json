@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    // 跨编辑器统一缩进、换行
+    "editorconfig.editorconfig",
+    // 实时提示 ESLint 错误，并在保存时自动修复
+    "dbaeumer.vscode-eslint",
+    // 自动格式化代码（对齐、引号、分号等），保持团队代码美观统一
+    "esbenp.prettier-vscode"
+  ]
+}

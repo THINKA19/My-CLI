@@ -23,7 +23,21 @@
 
 ### 1. 创建新 Monorepo 项目
 
+使用 `npm`
+
+```bash
+# 在新目录中创建
+npx @dengzhibo/create-monorepo-template my-monorepo
+
+# 在当前空目录中创建
+npx @dengzhibo/create-monorepo-template .
+
+# 创建后自动安装依赖
+npx @dengzhibo/create-monorepo-template my-monorepo --install
+```
+
 使用 `pnpm create`（推荐）：
 ```sh
+pnpm dlx @dengzhibo/create-monorepo-template my-monorepo
 pnpm create @dengzhibo/monorepo-template my-monorepo
 ```

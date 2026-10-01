@@ -1,0 +1,30 @@
+{
+  // 在 VSCode 全局全局搜索/文件查找（Ctrl+Shift+F）中排除特定目录与文件
+  "search.exclude": {
+    // 过滤掉所有层级的 node_modules 依赖目录
+    "**/node_modules": true,
+    // 过滤掉所有构建/打包产物目录
+    "**/dist": true,
+    // 过滤掉 Turborepo 的缓存目录
+    "**/.turbo": true,
+    // 过滤掉 pnpm 依赖锁文件
+    "pnpm-lock.yaml": true
+  },
+
+  // 禁用保存时默认的格式化操作（避免与 ESLint 保存修复产生冲突）
+  "editor.formatOnSave": false,
+
+  // 配置保存文件时自动执行的代码动作
+  "editor.codeActionsOnSave": {
+    // 保存时显式（explicit）触发 ESLint 的全局自动修复功能
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // 配置 ESLint 工作目录的识别模式
+  "eslint.workingDirectories": [
+    {
+      // 自动模式：自动识别 Monorepo 中的各个子 package 目录并作为 ESLint 工作根目录
+      "mode": "auto"
+    }
+  ]
+}

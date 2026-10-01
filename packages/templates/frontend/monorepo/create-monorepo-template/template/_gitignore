@@ -1,0 +1,51 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物与缓存（匹配任意层级，覆盖 apps/*、packages/*）
+dist/
+build/
+out/
+.turbo/
+.next/
+.nuxt/
+.output/
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# 测试
+coverage/
+.nyc_output/
+
+# 环境变量：真实文件不提交，仅保留示例
+.env
+.env.*
+!.env.example
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# 编辑器：忽略个人配置，保留团队共享的两个文件
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# AI 工具：仅忽略本地私有配置
+.claude/settings.local.json
+.claude/*.local.json
+.claude/worktrees/
+
+# 本地调试
+.yalc/
+yalc.lock

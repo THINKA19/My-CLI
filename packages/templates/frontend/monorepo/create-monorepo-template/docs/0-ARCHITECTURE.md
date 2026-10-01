@@ -55,3 +55,23 @@ package.json 文件
 * 修改三个地方的 package.json 文件
 * 根目录、packages/utils 和 apps/web
 
+## v0.1.0 (2026-10-02) 
+
+### 新增
+
+工程化基础配置
+
+* .vscode 通用性，中等偏低
+* .editorconfig 编辑器
+* .env.example 环境变量
+* .gitattributes Git相关
+* .npmrc
+* .nvmrc
+* _gitignore
+* AGENTS.md
+* README.md
+
+### 修改
+
+* apps
+* packages

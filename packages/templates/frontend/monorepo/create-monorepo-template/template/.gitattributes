@@ -1,0 +1,29 @@
+# 自动识别文本文件，提交时统一为 LF
+* text=auto eol=lf
+
+# 必须保持 LF 的脚本（CRLF 下会运行失败）
+*.sh    text eol=lf
+.husky/* text eol=lf
+
+# SVG 是文本，明确声明
+*.svg   text eol=lf
+
+# 二进制文件，禁止换行符转换与文本合并
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.avif  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.eot   binary
+*.ttf   binary
+*.otf   binary
+*.zip   binary
+*.gz    binary
+*.pdf   binary
+
+# 锁文件：GitHub diff 默认折叠，且合并冲突时不尝试自动合并
+pnpm-lock.yaml linguist-generated=true -diff
