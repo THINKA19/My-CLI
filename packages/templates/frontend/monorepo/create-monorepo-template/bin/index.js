@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url' // 引入 URL 转换工具，用于把 
 const templateDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../template')
 
 // 定义拷贝模板文件时需要跳过的文件或目录集合（Set 结构查询效率高）
-const SKIP = new Set(['node_modules', 'dist', '.npmignore', '.git', '.DS_Store'])
+const SKIP = new Set(['node_modules', 'dist', '.npmignore', '.git', '.DS_Store', 'pnpm-lock.yaml', '.turbo'])
 
 /**
  * 封装统一的错误处理并退出程序

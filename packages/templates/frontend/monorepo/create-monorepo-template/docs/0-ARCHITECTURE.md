@@ -20,16 +20,21 @@ bunx create-turbo@latest
 
 
 
-## v0.0.2 (2026-10-01) 
+## v0.0.4 (2026-10-01) 
 
 ### 新增
+
+```bahs
+node apps/web/index.js
+```
 
 * apps 应用包
 * packages 共享包
 * package.json  脚本命令
 * pnpm-workspace.yaml  开启 workspace
+* .npmignore 要放在子目录下，不是根目录
 
-## v0.0.3 (2026-10-01) 
+## v0.0.5 (2026-10-01) 
 
 ### 新增
 
