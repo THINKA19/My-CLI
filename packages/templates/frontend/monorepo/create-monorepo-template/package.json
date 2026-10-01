@@ -1,0 +1,51 @@
+{
+  "name": "@dengzhibo/create-monorepo-template",
+  "type": "module",
+  "version": "0.0.3",
+  "private": false,
+  "description": "基于 pnpm workspace + Turborepo 的全栈 Monorepo 脚手架 (集成分包、Vue 3、React、Node.js)",
+  "main": "bin/index.js",
+  "bin": {
+    "@dengzhibo/create-monorepo-template": "./bin/index.js",
+    "create-monorepo-template": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "pnpm pack --dry-run",
+    "pub": "pnpm publish"
+  },
+  "files": [
+    "bin",
+    "template",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "author": "THINKA <your-email@example.com>",
+  "license": "MIT",
+  "keywords": [
+    "monorepo",
+    "turborepo",
+    "pnpm-workspace",
+    "vue",
+    "vue3",
+    "react",
+    "node",
+    "scaffold",
+    "create"
+  ],
+  "homepage": "https://github.com/dengzhibo/create-vitepress-template#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dengzhibo/create-vitepress-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dengzhibo/create-vitepress-template/issues"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}
