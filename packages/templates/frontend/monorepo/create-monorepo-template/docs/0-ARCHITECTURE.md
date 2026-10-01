@@ -24,7 +24,8 @@ bunx create-turbo@latest
 
 ### 新增
 
-```bahs
+```js
+# 根目录下执行
 node apps/web/index.js
 ```
 
@@ -44,7 +45,13 @@ node apps/web/index.js
 
 ### 修改
 
+```js
+# apps/web 文件夹下执行
+pnpm dev
+```
+
 package.json 文件
 
 * 修改三个地方的 package.json 文件
 * 根目录、packages/utils 和 apps/web
+

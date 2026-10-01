@@ -2,8 +2,11 @@
   "name": "@repo/utils",
   "type": "module",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node -e \"const fs=require('fs'); fs.mkdirSync('dist', {recursive: true}); fs.copyFileSync('index.js', 'dist/index.js'); console.log('utils build done');\""
   }
 }
