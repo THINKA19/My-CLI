@@ -7,6 +7,10 @@ updates:
       interval: weekly
     # 同时最多打开的更新 PR 数量，避免一次性太多
     open-pull-requests-limit: 5
+    ignore:
+      # TypeScript 7 暂不被 vue-tsc 支持，先忽略大版本升级
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   # 检查 workflow 中使用的 Action 版本更新
   - package-ecosystem: github-actions

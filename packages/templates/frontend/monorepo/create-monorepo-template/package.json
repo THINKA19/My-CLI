@@ -1,7 +1,7 @@
 {
   "name": "@dengzhibo/create-monorepo-template",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "description": "基于 pnpm workspace + Turborepo 的全栈 Monorepo 脚手架 (集成分包、Vue 3、React、Node.js)",
   "main": "bin/index.js",

@@ -1,5 +1,5 @@
 {
-  // 在 VSCode 全局全局搜索/文件查找（Ctrl+Shift+F）中排除特定目录与文件
+  // 在 VSCode 全局搜索/文件查找（Ctrl+Shift+F）中排除特定目录与文件
   "search.exclude": {
     // 过滤掉所有层级的 node_modules 依赖目录
     "**/node_modules": true,
@@ -26,5 +26,9 @@
       // 自动模式：自动识别 Monorepo 中的各个子 package 目录并作为 ESLint 工作根目录
       "mode": "auto"
     }
-  ]
+  ],
+
+  // 防止代码使用 TypeScript7 版本
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true
 }

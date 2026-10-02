@@ -86,6 +86,32 @@ CICD 和 Docker
 * docker
 * _dockerignore
 
+```plain
+.github/
+├── actions/
+│   └── setup/
+│       └── action.yml    # [复合 Action] 跨 Workflow 复用的基础环境初始化配置（配置 Node.js、pnpm 及其依赖缓存）
+├── workflows/
+│   ├── ci.yml            # [持续集成] 代码提交与 PR 质量门禁（运行代码检查、类型校验、单元测试及构建验证）
+│   ├── deploy.yml        # [持续部署] 生产/预发环境自动化部署流程（如将 apps/web 部署至 Vercel、Cloudflare 或服务器）
+│   └── release.yml       # [版本发布] 自动化语义化版本发布流程（结合Changesets自动打Tag、生成Changelog及发布 npm 包）
+├── dependabot.yml        # [安全运维] GitHub 依赖自动更新配置（定时检测 package.json 及 Actions 版本并自动拉取 PR）
+└── README.md             # [文档说明] CI/CD 架构与运维指南（说明环境变量/Secrets 配置、工作流触发机制及本地调试方法）
+```
+
+```plain
+├── docker/
+│   ├── frontend/
+│   │   ├── Dockerfile          # 多阶段：dev / build / nginx 运行
+│   │   └── nginx.conf
+│   ├── backend/
+│   │   └── Dockerfile          # 多阶段：dev / 生产运行
+│   ├── compose.yml             # 公共配置
+│   ├── compose.dev.yml         # 开发覆盖
+│   ├── compose.prod.yml        # 生产覆盖
+│   └── README.md
+```
+
 ### 修改
 
 * .npmrc 文件改成 _npmrc
@@ -99,4 +125,60 @@ CICD 和 Docker
   "docker:down": "docker compose -f docker/compose.yml down"
 }
 ```
+
+## v0.3.0 (2026-10-02)
+
+> 写完后请先执行 `pnpm install && pnpm typecheck`，有报错把日志发给 AI 检查
+
+### 新增 
+
+TypeScript 
+
+* tsconfig.base.json
+* tsconfig.json
+
+```plain
+├── apps/
+│   ├── frontend/
+│   │   ├── vue/
+│   │   │   ├── tsconfig.json
+│   │   │   ├── tsconfig.app.json
+│   │   │   └── tsconfig.node.json
+│   │   │
+│   │   └── react/
+│   │       ├── tsconfig.json
+│   │       ├── tsconfig.app.json
+│   │       └── tsconfig.node.json
+│   │
+│   └── backend/
+│       ├── node/
+│       │   └── tsconfig.json
+│       │
+│       └── nest/
+│           └── tsconfig.json
+│
+├── packages/
+│   ├── ui/
+│   │   └── tsconfig.json
+│   ├── utils/
+│   │   └── tsconfig.json
+│   └── types/
+│       └── tsconfig.json
+│
+├── tsconfig.json
+├── tsconfig.base.json
+│
+├── package.json
+├── pnpm-workspace.yaml
+└── turbo.json
+```
+
+### 修改
+
+* package.json
+* pnpm-workspace.yaml
+* turbo.json
+* .github/ci.yml
+* .github/dependabot.yml
+* .vscode/settings.json
 

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    // 编译目标：Node 24 和现代浏览器都支持 ES2022
+    "target": "ES2022",
+    // 模块写法：ESM
+    "module": "ESNext",
+    // 模块解析：按打包工具（Vite）的方式解析，Node 项目会在自己的配置里覆盖
+    "moduleResolution": "Bundler",
+    // 严格模式：类型检查最严格，新项目建议一开始就开
+    "strict": true,
+    // 跳过 node_modules 里 .d.ts 的检查，提速并避免第三方类型报错
+    "skipLibCheck": true,
+    // 每个文件可独立编译，Vite / esbuild 等工具的要求
+    "isolatedModules": true,
+    // 类型导入必须写 import type，避免运行时多余的导入
+    "verbatimModuleSyntax": true,
+    // 允许 import json 文件
+    "resolveJsonModule": true,
+    // 文件名大小写必须与导入一致，避免 Windows 和 Linux 表现不同
+    "forceConsistentCasingInFileNames": true
+  }
+}

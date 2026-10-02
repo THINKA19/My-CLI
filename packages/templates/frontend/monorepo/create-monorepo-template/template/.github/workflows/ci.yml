@@ -22,5 +22,8 @@ jobs:
       - name: 准备环境
         uses: ./.github/actions/setup
 
+      - name: 类型检查
+        run: pnpm typecheck
+
       - name: 构建
         run: pnpm build
