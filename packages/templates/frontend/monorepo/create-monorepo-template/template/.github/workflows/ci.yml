@@ -1,0 +1,26 @@
+name: CI
+
+# 推送到 main 或提交 PR 时自动运行
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 同一分支有新提交时，取消还在运行的旧任务，节省时间
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 必须先检出代码，才能找到下面的本地 Action
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 准备环境
+        uses: ./.github/actions/setup
+
+      - name: 构建
+        run: pnpm build

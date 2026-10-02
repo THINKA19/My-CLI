@@ -75,3 +75,28 @@ package.json 文件
 
 * apps
 * packages
+
+## v0.2.0 (2026-10-02) 
+
+### 新增
+
+CICD 和 Docker
+
+* .github
+* docker
+* _dockerignore
+
+### 修改
+
+* .npmrc 文件改成 _npmrc
+* bin/index.js 文件修改
+* package.json
+
+```js
+"scripts": {
+  "docker:dev": "docker compose -f docker/compose.yml -f docker/compose.dev.yml up --build",
+  "docker:prod": "docker compose -f docker/compose.yml -f docker/compose.prod.yml up -d --build",
+  "docker:down": "docker compose -f docker/compose.yml down"
+}
+```
+

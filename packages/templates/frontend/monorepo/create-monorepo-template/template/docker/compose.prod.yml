@@ -1,0 +1,18 @@
+# 用法：docker compose -f docker/compose.yml -f docker/compose.prod.yml up -d --build
+services:
+  frontend:
+    build:
+      target: prod
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+  backend:
+    build:
+      target: prod
+    environment:
+      NODE_ENV: production
+    # 只在容器网络内暴露，由前端 nginx 转发，不对外发布端口
+    expose:
+      - "3000"
+    restart: unless-stopped

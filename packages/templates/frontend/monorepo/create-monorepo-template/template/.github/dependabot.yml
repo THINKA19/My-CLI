@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # 检查 package.json 里的依赖更新
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # 同时最多打开的更新 PR 数量，避免一次性太多
+    open-pull-requests-limit: 5
+
+  # 检查 workflow 中使用的 Action 版本更新
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

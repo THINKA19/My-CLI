@@ -1,0 +1,34 @@
+# 用法：docker compose -f docker/compose.yml -f docker/compose.dev.yml up --build
+services:
+  frontend:
+    build:
+      target: dev
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+      # Windows / macOS 下挂载目录的文件变化通知不可靠，启用轮询保证热更新
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      # 挂载源码，修改后热更新
+      - ..:/repo
+      # 用匿名卷"遮住"宿主机的 node_modules，使用容器内安装的依赖
+      # 新增 apps / packages 后，需要在这里补充对应路径
+      - /repo/node_modules
+      - /repo/apps/web/node_modules
+      - /repo/apps/server/node_modules
+      - /repo/packages/utils/node_modules
+
+  backend:
+    build:
+      target: dev
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ..:/repo
+      - /repo/node_modules
+      - /repo/apps/web/node_modules
+      - /repo/apps/server/node_modules
+      - /repo/packages/utils/node_modules
