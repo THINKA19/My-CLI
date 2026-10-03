@@ -160,3 +160,16 @@ config 配置，完成基础版
 ],
 ```
 
+## v0.4.0 (2026-10-03) 
+
+### 新增
+
+国际化，多语言
+
+* src 文件夹下，原有文档全部删除
+* src 文件夹下，新增 en、zh、vi 文件夹
+* .vitepress/config 文件夹下，新增 locales 和 i18n.ts 文件
+
+### 修改
+
+* vitepress 文件夹下，config.ts 和 site.ts

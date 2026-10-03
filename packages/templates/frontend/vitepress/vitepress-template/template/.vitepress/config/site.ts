@@ -38,9 +38,9 @@ export const siteConfig: UserConfig<DefaultTheme.Config> = {
 
   // ==================== 2. 路由 ====================
   cleanUrls: true,
+  // 路径重写：将根路径映射到 zh 目录，实现中文为默认语言
   rewrites: {
-    'index.md': 'api/index.md',
-    // ':path*': 'api/:path*'
+    'zh/:rest*': ':rest*'
   },
 
   // ==================== 3. 构建 ====================
