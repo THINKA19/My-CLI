@@ -173,3 +173,18 @@ config 配置，完成基础版
 ### 修改
 
 * vitepress 文件夹下，config.ts 和 site.ts
+
+## v0.5.0 (2026-10-03) 
+
+### 新增
+
+新增 Mermaid 功能
+
+* src 文件夹下，新增使用示例文档
+
+### 修改
+
+* .vitepress/config 文件夹，locales 下所有文件和 site.ts文件
+* .vitepress/theme 下所有文件
+* .vitepress 下 config.ts 文件
+

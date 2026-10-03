@@ -25,6 +25,7 @@ export const viConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       { text: 'Trang chủ', link: '/vi/' },
       { text: 'Ví dụ', link: '/vi/markdown-examples' },
       { text: 'API', link: '/vi/api-examples' },
+      { text: 'Sơ đồ Mermaid', link: '/vi/mermaid-examples' },
       { text: 'Liên kết Juejin', link: 'https://juejin.cn' },
     ],
 
@@ -34,7 +35,8 @@ export const viConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
         text: 'Ví dụ',
         items: [
           { text: 'Ví dụ Markdown', link: '/vi/markdown-examples' },
-          { text: 'Ví dụ Runtime API', link: '/vi/api-examples' }
+          { text: 'Ví dụ Runtime API', link: '/vi/api-examples' },
+          { text: 'Ví dụ Sơ đồ Mermaid', link: '/vi/mermaid-examples' }
         ]
       }
     ],

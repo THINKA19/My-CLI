@@ -25,6 +25,7 @@ export const zhConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       { text: '首页', link: '/' },
       { text: '示例', link: '/markdown-examples' },
       { text: 'API', link: '/api-examples' },
+      { text: 'Mermaid 图表', link: '/mermaid-examples' },
       { text: '掘金链接', link: 'https://juejin.cn' },
     ],
 
@@ -34,7 +35,8 @@ export const zhConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
         text: '示例',
         items: [
           { text: 'Markdown 示例', link: '/markdown-examples' },
-          { text: 'Runtime API 示例', link: '/api-examples' }
+          { text: 'Runtime API 示例', link: '/api-examples' },
+          { text: 'Mermaid 图表示例', link: '/mermaid-examples' }
         ]
       }
     ],

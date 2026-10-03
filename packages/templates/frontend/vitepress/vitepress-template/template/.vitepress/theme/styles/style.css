@@ -137,3 +137,24 @@
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 
+
+/* Mermaid 图表样式 */
+.mermaid-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: var(--vp-code-block-bg);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.mermaid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}

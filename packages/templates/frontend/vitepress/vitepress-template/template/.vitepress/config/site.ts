@@ -71,8 +71,13 @@ export const siteConfig: UserConfig<DefaultTheme.Config> = {
   * - publicDir：指定静态资源public文件夹的位置
   * - 当前srcDir是 ./src，配置文件运行时的基准目录在 src/.vitepress
   * - public目录里面放置logo、图片等不需要编译、直接原样输出的静态资源
+  * - optimizeDeps: 优化 Mermaid 依赖
   */
   vite: {
-    publicDir: '../public'
+    publicDir: '../public',
+    // 修复 Mermaid 模块导入问题
+    optimizeDeps: {
+      include: ['mermaid'],
+    },
   },
 }

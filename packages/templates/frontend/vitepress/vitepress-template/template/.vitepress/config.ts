@@ -6,6 +6,7 @@
  * 以确保配置文件的单一职责 (SRP) 与高度可维护性。
  * 
  * 【国际化支持】：支持中文、英文、越南语三种语言
+ * 【Mermaid 支持】：支持在 Markdown 中绘制流程图、时序图等图表
  */
 
 import { defineConfig } from 'vitepress'
@@ -39,6 +40,7 @@ import { viConfig } from './config/locales/vi'
  * - 顶层属性 (Site-level Specs): 影响站点构建、HTML 生成与 SSR 行为。
  * - locales (i18n): 多语言配置，每个语言有独立的站点与主题配置。
  * - themeConfig (Theme-level Specs): 作用于 VitePress 默认主题 (Default Theme) 的渲染层。
+ * - markdown: 配置 Markdown 解析器，支持 Mermaid 等扩展。
  */
 export default defineConfig({
   // 站点基础信息
@@ -75,5 +77,24 @@ export default defineConfig({
   themeConfig: {
     // 本地搜索配置
     search: searchConfig
+  },
+
+  // Markdown 配置
+  markdown: {
+    // 配置 Mermaid 支持
+    config: (md) => {
+      // Mermaid 代码块将被包装在特殊的容器中，供前端渲染
+      const fence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (...args) => {
+        const [tokens, idx] = args
+        const token = tokens[idx]
+        const lang = token.info.trim()
+        
+        if (lang === 'mermaid') {
+          return `<div class="mermaid-container"><pre class="mermaid">${md.utils.escapeHtml(token.content)}</pre></div>`
+        }
+        return fence(...args)
+      }
+    }
   }
 })

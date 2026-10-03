@@ -25,6 +25,7 @@ export const enConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       { text: 'Home', link: '/en/' },
       { text: 'Examples', link: '/en/markdown-examples' },
       { text: 'API', link: '/en/api-examples' },
+      { text: 'Mermaid Diagrams', link: '/en/mermaid-examples' },
       { text: 'Juejin Link', link: 'https://juejin.cn' },
     ],
 
@@ -34,7 +35,8 @@ export const enConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
         text: 'Examples',
         items: [
           { text: 'Markdown Examples', link: '/en/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/en/api-examples' }
+          { text: 'Runtime API Examples', link: '/en/api-examples' },
+          { text: 'Mermaid Diagram Examples', link: '/en/mermaid-examples' }
         ]
       }
     ],
