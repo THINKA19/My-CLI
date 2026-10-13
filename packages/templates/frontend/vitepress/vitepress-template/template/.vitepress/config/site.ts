@@ -3,7 +3,7 @@ import type { DefaultTheme, UserConfig } from 'vitepress'
 /** 站点部署的基准路径 (Base URL) */
 const VITE_BASE = (import.meta.env?.VITE_BASE as string) || '/'
 /** 站点生产环境完整域名 (用于 RSS、Sitemap 生成) */
-const VITE_SITE_URL = (import.meta.env.VITE_SITE_URL as string)
+const VITE_SITE_URL = (import.meta.env?.VITE_SITE_URL as string)
 
 /**
  * 站点配置

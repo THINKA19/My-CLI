@@ -1,7 +1,7 @@
 import type { HeadConfig } from 'vitepress'
 
 /** 生产环境域名，用于拼接绝对路径 (避免社交分享图片失效) */
-const VITE_SITE_URL = (import.meta.env?.VITE_VITE_SITE_URL as string)
+const VITE_SITE_URL = (import.meta.env?.VITE_SITE_URL as string)
 
 /**
  * SEO 与 HTML <head> 头部标签配置
