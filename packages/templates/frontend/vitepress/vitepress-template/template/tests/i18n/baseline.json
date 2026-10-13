@@ -1,0 +1,185 @@
+{
+  "zh": {
+    "title": "我的文档站点",
+    "titleTemplate": "自定义标题后缀",
+    "description": "基于 VitePress 的项目文档",
+    "lang": "zh-CN",
+    "themeConfig": {
+      "logo": "/logo.svg",
+      "siteTitle": "自定义导航栏标题",
+      "nav": [
+        {
+          "text": "首页",
+          "link": "/zh/"
+        }
+      ],
+      "sidebar": [],
+      "outline": {
+        "level": [
+          2,
+          5
+        ],
+        "label": "本页目录"
+      },
+      "socialLinks": [
+        {
+          "icon": "github",
+          "link": "https://github.com/your-username/your-repo"
+        }
+      ],
+      "footer": {
+        "message": "基于 MIT 许可协议发布",
+        "copyright": "Copyright © 2024-present 您的名字"
+      },
+      "editLink": {
+        "pattern": "https://github.com/your-username/your-repo/edit/main/src/:path",
+        "text": "在 GitHub 上编辑此页"
+      },
+      "lastUpdated": {
+        "text": "最后更新于",
+        "formatOptions": {
+          "dateStyle": "short",
+          "timeStyle": "medium"
+        }
+      },
+      "docFooter": {
+        "prev": "上一页",
+        "next": "下一页"
+      },
+      "darkModeSwitchLabel": "外观",
+      "lightModeSwitchTitle": "切换到浅色模式",
+      "darkModeSwitchTitle": "切换到深色模式",
+      "sidebarMenuLabel": "菜单",
+      "returnToTopLabel": "回到顶部",
+      "externalLinkIcon": true,
+      "notFound": {
+        "title": "页面未找到",
+        "quote": "看似你来到了一个未知的荒野...",
+        "linkLabel": "返回首页",
+        "linkText": "带我回家"
+      }
+    }
+  },
+  "en": {
+    "title": "My Documentation Site",
+    "titleTemplate": "Custom Title Suffix",
+    "description": "Project documentation based on VitePress",
+    "lang": "en-US",
+    "themeConfig": {
+      "logo": "/logo.svg",
+      "siteTitle": "Custom Navigation Title",
+      "nav": [
+        {
+          "text": "Home",
+          "link": "/en/"
+        }
+      ],
+      "sidebar": [],
+      "outline": {
+        "level": [
+          2,
+          5
+        ],
+        "label": "On this page"
+      },
+      "socialLinks": [
+        {
+          "icon": "github",
+          "link": "https://github.com/your-username/your-repo"
+        }
+      ],
+      "footer": {
+        "message": "Released under the MIT License",
+        "copyright": "Copyright © 2024-present Your Name"
+      },
+      "editLink": {
+        "pattern": "https://github.com/your-username/your-repo/edit/main/src/:path",
+        "text": "Edit this page on GitHub"
+      },
+      "lastUpdated": {
+        "text": "Last updated",
+        "formatOptions": {
+          "dateStyle": "short",
+          "timeStyle": "medium"
+        }
+      },
+      "docFooter": {
+        "prev": "Previous",
+        "next": "Next"
+      },
+      "darkModeSwitchLabel": "Appearance",
+      "lightModeSwitchTitle": "Switch to light mode",
+      "darkModeSwitchTitle": "Switch to dark mode",
+      "sidebarMenuLabel": "Menu",
+      "returnToTopLabel": "Return to top",
+      "externalLinkIcon": true,
+      "notFound": {
+        "title": "Page Not Found",
+        "quote": "It seems you have arrived in an unknown wilderness...",
+        "linkLabel": "Go to home",
+        "linkText": "Take me home"
+      }
+    }
+  },
+  "vi": {
+    "title": "Trang Tài liệu của Tôi",
+    "titleTemplate": "Hậu tố Tiêu đề Tùy chỉnh",
+    "description": "Tài liệu dự án dựa trên VitePress",
+    "lang": "vi-VN",
+    "themeConfig": {
+      "logo": "/logo.svg",
+      "siteTitle": "Tiêu đề Điều hướng Tùy chỉnh",
+      "nav": [
+        {
+          "text": "Trang chủ",
+          "link": "/vi/"
+        }
+      ],
+      "sidebar": [],
+      "outline": {
+        "level": [
+          2,
+          5
+        ],
+        "label": "Trên trang này"
+      },
+      "socialLinks": [
+        {
+          "icon": "github",
+          "link": "https://github.com/your-username/your-repo"
+        }
+      ],
+      "footer": {
+        "message": "Được phát hành theo Giấy phép MIT",
+        "copyright": "Bản quyền © 2024-present Tên của bạn"
+      },
+      "editLink": {
+        "pattern": "https://github.com/your-username/your-repo/edit/main/src/:path",
+        "text": "Chỉnh sửa trang này trên GitHub"
+      },
+      "lastUpdated": {
+        "text": "Cập nhật lần cuối",
+        "formatOptions": {
+          "dateStyle": "short",
+          "timeStyle": "medium"
+        }
+      },
+      "docFooter": {
+        "prev": "Trang trước",
+        "next": "Trang tiếp theo"
+      },
+      "darkModeSwitchLabel": "Giao diện",
+      "lightModeSwitchTitle": "Chuyển sang chế độ sáng",
+      "darkModeSwitchTitle": "Chuyển sang chế độ tối",
+      "sidebarMenuLabel": "Menu",
+      "returnToTopLabel": "Quay lại đầu trang",
+      "externalLinkIcon": true,
+      "notFound": {
+        "title": "Không tìm thấy trang",
+        "quote": "Có vẻ như bạn đã đến một vùng đất hoang dã chưa được biết đến...",
+        "linkLabel": "Về trang chủ",
+        "linkText": "Đưa tôi về nhà"
+      }
+    }
+  }
+}

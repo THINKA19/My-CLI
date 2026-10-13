@@ -1,25 +1,30 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
-
+title: 多语言文档站点
 hero:
-  name: "我的优秀项目"
-  text: "VitePress 站点"
-  tagline: 我的精彩项目标语
+  name: 多语言文档站点
+  text: 按分类浏览文档与扩展示例
   actions:
     - theme: brand
-      text: Markdown 示例
-      link: /markdown-examples
-    - theme: alt
-      text: API 示例
-      link: /api-examples
-
+      text: 开始阅读
+      link: /zh/getting-started/page-01
 features:
-  - title: 功能 A
-    details: 这是功能 A 的描述信息
-  - title: 功能 B
-    details: 这是功能 B 的描述信息
-  - title: 功能 C
-    details: 这是功能 C 的描述信息
+  - title: 入门
+    details: 浏览本分类的文档与菜单示例
+    link: /zh/getting-started/page-01
+  - title: 配置
+    details: 浏览本分类的文档与菜单示例
+    link: /zh/configuration/page-01
+  - title: 开发
+    details: 浏览本分类的文档与菜单示例
+    link: /zh/development/page-01
+  - title: 部署
+    details: 浏览本分类的文档与菜单示例
+    link: /zh/deployment/page-01
+  - title: 集成
+    details: 浏览本分类的文档与菜单示例
+    link: /zh/integrations/page-01
+  - title: 参考
+    details: 浏览本分类的文档与菜单示例
+    link: /zh/reference/page-01
 ---
-

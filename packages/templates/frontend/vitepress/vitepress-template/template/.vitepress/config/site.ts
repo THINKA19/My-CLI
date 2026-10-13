@@ -1,66 +1,38 @@
 import type { DefaultTheme, UserConfig } from 'vitepress'
+import { fileURLToPath } from 'node:url'
+import { loadEnv } from 'vite'
 
-/** 站点部署的基准路径 (Base URL) */
-const VITE_BASE = (import.meta.env?.VITE_BASE as string) || '/'
-/** 站点生产环境完整域名 (用于 RSS、Sitemap 生成) */
-const VITE_SITE_URL = (import.meta.env?.VITE_SITE_URL as string)
+const env = loadEnv(process.env.NODE_ENV === 'production' ? 'production' : 'development', fileURLToPath(new URL('../../', import.meta.url)), 'VITE_')
+const base = env.VITE_BASE || '/'
+if (!base.startsWith('/') || !base.endsWith('/'))
+  throw new Error('VITE_BASE 必须以 / 开头和结尾')
 
-/**
- * 站点配置
- */
-export const siteConfig: UserConfig<DefaultTheme.Config> = {
-  // ==================== 1. 站点元数据 ====================
-  title: '我的文档站点',
-  titleTemplate: "自定义标题后缀",
-  description: '基于 VitePress 的项目文档',
-  lang: 'zh-CN',
-  /** 
-   * 站点部署的基准路径 (Base URL)
-   * - 部署在根域名 (https://example.com/) 时设为 '/'
-   * - 部署在 GitHub Pages 或子路径 (https://example.com/docs/) 时设为 '/docs/'
-   * - 建议：生产环境可通过 import.meta.env.VITE_BASE 动态读取
-   */
-  base: VITE_BASE,
+export function resolveSiteUrl(value: string, basePath: string): string {
+  const url = new URL(value)
+  if (!['http:', 'https:'].includes(url.protocol))
+    throw new Error('VITE_SITE_URL 必须是 HTTP(S) 地址')
+  const pathname = url.pathname.replace(/\/$/, '')
+  if (pathname && pathname !== basePath.replace(/\/$/, ''))
+    throw new Error('VITE_SITE_URL 的子路径必须与 VITE_BASE 一致')
+  url.pathname = basePath
+  url.search = ''
+  url.hash = ''
+  return url.href
+}
 
-  // ==================== 2. 路由 ====================
+export const siteUrl = resolveSiteUrl(env.VITE_SITE_URL || 'http://localhost:5173', base)
+
+export const siteConfig = {
+  base,
   cleanUrls: true,
-  // 路径重写：将根路径映射到 zh 目录，实现中文为默认语言
-  rewrites: {
-    'zh/:rest*': ':rest*'
-  },
-
-  // ==================== 3. 构建 ====================
   srcDir: './src',
   outDir: './dist',
-  ignoreDeadLinks: [
-    /^https?:\/\/localhost/
-  ],
-
-
-  // ==================== 4. 主题 ====================
+  ignoreDeadLinks: [/^https?:\/\/localhost/],
   appearance: true,
   lastUpdated: true,
-
-  // ==================== 5. 构建钩子 ====================
-  /**
-   * 自动生成 sitemap.xml 供搜索引擎抓取 (SEO 核心配置)
-   * - 替换为你的真实线上域名
-   */
-  sitemap: {
-    hostname: VITE_SITE_URL
-  },
-  /**
-  * Vite底层配置，VitePress是基于Vite构建，这里直接透传Vite配置项
-  * - publicDir：指定静态资源public文件夹的位置
-  * - 当前srcDir是 ./src，配置文件运行时的基准目录在 src/.vitepress
-  * - public目录里面放置logo、图片等不需要编译、直接原样输出的静态资源
-  * - optimizeDeps: 优化 Mermaid 依赖
-  */
+  sitemap: { hostname: siteUrl },
   vite: {
     publicDir: '../public',
-    // 修复 Mermaid 模块导入问题
-    optimizeDeps: {
-      include: ['mermaid'],
-    },
+    optimizeDeps: { include: ['mermaid'] },
   },
-}
+} satisfies UserConfig<DefaultTheme.Config>

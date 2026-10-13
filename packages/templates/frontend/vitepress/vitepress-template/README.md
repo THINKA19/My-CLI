@@ -4,23 +4,6 @@
 >
 > 基于 VitePress 的开箱即用个人知识库/文档脚手架。
 
-## 快速开始
-
-* 使用 npx 直接运行（推荐）
-
-```bash
-npx @dengzhibo/create-vitepress-template my-doc
-```
-
-* 或全局安装使用
-
-```Bash
-pnpm add -g @dengzhibo/create-vitepress-template
-create-vitepress-template my-doc
-```
-
-
-
 ## 发布四部曲
 
 * 步骤1：登录
@@ -45,4 +28,21 @@ pnpm whoami --registry=https://registry.npmjs.org/
 
 ```bash
 pnpm publish --access public
+```
+
+ 
+
+## 快速开始
+
+* 使用 npx 直接运行（推荐）
+
+```bash
+npx @dengzhibo/create-vitepress-template my-doc
+```
+
+* 或全局安装使用
+
+```Bash
+pnpm add -g @dengzhibo/create-vitepress-template
+create-vitepress-template my-doc
 ```

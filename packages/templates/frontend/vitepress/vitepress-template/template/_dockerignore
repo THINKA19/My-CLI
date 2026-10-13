@@ -12,6 +12,7 @@ dist
 .gitignore
 .github
 .gitee
+.vercel
 
 # ==================== 3. IDE、编辑器与系统临时文件 ====================
 .vscode
@@ -54,7 +55,9 @@ __tests__
 .env.example
 
 # ==================== 7. Docker 相关文件 (避免嵌套) ====================
-docker
+# nginx.conf 必须进入构建上下文。
+docker/*
+!docker/nginx.conf
 Dockerfile
 docker-compose*.yml
 .dockerignore

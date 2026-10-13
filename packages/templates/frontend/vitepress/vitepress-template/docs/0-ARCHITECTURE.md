@@ -204,3 +204,6 @@ v0.6.0不可用，修正它的错误
 * .vitepress/config 文件夹下 seo.ts 文件
 * .vitepress/config 文件夹下 site.ts 文件
 
+## v0.6.2 (2026-10-13) 
+
+* 架构大调整

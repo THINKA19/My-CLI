@@ -1,11 +1,7 @@
-import type { DefaultTheme } from 'vitepress'
+import type { SidebarSection } from '../i18n/types'
+import { demoSections } from './demo'
 
-export const sidebarConfig: DefaultTheme.Sidebar = [
-  {
-    text: 'Examples',
-    items: [
-      { text: 'Markdown Examples', link: '/markdown-examples' },
-      { text: 'Runtime API Examples', link: '/api-examples' }
-    ]
-  }
-]
+// 各分类独立匹配侧边栏，首页不显示文档菜单。
+export const sidebarSections = [
+  ...demoSections,
+] as const satisfies readonly SidebarSection[]

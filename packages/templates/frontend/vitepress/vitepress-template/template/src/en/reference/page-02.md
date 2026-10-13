@@ -1,0 +1,15 @@
+---
+title: Reference · Fields
+description: Reference · Fields
+---
+
+# Reference · Fields
+
+This is a manual expansion example. Menu structure is shared; each language uses the same keys.
+
+## Configuration {#details}
+
+- `.vitepress/config/sidebar/demo/reference.ts`
+- `.vitepress/config/locales/en/sidebar/demo/reference.ts`
+
+[Home](../index.md)

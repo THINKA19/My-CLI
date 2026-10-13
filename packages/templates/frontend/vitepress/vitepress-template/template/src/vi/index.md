@@ -1,24 +1,30 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
-
+title: Tài liệu đa ngôn ngữ
 hero:
-  name: "Dự án Tuyệt vời của Tôi"
-  text: "Trang VitePress"
-  tagline: Khẩu hiệu dự án tuyệt vời của tôi
+  name: Tài liệu đa ngôn ngữ
+  text: Duyệt tài liệu và ví dụ mở rộng theo nhóm
   actions:
     - theme: brand
-      text: Ví dụ Markdown
-      link: /vi/markdown-examples
-    - theme: alt
-      text: Ví dụ API
-      link: /vi/api-examples
-
+      text: Bắt đầu
+      link: /vi/getting-started/page-01
 features:
-  - title: Tính năng A
-    details: Đây là mô tả cho tính năng A
-  - title: Tính năng B
-    details: Đây là mô tả cho tính năng B
-  - title: Tính năng C
-    details: Đây là mô tả cho tính năng C
+  - title: Bắt đầu
+    details: Xem tài liệu và ví dụ menu trong nhóm này
+    link: /vi/getting-started/page-01
+  - title: Cấu hình
+    details: Xem tài liệu và ví dụ menu trong nhóm này
+    link: /vi/configuration/page-01
+  - title: Phát triển
+    details: Xem tài liệu và ví dụ menu trong nhóm này
+    link: /vi/development/page-01
+  - title: Triển khai
+    details: Xem tài liệu và ví dụ menu trong nhóm này
+    link: /vi/deployment/page-01
+  - title: Tích hợp
+    details: Xem tài liệu và ví dụ menu trong nhóm này
+    link: /vi/integrations/page-01
+  - title: Tham khảo
+    details: Xem tài liệu và ví dụ menu trong nhóm này
+    link: /vi/reference/page-01
 ---
