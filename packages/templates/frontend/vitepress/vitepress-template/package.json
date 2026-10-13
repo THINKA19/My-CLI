@@ -1,15 +1,15 @@
 {
   "name": "@dengzhibo/create-vitepress-template",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": false,
   "description": "基于 VitePress 的开箱即用文档脚手架",
   "bin": {
-    "create-vitepress-template": "./bin/cli.js",
-    "cvt": "./bin/cli.js"
+    "create-vitepress-template": "./bin/index.js"
   },
   "scripts": {
     "test": "pnpm pack --dry-run",
+    "help": "node bin/index.js --help",
     "pub": "pnpm publish"
   },
   "files": [
@@ -32,15 +32,15 @@
     "template",
     "documentation"
   ],
-  "homepage": "https://github.com/dengzhibo/create-vitepress-template#readme",
+  "homepage": "https://github.com/THINKA19/My-CLI/tree/main/packages/templates/frontend/vitepress/vitepress-template#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dengzhibo/create-vitepress-template.git"
+    "url": "https://github.com/THINKA19/My-CLI/tree/main/packages/templates/frontend/vitepress/vitepress-template"
   },
   "bugs": {
-    "url": "https://github.com/dengzhibo/create-vitepress-template/issues"
+    "url": "https://github.com/THINKA19/My-CLI/tree/main/packages/templates/frontend/vitepress/vitepress-template/issues"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

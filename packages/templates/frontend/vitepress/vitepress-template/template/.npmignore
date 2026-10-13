@@ -1,0 +1,18 @@
+# 1. 递归排除模板内所有层级的依赖、缓存与构建产物（支持 Monorepo 子包）
+**/node_modules
+**/node_modules/**
+**/.pnpm
+**/.pnpm/**
+**/dist
+**/dist/**
+**/.turbo
+**/.turbo/**
+
+# 2. 排除本地环境变量文件
+**/.env.local
+**/.env.*.local
+
+# 3. 排除 lock 文件（脚手架模板保持干净，由用户初始化后自行 install 生成）
+**/pnpm-lock.yaml
+**/yarn.lock
+**/package-lock.json

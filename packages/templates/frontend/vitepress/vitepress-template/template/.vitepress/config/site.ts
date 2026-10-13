@@ -3,7 +3,7 @@ import type { DefaultTheme, UserConfig } from 'vitepress'
 /** 站点部署的基准路径 (Base URL) */
 const VITE_BASE = (import.meta.env?.VITE_BASE as string) || '/'
 /** 站点生产环境完整域名 (用于 RSS、Sitemap 生成) */
-const VITE_SITE_URL = (import.meta.env?.VITE_SITE_URL as string)
+const VITE_SITE_URL = (import.meta.env.VITE_SITE_URL as string)
 
 /**
  * 站点配置
@@ -13,20 +13,6 @@ export const siteConfig: UserConfig<DefaultTheme.Config> = {
   title: '我的文档站点',
   titleTemplate: "自定义标题后缀",
   description: '基于 VitePress 的项目文档',
-  head: [
-    [
-      'link',
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' }
-    ],
-    [
-      'link',
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
-    ],
-    [
-      'link',
-      { href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap', rel: 'stylesheet' }
-    ]
-  ],
   lang: 'zh-CN',
   /** 
    * 站点部署的基准路径 (Base URL)
@@ -45,10 +31,7 @@ export const siteConfig: UserConfig<DefaultTheme.Config> = {
 
   // ==================== 3. 构建 ====================
   srcDir: './src',
-  srcExclude: ['**/README.md', '**/TODO.md'],
   outDir: './dist',
-  assetsDir: 'static',
-  // cacheDir: './.vitepress/.vite',
   ignoreDeadLinks: [
     /^https?:\/\/localhost/
   ],
