@@ -7,6 +7,10 @@
 **/dist/**
 **/.turbo
 **/.turbo/**
+**/.vitepress/cache
+**/.vitepress/cache/**
+**/.vitepress/.temp
+**/.vitepress/.temp/**
 
 # 2. 排除本地环境变量文件
 **/.env.local
