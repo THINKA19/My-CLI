@@ -1,4 +1,4 @@
-import type { SeoText } from '../../i18n/types'
+import type { SeoText } from '#config/i18n/types'
 
 export const seoConfig = {
   author: '您的名字',

@@ -1,9 +1,9 @@
-import type { LocaleText } from '../../i18n/types'
-import { nav } from './nav'
-import { search } from './search'
-import { seoConfig as seo } from './seo'
-import { sidebar } from './sidebar'
-import { siteConfig as site } from './site'
-import { themeConfig as theme } from './theme'
+import type { LocaleText } from '#config/i18n/types'
+import { nav } from '#config/locales/en/nav/index'
+import { search } from './search.ts'
+import { seoConfig as seo } from './seo.ts'
+import { sidebar } from '#config/locales/en/sidebar/index'
+import { siteConfig as site } from './site.ts'
+import { themeConfig as theme } from './theme.ts'
 
 export const en = { site, theme, seo, nav, sidebar, search } satisfies LocaleText

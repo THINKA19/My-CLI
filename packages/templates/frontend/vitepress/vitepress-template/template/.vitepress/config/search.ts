@@ -1,9 +1,9 @@
 import type { DefaultTheme } from 'vitepress'
-import type { Language, SearchText } from './i18n/types'
-import { languages } from './i18n/registry'
-import { search as en } from './locales/en/search'
-import { search as vi } from './locales/vi/search'
-import { search as zh } from './locales/zh/search'
+import type { Language, SearchText } from '#config/i18n/types'
+import { languages } from '#config/i18n/registry'
+import { search as en } from '#config/locales/en/search'
+import { search as vi } from '#config/locales/vi/search'
+import { search as zh } from '#config/locales/zh/search'
 
 const translations = { zh, en, vi } satisfies Record<Language, SearchText>
 

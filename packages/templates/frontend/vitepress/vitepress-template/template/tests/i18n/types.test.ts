@@ -1,4 +1,4 @@
-import type { MenuNode, MenuText } from '../../.vitepress/config/i18n/types'
+import type { MenuNode, MenuText } from '#config/i18n/types'
 import './entry'
 
 // 嵌套 key 必须保留字面量类型；每种语言使用同一个契约。

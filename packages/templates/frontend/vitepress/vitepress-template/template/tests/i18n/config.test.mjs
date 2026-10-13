@@ -163,7 +163,7 @@ it('示例使用真实且简短的文件，各语言都有六十篇分类页面'
     assert.ok(pages.every(file => fs.readFileSync(file, 'utf8').trimEnd().split('\n').length <= 20))
   }
   for (const category of ['nav', 'sidebar']) {
-    const files = collect(path.join(root, '.vitepress/config', category, 'demo')).filter(file => file.endsWith('.ts'))
+    const files = collect(path.join(root, '.vitepress/config', category)).filter(file => file.endsWith('.ts'))
     assert.equal(files.length, 7)
     assert.ok(files.every(file => fs.readFileSync(file, 'utf8').trimEnd().split('\n').length <= 50))
   }

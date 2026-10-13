@@ -10,7 +10,7 @@
     "preview": "vitepress preview",
     "preinstall": "npx only-allow pnpm",
     "typecheck": "vue-tsc --noEmit",
-    "test:i18n": "node node_modules/typescript/bin/tsc --noEmit --skipLibCheck --target ES2022 --module ESNext --moduleResolution bundler --types node,vite/client tests/i18n/types.test.ts && node --test tests/i18n/config.test.mjs",
+    "test:i18n": "node node_modules/typescript/bin/tsc --noEmit -p tests/i18n/tsconfig.json && node --test tests/i18n/config.test.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepare": "husky"
@@ -41,5 +41,8 @@
       "version": "^11.22.0",
       "onFail": "download"
     }
+  },
+  "imports": {
+    "#config/*": "./.vitepress/config/*.ts"
   }
 }

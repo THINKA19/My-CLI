@@ -1,4 +1,4 @@
-import type { SiteText } from '../../i18n/types'
+import type { SiteText } from '#config/i18n/types'
 
 export const siteConfig = {
   title: 'My Documentation Site',

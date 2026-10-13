@@ -1,4 +1,4 @@
-import type { ThemeText } from '../../i18n/types'
+import type { ThemeText } from '#config/i18n/types'
 
 export const themeConfig = {
   siteTitle: '自定义导航栏标题',

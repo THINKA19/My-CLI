@@ -1,5 +1,5 @@
 import type { DefaultTheme } from 'vitepress'
-import type { LinkTarget, MenuNode, SidebarMap, SidebarSection } from './types'
+import type { LinkTarget, MenuNode, SidebarMap, SidebarSection } from './types.ts'
 
 type TextKeys<Text> = Text extends Record<string, string> ? keyof Text : never
 

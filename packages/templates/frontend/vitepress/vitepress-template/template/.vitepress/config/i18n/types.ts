@@ -1,5 +1,5 @@
 import type { DefaultTheme } from 'vitepress'
-import type { languages } from './registry'
+import type { languages } from './registry.ts'
 
 export type Language = keyof typeof languages
 

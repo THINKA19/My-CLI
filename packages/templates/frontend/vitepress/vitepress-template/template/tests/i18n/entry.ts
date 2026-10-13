@@ -1,11 +1,11 @@
+import { localesConfig, localeTexts } from '#config/i18n/index'
+import { mergeText, resolveLink, resolveNav, resolveSidebar, resolveSidebars, resolveText } from '#config/i18n/resolve'
+import { validateConfig, validateMenu } from '#config/i18n/validate'
+import { navStructure } from '#config/nav/index'
+import { pageUrl } from '#config/seo'
+import { sidebarSections } from '#config/sidebar/index'
+import { resolveSiteUrl } from '#config/site'
 import config from '../../.vitepress/config'
-import { localesConfig, localeTexts } from '../../.vitepress/config/i18n'
-import { mergeText, resolveLink, resolveNav, resolveSidebar, resolveSidebars, resolveText } from '../../.vitepress/config/i18n/resolve'
-import { validateConfig, validateMenu } from '../../.vitepress/config/i18n/validate'
-import { navStructure } from '../../.vitepress/config/nav'
-import { pageUrl } from '../../.vitepress/config/seo'
-import { sidebarSections } from '../../.vitepress/config/sidebar'
-import { resolveSiteUrl } from '../../.vitepress/config/site'
 
 export default {
   pageUrl,

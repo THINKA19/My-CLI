@@ -1,6 +1,6 @@
 import type { HeadConfig, TransformContext } from 'vitepress'
-import { languages } from './i18n/registry'
-import { siteConfig, siteUrl } from './site'
+import { languages } from '#config/i18n/registry'
+import { siteConfig, siteUrl } from './site.ts'
 
 export const seoConfig: HeadConfig[] = [
   ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1.0' }],

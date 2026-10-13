@@ -1,4 +1,4 @@
-import type { SearchText } from '../../i18n/types'
+import type { SearchText } from '#config/i18n/types'
 
 export const search = {
   button: {

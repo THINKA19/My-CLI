@@ -1,8 +1,8 @@
-import type { Language, LocaleText, MenuNode, SidebarSection } from './types'
+import type { Language, LocaleText, MenuNode, SidebarSection } from './types.ts'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { languages } from './registry'
+import { languages } from './registry.ts'
 
 const srcDir = fileURLToPath(new URL('../../../src/', import.meta.url))
 
