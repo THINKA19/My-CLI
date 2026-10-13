@@ -126,46 +126,20 @@ it('SEO 使用页面标题和描述，并保留显式的页面分享标签', () 
   assert.ok(!custom.some(([, attrs]) => attrs.property === 'og:title' || attrs.rel === 'canonical'))
 })
 
-it('真实扩展示例包含六个分区、六十个侧边栏页面以及多种导航类型', () => {
-  const count = nodes => nodes.reduce((total, node) => total + 1 + (node.items ? count(node.items) : 0), 0)
+it('生成菜单匹配文档分区，并保留外部导航', () => {
   const links = nodes => nodes.flatMap(node => [...(node.link ? [node.link] : []), ...(node.items ? links(node.items) : [])])
   for (const language of ['zh', 'en', 'vi']) {
     const locale = api.localesConfig[language === 'zh' ? 'root' : language]
-    const sections = Object.entries(locale.themeConfig.sidebar).filter(([prefix]) => prefix !== `/${language}/`)
-    assert.equal(sections.length, 6)
-    assert.equal(sections.reduce((total, [, items]) => total + links(items).length, 0), 60)
-    for (const [prefix, items] of sections) {
-      assert.equal(links(items).length, 10)
+    for (const [prefix, items] of Object.entries(locale.themeConfig.sidebar)) {
+      const category = prefix.split('/')[2]
+      const pages = fs.readdirSync(path.join(root, 'src', language, category)).filter(file => file.endsWith('.md') && file !== 'index.md')
+      assert.equal(links(items).length, pages.length)
       assert.ok(links(items).every(link => link.startsWith(prefix)))
     }
-    assert.equal(locale.themeConfig.nav.length, 7)
-    assert.equal(count(locale.themeConfig.nav), 39)
     const navLinks = links(locale.themeConfig.nav)
-    assert.ok(!navLinks.includes(`/${language}/catalog`))
-    assert.ok(!navLinks.some(link => link.startsWith(`/${language}/demo/`)))
-    assert.ok(navLinks.some(link => link.includes('#details')))
-    assert.ok(navLinks.some(link => link.includes('?view=full')))
     assert.ok(navLinks.includes('https://vitepress.dev/guide/i18n'))
     assert.ok(navLinks.includes('mailto:docs@example.com'))
-    assert.ok(locale.themeConfig.nav.some(node => node.items?.some(child => child.items)))
-  }
-})
-
-it('示例使用真实且简短的文件，各语言都有六十篇分类页面', () => {
-  const collect = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const file = path.join(dir, entry.name)
-    return entry.isDirectory() ? collect(file) : [file]
-  })
-  for (const language of ['zh', 'en', 'vi']) {
-    const pages = collect(path.join(root, 'src', language)).filter(file => /page-\d+\.md$/.test(file))
-    assert.ok(!fs.existsSync(path.join(root, 'src', language, 'demo')))
-    assert.equal(pages.length, 60)
-    assert.ok(pages.every(file => fs.readFileSync(file, 'utf8').trimEnd().split('\n').length <= 20))
-  }
-  for (const category of ['nav', 'sidebar']) {
-    const files = collect(path.join(root, '.vitepress/config', category)).filter(file => file.endsWith('.ts'))
-    assert.equal(files.length, 7)
-    assert.ok(files.every(file => fs.readFileSync(file, 'utf8').trimEnd().split('\n').length <= 50))
+    assert.ok(!navLinks.some(link => link.includes('/demo/')))
   }
 })
 

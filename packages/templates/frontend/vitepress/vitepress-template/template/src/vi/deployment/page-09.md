@@ -1,6 +1,11 @@
 ---
 title: Triển khai · Khôi phục
 description: Triển khai · Khôi phục
+menu:
+  id: deployment.9
+  sidebar:
+    text: Khôi phục
+    order: 9
 ---
 
 # Triển khai · Khôi phục
@@ -9,7 +14,6 @@ description: Triển khai · Khôi phục
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

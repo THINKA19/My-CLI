@@ -1,6 +1,16 @@
 ---
 title: Phát triển · Markdown
 description: Phát triển · Markdown
+menu:
+  id: development.1
+  sidebar:
+    text: Markdown
+    order: 1
+  nav:
+    enabled: true
+    text: Markdown
+    order: 1
+    parent: development
 ---
 
 # Phát triển · Markdown
@@ -9,7 +19,6 @@ description: Phát triển · Markdown
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

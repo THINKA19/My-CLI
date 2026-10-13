@@ -1,6 +1,11 @@
 ---
 title: Tích hợp · Mở rộng
 description: Tích hợp · Mở rộng
+menu:
+  id: integrations.10
+  sidebar:
+    text: Mở rộng
+    order: 10
 ---
 
 # Tích hợp · Mở rộng
@@ -9,7 +14,6 @@ description: Tích hợp · Mở rộng
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

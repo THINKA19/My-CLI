@@ -1,6 +1,16 @@
 ---
 title: Configuration · Site
 description: Configuration · Site
+menu:
+  id: configuration.1
+  sidebar:
+    text: Site
+    order: 1
+  nav:
+    enabled: true
+    text: Site
+    order: 1
+    parent: configuration
 ---
 
 # Configuration · Site
@@ -9,7 +19,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/en/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

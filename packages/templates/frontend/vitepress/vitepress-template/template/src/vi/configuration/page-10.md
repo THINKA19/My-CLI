@@ -1,6 +1,11 @@
 ---
 title: Cấu hình · Xác thực
 description: Cấu hình · Xác thực
+menu:
+  id: configuration.10
+  sidebar:
+    text: Xác thực
+    order: 10
 ---
 
 # Cấu hình · Xác thực
@@ -9,7 +14,6 @@ description: Cấu hình · Xác thực
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

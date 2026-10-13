@@ -1,6 +1,11 @@
 ---
 title: Tích hợp · Giao tiếp
 description: Tích hợp · Giao tiếp
+menu:
+  id: integrations.6
+  sidebar:
+    text: Giao tiếp
+    order: 6
 ---
 
 # Tích hợp · Giao tiếp
@@ -9,7 +14,6 @@ description: Tích hợp · Giao tiếp
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

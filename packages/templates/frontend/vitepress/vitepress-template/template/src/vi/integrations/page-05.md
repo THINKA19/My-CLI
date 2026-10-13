@@ -1,6 +1,11 @@
 ---
 title: Tích hợp · Ví dụ mã
 description: Tích hợp · Ví dụ mã
+menu:
+  id: integrations.5
+  sidebar:
+    text: Ví dụ mã
+    order: 5
 ---
 
 # Tích hợp · Ví dụ mã
@@ -9,7 +14,6 @@ description: Tích hợp · Ví dụ mã
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

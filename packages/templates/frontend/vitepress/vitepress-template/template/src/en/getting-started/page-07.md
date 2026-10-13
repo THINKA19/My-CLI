@@ -1,6 +1,11 @@
 ---
 title: Getting started · Assets
 description: Getting started · Assets
+menu:
+  id: getting-started.7
+  sidebar:
+    text: Assets
+    order: 7
 ---
 
 # Getting started · Assets
@@ -9,7 +14,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/getting-started.ts`
-- `.vitepress/config/locales/en/sidebar/demo/getting-started.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

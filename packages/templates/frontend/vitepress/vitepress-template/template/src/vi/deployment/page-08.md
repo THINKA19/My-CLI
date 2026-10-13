@@ -1,6 +1,11 @@
 ---
 title: Triển khai · COS
 description: Triển khai · COS
+menu:
+  id: deployment.8
+  sidebar:
+    text: COS
+    order: 8
 ---
 
 # Triển khai · COS
@@ -9,7 +14,6 @@ description: Triển khai · COS
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

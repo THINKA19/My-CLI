@@ -1,6 +1,16 @@
 ---
 title: Reference · Conventions
 description: Reference · Conventions
+menu:
+  id: reference.1
+  sidebar:
+    text: Conventions
+    order: 1
+  nav:
+    enabled: true
+    text: Conventions
+    order: 1
+    parent: reference
 ---
 
 # Reference · Conventions
@@ -9,7 +19,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/en/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

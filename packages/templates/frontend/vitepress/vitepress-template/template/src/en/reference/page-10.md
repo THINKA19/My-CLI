@@ -1,6 +1,11 @@
 ---
 title: Reference · Index
 description: Reference · Index
+menu:
+  id: reference.10
+  sidebar:
+    text: Index
+    order: 10
 ---
 
 # Reference · Index
@@ -9,7 +14,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/en/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

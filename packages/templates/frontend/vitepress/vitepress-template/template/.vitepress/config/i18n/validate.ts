@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { languages } from './registry.ts'
+import { filterMenu } from './resolve.ts'
 
 const srcDir = fileURLToPath(new URL('../../../src/', import.meta.url))
 
@@ -77,8 +78,8 @@ export function validateConfig(
     if (!locale.prefix.startsWith('/') || !locale.prefix.endsWith('/'))
       throw new Error(`语言前缀必须以 / 开头和结尾: ${code}`)
     const language = code as Language
-    validateMenu(nav, texts[language].nav, language)
-    for (const section of sections) validateMenu(section.items, texts[language].sidebar, language)
+    validateMenu(filterMenu(nav, language), texts[language].nav, language)
+    for (const section of sections) validateMenu(filterMenu(section.items, language), texts[language].sidebar, language)
   }
   const ids = new Set<string>()
   const routes = new Set<string>()

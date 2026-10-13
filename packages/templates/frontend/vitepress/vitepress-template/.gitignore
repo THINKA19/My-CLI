@@ -12,6 +12,7 @@ template/node_modules/
 template/pnpm-lock.yaml
 template/.turbo/
 template/dist/
+template/.vitepress/config/generated/
 
 # 日志
 *.log

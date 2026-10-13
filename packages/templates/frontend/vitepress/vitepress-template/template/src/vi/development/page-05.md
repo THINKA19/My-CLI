@@ -1,6 +1,16 @@
 ---
 title: Phát triển · Biểu đồ
 description: Phát triển · Biểu đồ
+menu:
+  id: development.5
+  sidebar:
+    text: Biểu đồ
+    order: 5
+  nav:
+    enabled: true
+    text: Biểu đồ
+    order: 5
+    parent: development
 ---
 
 # Phát triển · Biểu đồ
@@ -9,7 +19,6 @@ description: Phát triển · Biểu đồ
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

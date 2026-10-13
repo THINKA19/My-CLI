@@ -1,6 +1,11 @@
 ---
 title: Triển khai · Docker
 description: Triển khai · Docker
+menu:
+  id: deployment.6
+  sidebar:
+    text: Docker
+    order: 6
 ---
 
 # Triển khai · Docker
@@ -9,7 +14,6 @@ description: Triển khai · Docker
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

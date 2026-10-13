@@ -1,6 +1,11 @@
 ---
 title: Tham khảo · Thứ tự
 description: Tham khảo · Thứ tự
+menu:
+  id: reference.5
+  sidebar:
+    text: Thứ tự
+    order: 5
 ---
 
 # Tham khảo · Thứ tự
@@ -9,7 +14,6 @@ description: Tham khảo · Thứ tự
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

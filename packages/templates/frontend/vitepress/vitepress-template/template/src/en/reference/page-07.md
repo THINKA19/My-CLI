@@ -1,6 +1,11 @@
 ---
 title: Reference · Translations
 description: Reference · Translations
+menu:
+  id: reference.7
+  sidebar:
+    text: Translations
+    order: 7
 ---
 
 # Reference · Translations
@@ -9,7 +14,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/en/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

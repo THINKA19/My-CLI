@@ -1,6 +1,11 @@
 ---
 title: Tích hợp · Thông báo
 description: Tích hợp · Thông báo
+menu:
+  id: integrations.7
+  sidebar:
+    text: Thông báo
+    order: 7
 ---
 
 # Tích hợp · Thông báo
@@ -9,7 +14,6 @@ description: Tích hợp · Thông báo
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

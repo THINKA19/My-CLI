@@ -1,6 +1,11 @@
 ---
 title: Triển khai · OSS
 description: Triển khai · OSS
+menu:
+  id: deployment.7
+  sidebar:
+    text: OSS
+    order: 7
 ---
 
 # Triển khai · OSS
@@ -9,7 +14,6 @@ description: Triển khai · OSS
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

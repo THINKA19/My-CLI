@@ -1,6 +1,16 @@
 ---
 title: Tham khảo · Quy tắc liên kết
 description: Tham khảo · Quy tắc liên kết
+menu:
+  id: reference.4
+  sidebar:
+    text: Quy tắc liên kết
+    order: 4
+  nav:
+    enabled: true
+    text: Quy tắc liên kết
+    order: 4
+    parent: reference
 ---
 
 # Tham khảo · Quy tắc liên kết
@@ -9,7 +19,6 @@ description: Tham khảo · Quy tắc liên kết
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,16 @@
 ---
 title: Cấu hình · Thanh bên
 description: Cấu hình · Thanh bên
+menu:
+  id: configuration.5
+  sidebar:
+    text: Thanh bên
+    order: 5
+  nav:
+    enabled: true
+    text: Thanh bên
+    order: 5
+    parent: configuration
 ---
 
 # Cấu hình · Thanh bên
@@ -9,7 +19,6 @@ description: Cấu hình · Thanh bên
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

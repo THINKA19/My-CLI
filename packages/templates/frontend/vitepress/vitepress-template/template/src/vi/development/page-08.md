@@ -1,6 +1,11 @@
 ---
 title: Phát triển · Kiểm thử
 description: Phát triển · Kiểm thử
+menu:
+  id: development.8
+  sidebar:
+    text: Kiểm thử
+    order: 8
 ---
 
 # Phát triển · Kiểm thử
@@ -9,7 +14,6 @@ description: Phát triển · Kiểm thử
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

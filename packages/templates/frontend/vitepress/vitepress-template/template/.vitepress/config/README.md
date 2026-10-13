@@ -6,75 +6,31 @@
 
 ## 目录职责
 
-当前沿用“公共菜单结构 + 分语言文案 + i18n 组装”的设计，实际目录如下：
+日常菜单由文档生成，字段规范与命令见 [菜单生成说明](../../scripts/menus/README.md)。
 
 ```text
 .vitepress/config/
-├── nav/
-│   ├── index.ts                 # 组合顶部导航，决定栏目顺序
-│   ├── getting-started.ts       # 入门导航
-│   ├── configuration.ts         # 配置导航
-│   ├── development.ts           # 开发导航
-│   ├── deployment.ts            # 部署导航
-│   ├── integrations.ts          # 集成导航
-│   └── reference.ts             # 参考导航
-├── sidebar/
-│   ├── index.ts                 # 注册路径前缀及对应侧边栏
-│   ├── getting-started.ts       # 入门侧边栏结构
-│   ├── configuration.ts         # 配置侧边栏结构
-│   ├── development.ts           # 开发侧边栏结构
-│   ├── deployment.ts            # 部署侧边栏结构
-│   ├── integrations.ts          # 集成侧边栏结构
-│   ├── reference.ts             # 参考侧边栏结构
-│   └── README.md                # 菜单扩展示例说明
+├── generated/                  # 自动生成，不入库：栏目结构及多语言文字
+│   ├── index.ts
+│   ├── home.ts
+│   ├── configuration.ts
+│   └── ...
+├── nav/index.ts                # 加载生成菜单，缺文件时给出生成提示
+├── sidebar/index.ts            # 稳定侧边栏入口
 ├── locales/
-│   ├── zh/
-│   │   ├── index.ts             # 汇总中文配置与文案
-│   │   ├── site.ts              # 站点标题、描述
-│   │   ├── theme.ts             # 主题文字：按钮、页脚、404 等
-│   │   ├── search.ts            # 搜索文字
-│   │   ├── seo.ts               # 作者、关键词、分享语言标识
-│   │   ├── nav/
-│   │   │   ├── index.ts         # 汇总导航文案
-│   │   │   ├── getting-started.ts
-│   │   │   ├── configuration.ts
-│   │   │   ├── development.ts
-│   │   │   ├── deployment.ts
-│   │   │   ├── integrations.ts
-│   │   │   └── reference.ts
-│   │   └── sidebar/
-│   │       ├── index.ts         # 汇总侧边栏文案
-│   │       ├── getting-started.ts
-│   │       ├── configuration.ts
-│   │       ├── development.ts
-│   │       ├── deployment.ts
-│   │       ├── integrations.ts
-│   │       └── reference.ts
-│   ├── en/                     # 与 zh 相同的文件结构，提供英文文案
-│   └── vi/                     # 与 zh 相同的文件结构，提供越南语文案
-├── i18n/
-│   ├── index.ts                 # 组装 VitePress 多语言配置
-│   ├── registry.ts              # 登记语言、路径前缀和回退语言
-│   ├── resolve.ts               # 解析文案、链接及菜单
-│   ├── types.ts                 # 菜单、文案 key 和语言类型约束
-│   └── validate.ts              # 检查菜单、翻译和页面链接
-├── site.ts                     # 公共站点与构建设置
-├── theme.ts                    # 公共主题设置
-├── search.ts                   # 搜索参数及多语言搜索文案组装
-├── seo.ts                      # 公共 SEO 标签与页面元数据生成
-└── README.md                   # 本维护说明
+│   ├── zh/                     # 手写：index、site、theme、search、seo
+│   ├── en/
+│   └── vi/
+├── i18n/                       # index、registry、resolve、types、validate
+├── site.ts
+├── theme.ts
+├── search.ts
+├── seo.ts
+└── README.md
 ```
 
-与早期草案的差异：栏目已替换为当前六个分类；`ui.ts` 已拆为独立的
-`theme.ts`、`search.ts`，站点和 SEO 文案分别由 `site.ts`、`seo.ts` 管理。
-增加了 `validate.ts`；不保留空的 `auto.ts`，以后需要自动生成时再添加。
-菜单结构与文案目录均不再包含 `demo/` 层。
-
-- `config/nav/`：顶部导航结构和组合顺序。
-- `config/sidebar/`：侧边栏结构及路径分区。
-- `config/locales/zh|en|vi/`：站点、界面、搜索、导航和侧边栏文字。
-- `config/i18n/`：语言登记、共享类型、解析和校验。
-- `config/theme.ts`：Logo、社交地址和其他公共主题设置。
+生成逻辑位于 `scripts/menus/`：index、schema、scan、build、output 五个实现文件。
+`src/menu.config.ts` 仅存外部链接与无正文分组。有正文的节点在 Markdown frontmatter 中配置。
 
 ## 公共配置与语言差异
 
@@ -92,20 +48,13 @@ SEO 和 sitemap 统一使用该地址，避免重复添加 base。页面可通�
 
 ## 新增菜单与栏目
 
-1. 在 nav 或 sidebar 的栏目文件定义结构，使用稳定且带命名空间的 key。
-2. 站内链接写 `link: { path: '/guide/install' }`，不带语言前缀，不添加部署 base。
-   外部链接、公共资源和当前页面锚点写 `link: { url: '...' }`，保持原值。
-3. 各语言对应栏目文案使用 `satisfies MenuText<typeof 栏目结构>`，结构使用
-   `as const satisfies readonly MenuNode[]`，确保缺失或拼错的 key 被类型检查发现。
-4. 在相应 index.ts 中汇总。文案使用 `mergeText`，重复 key 会报错。
-5. 有顶部导航才增加 nav 文件，有侧边栏才增加 sidebar 文件，不要求创建所有类别的文件。
-6. 侧边栏在 sidebar/index.ts 注册 `id`、`prefix` 和 `items`；前缀以 / 开头和结尾。
-   首页不显示侧边栏，更具体的分区匹配优先。
-7. 运行 `pnpm test:i18n` 和 `pnpm typecheck`，再检查开发预览。
+1. 在各语言 src 目录新增对应 Markdown，提供 title 和所需 menu 元数据。
+2. 普通文章默认进入侧边栏；顶部导航需要显式启用 nav.enabled。
+3. 栏目 index.md 描述分组；结构和顺序以默认语言为准，文字取各语言文档。
+4. 运行 `pnpm menus:generate`；开发和构建命令会先自动生成。
+5. 运行 `pnpm menus:check` 校验但不写文件；`pnpm test:menus` 和 `pnpm test:i18n` 验证生成与解析。
 
-分组使用 `items`，侧边栏可使用 `collapsed`；顶部导航分组不能同时有链接。
-沿用默认主题导航分组深度与侧边栏最多六层的限制。
-页面目标以 cleanUrls 规则解析，正文目录与语言登记的 sourceDir 对应。
+不再手写菜单结构或 locales 中的菜单文案文件。生成文件中的路径不带语言前缀和部署 base。
 中文、英文、越南语分别使用 /zh/、/en/、/vi/，不使用路径重写。
 
 ## 新增语言
@@ -118,15 +67,121 @@ SEO 和 sitemap 统一使用该地址，避免重复添加 base。页面可通�
 重复项、语言前缀和各语言页面是否存在；缺少页面应先补齐或明确调整菜单，不会静默生成失效链接。
 resolveText 支持文案回退，但当前菜单校验要求完整翻译，fallback 不表示自动跳转到原文页面。
 
+## 文档菜单元数据
+
+以下 frontmatter 由菜单生成脚本读取。修改后运行 `pnpm menus:generate` 更新菜单。
+
+### 简单页面
+
+在 Markdown 文件开头填写页面信息：
+
+```md
+---
+title: 站点配置
+description: 如何配置站点
+---
+
+# 站点配置
+```
+
+默认将普通文章加入所属目录的侧边栏，使用 `title` 作为菜单文字；
+不单独加入顶部导航。页面链接从文件路径推导，不需要手写。
+
+### 分别配置侧边栏和顶部导航
+
+例如 `src/zh/configuration/site.md`：
+
+```md
+---
+title: 站点配置
+description: 如何配置站点
+menu:
+  id: configuration.site
+  sidebar:
+    enabled: true
+    text: 站点配置
+    order: 20
+  nav:
+    enabled: true
+    text: 配置站点
+    order: 30
+    parent: configuration
+    activeMatch: "^/configuration/"
+---
+
+# 站点配置
+```
+
+| 字段 | 含义 | 默认值或规则 |
+| --- | --- | --- |
+| `title` | 页面标题，也是菜单文字的默认来源 | 页面应提供标题 |
+| `description` | 页面说明，供 SEO 等现有功能使用 | 可省略，遵循现有页面配置 |
+| `menu.id` | 菜单稳定标识，用于匹配多语言页面和父分组 | 不带语言前缀的相对文档路径 |
+| `menu.sidebar.enabled` | 是否进入侧边栏 | 普通文章为 `true` |
+| `menu.sidebar.text` | 侧边栏显示文字，可与页面标题不同 | 使用 `title` |
+| `menu.sidebar.order` | 所属分组内的排序，数值越小越靠前 | 未填写的排在显式排序之后；同序按文件名排序 |
+| `menu.nav.enabled` | 是否作为顶部导航入口或下拉菜单项 | 普通文章为 `false` |
+| `menu.nav.text` | 顶部导航显示文字 | 使用 `title` |
+| `menu.nav.order` | 所属导航分组内的排序 | 与侧边栏排序规则相同，单独计算 |
+| `menu.nav.parent` | 所属导航分组的 `menu.id` | 未填写时作为顶层入口 |
+| `menu.nav.activeMatch` | 控制导航高亮的正则表达式字符串 | 不生成，使用主题默认匹配 |
+
+这个例子表示：侧边栏显示“站点配置”，按 20 排序；导航中显示“配置站点”，
+放入 ID 为 `configuration` 的分组，按 30 排序。两处排序互不影响。
+父分组必须存在且支持下拉菜单，不能把普通页面当成父分组，也不能循环引用。
+
+中文页面的地址为 `/zh/configuration/site`（部署时另加 base）。公共菜单结构保存
+`/configuration/site`，语言前缀由现有 i18n 解析器添加。
+`activeMatch` 示例匹配不带语言前缀的栏目路径；生成器需要按语言转换为
+`^/zh/configuration/`、`^/en/configuration/` 等，不能直接原样用于当前语言地址。
+
+### 栏目首页与分组
+
+目录中的 `index.md` 可以描述栏目，例如 `src/zh/configuration/index.md`：
+
+```yaml
+---
+title: 配置
+menu:
+  id: configuration
+  sidebar:
+    enabled: true
+    text: 配置指南
+    order: 20
+    collapsed: false
+    linkToIndex: true
+  nav:
+    enabled: true
+    text: 配置
+    order: 20
+    mode: dropdown
+---
+```
+
+- `sidebar.collapsed`：分组初始折叠状态；`false` 表示初始展开，`true` 表示初始折叠，省略时不设置折叠状态。
+- `sidebar.linkToIndex`：分组标题是否链接栏目首页；存在 `index.md` 时默认为 `true`。
+- `nav.mode`：`link` 表示栏目链接，`dropdown` 表示下拉分组；默认为 `link`。
+- 下拉分组只收集显式启用 `nav.enabled` 的后代，避免把全部文章放进顶部导航。
+- 隐藏侧边栏分组时，整个分组不进入菜单，但页面仍可访问；根首页不自动形成侧边栏分组。
+
+### 多语言和维护约定
+
+默认语言提供层级、顺序和显示开关；其他语言提供页面标题及菜单文字。
+对应页面使用相同 `menu.id`，或保持相同的相对文档路径；当前对应页面路径仍需一致。缺少翻译页面应报错，
+不能生成不存在的链接。显式设置 ID 后，移动文件时保持 ID 不变，链接仍从新路径推导。
+默认语言文档可设置 `translate: false`，入口只在默认语言菜单显示，其他语言跳过，不生成回退链接。
+
+字段均按需要填写，不要求复制完整示例。新增可选字段应保留旧文档的默认行为；
+拼错字段、类型错误、重复 ID、无效父分组和无效正则应明确报错。
+使用一个 `pnpm menus:generate` 命令统一生成导航、侧边栏及菜单文案，
+全部校验成功后再更新文件；`pnpm menus:check` 校验输入及内存菜单，不写文件，也不检查生成文件是否过期。
+这两个命令已提供；dev 和 build 会先自动生成。
+
 ## 扩展约定
 
-栏目出现独立子模块或约 300 个节点时，考虑把 api.ts 升级为 api/index.ts、
-core.ts、plugins.ts。约 300 项是提醒，不是硬性门槛。
-结构与各语言文案保持相同逻辑分区和导出接口，物理文件可按维护需要拆分。
-优先按栏目推导 key，不手写全站 key 清单；不复制整套菜单结构到各语言目录。
-
-大量页面按路径分区展示。拆文件改善维护，但不会自动减少浏览器配置体积。
-当前不提供自动菜单生成；将来可在 sidebar/ 增加工具，不必更换现有模块接口。
+侧边栏按文档目录分组，默认主题最多六层；导航只展示明确启用的节点，最多两层分组。
+生成数据按栏目输出，生成器会发现新增栏目，不需要手改汇总入口。
+大规模菜单的解析有测试覆盖；拆分输出文件不会自动减少浏览器菜单体积。
 
 ## 验证
 
@@ -143,4 +198,4 @@ tests/i18n/baseline.json 记录迁移前的示例菜单；有意修改示例菜�
 目录入口显式使用 `#config/nav/index`。
 别名由 package.json 的 imports 和 tsconfig.json 的 paths 对齐配置，
 支持 VitePress 配置加载及类型检查，不依赖配置加载后的 Vite alias。
-栏目结构及三种语言文案直接按栏目组织，不再增加 demo 层。
+菜单结构和文字统一由 generated 中的栏目文件提供，不再增加 demo 层。

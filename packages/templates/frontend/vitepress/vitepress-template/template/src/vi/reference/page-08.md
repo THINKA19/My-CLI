@@ -1,6 +1,11 @@
 ---
 title: Tham khảo · Câu hỏi thường gặp
 description: Tham khảo · Câu hỏi thường gặp
+menu:
+  id: reference.8
+  sidebar:
+    text: Câu hỏi thường gặp
+    order: 8
 ---
 
 # Tham khảo · Câu hỏi thường gặp
@@ -9,7 +14,6 @@ description: Tham khảo · Câu hỏi thường gặp
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

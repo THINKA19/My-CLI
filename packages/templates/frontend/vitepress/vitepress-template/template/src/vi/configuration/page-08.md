@@ -1,6 +1,11 @@
 ---
 title: Cấu hình · Tên miền
 description: Cấu hình · Tên miền
+menu:
+  id: configuration.8
+  sidebar:
+    text: Tên miền
+    order: 8
 ---
 
 # Cấu hình · Tên miền
@@ -9,7 +14,6 @@ description: Cấu hình · Tên miền
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

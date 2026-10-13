@@ -1,6 +1,16 @@
 ---
 title: Tích hợp · Plugin
 description: Tích hợp · Plugin
+menu:
+  id: integrations.1
+  sidebar:
+    text: Plugin
+    order: 1
+  nav:
+    enabled: true
+    text: Plugin
+    order: 1
+    parent: integrations
 ---
 
 # Tích hợp · Plugin
@@ -9,7 +19,6 @@ description: Tích hợp · Plugin
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

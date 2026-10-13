@@ -1,6 +1,11 @@
 ---
 title: Cấu hình · SEO
 description: Cấu hình · SEO
+menu:
+  id: configuration.7
+  sidebar:
+    text: SEO
+    order: 7
 ---
 
 # Cấu hình · SEO
@@ -9,7 +14,6 @@ description: Cấu hình · SEO
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

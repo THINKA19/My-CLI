@@ -11,7 +11,7 @@ const templateDir = path.resolve(
   '../template',
 )
 
-// 复制模板时跳过的文件/目录
+// 按名称排除，适用于模板内所有层级。
 const SKIP = new Set([
   'node_modules',
   'dist',
@@ -22,6 +22,11 @@ const SKIP = new Set([
   'pnpm-lock.yaml',
   'package-lock.json',
   'yarn.lock',
+])
+
+// 按模板相对路径排除，只针对指定位置。
+const SKIP_PATHS = new Set([
+  '.vitepress/config/generated',
 ])
 
 // 模板里以 _ 开头的文件，生成后改回正式名称（npm 发布时会丢弃/改写点文件）
@@ -102,8 +107,14 @@ console.log('\n🚀 正在创建 VitePress 项目...\n')
 // ---------- 1. 复制模板（复制时过滤，而不是事后删除） ----------
 fs.cpSync(templateDir, targetDir, {
   recursive: true,
-  filter: src => !SKIP.has(path.basename(src)),
+  filter: (src) => {
+    const relative = path.relative(templateDir, src).split(path.sep).join('/')
+    return !SKIP.has(path.basename(src)) && !SKIP_PATHS.has(relative)
+  },
 })
+
+// npm 不保存空目录：复制时排除生成物，再为新项目创建空的输出目录。
+fs.mkdirSync(path.join(targetDir, '.vitepress/config/generated'), { recursive: true })
 
 // ---------- 2. 还原被重命名的点文件 ----------
 for (const [from, to] of Object.entries(RENAME)) {

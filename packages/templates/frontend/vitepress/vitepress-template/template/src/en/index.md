@@ -27,4 +27,10 @@ features:
   - title: Reference
     details: Browse documentation and menu examples in this category
     link: /en/reference/page-01
+menu:
+  id: home
+  nav:
+    enabled: true
+    text: Home
+    order: 0
 ---

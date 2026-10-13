@@ -1,6 +1,16 @@
 ---
 title: Triển khai · Pages
 description: Triển khai · Pages
+menu:
+  id: deployment.3
+  sidebar:
+    text: Pages
+    order: 3
+  nav:
+    enabled: true
+    text: Pages
+    order: 3
+    parent: deployment
 ---
 
 # Triển khai · Pages
@@ -9,7 +19,6 @@ description: Triển khai · Pages
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

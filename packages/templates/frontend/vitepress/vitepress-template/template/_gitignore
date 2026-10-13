@@ -73,6 +73,7 @@ dist/
 
 # VitePress 本地开发与构建缓存
 .vitepress/cache/
+.vitepress/config/generated/
 
 # Vite 打包分析报告 (如 rollup-plugin-visualizer 产物)
 stats.html

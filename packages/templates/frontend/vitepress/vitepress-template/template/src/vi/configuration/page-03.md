@@ -1,6 +1,16 @@
 ---
 title: Cấu hình · Ngôn ngữ
 description: Cấu hình · Ngôn ngữ
+menu:
+  id: configuration.3
+  sidebar:
+    text: Ngôn ngữ
+    order: 3
+  nav:
+    enabled: true
+    text: Ngôn ngữ
+    order: 3
+    parent: configuration
 ---
 
 # Cấu hình · Ngôn ngữ
@@ -9,7 +19,6 @@ description: Cấu hình · Ngôn ngữ
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

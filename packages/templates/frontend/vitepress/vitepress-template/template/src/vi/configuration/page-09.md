@@ -1,6 +1,11 @@
 ---
 title: Cấu hình · Đường dẫn gốc
 description: Cấu hình · Đường dẫn gốc
+menu:
+  id: configuration.9
+  sidebar:
+    text: Đường dẫn gốc
+    order: 9
 ---
 
 # Cấu hình · Đường dẫn gốc
@@ -9,7 +14,6 @@ description: Cấu hình · Đường dẫn gốc
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

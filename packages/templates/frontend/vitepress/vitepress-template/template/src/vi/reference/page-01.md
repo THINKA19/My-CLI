@@ -1,6 +1,16 @@
 ---
 title: Tham khảo · Quy ước
 description: Tham khảo · Quy ước
+menu:
+  id: reference.1
+  sidebar:
+    text: Quy ước
+    order: 1
+  nav:
+    enabled: true
+    text: Quy ước
+    order: 1
+    parent: reference
 ---
 
 # Tham khảo · Quy ước
@@ -9,7 +19,6 @@ description: Tham khảo · Quy ước
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,11 @@
 ---
 title: Getting started · Pages
 description: Getting started · Pages
+menu:
+  id: getting-started.6
+  sidebar:
+    text: Pages
+    order: 6
 ---
 
 # Getting started · Pages
@@ -9,7 +14,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/getting-started.ts`
-- `.vitepress/config/locales/en/sidebar/demo/getting-started.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

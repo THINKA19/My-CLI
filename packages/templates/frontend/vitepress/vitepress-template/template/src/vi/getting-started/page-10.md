@@ -1,6 +1,11 @@
 ---
 title: Bắt đầu · Kiểm tra
 description: Bắt đầu · Kiểm tra
+menu:
+  id: getting-started.10
+  sidebar:
+    text: Kiểm tra
+    order: 10
 ---
 
 # Bắt đầu · Kiểm tra
@@ -9,7 +14,6 @@ description: Bắt đầu · Kiểm tra
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/getting-started.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/getting-started.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

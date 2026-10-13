@@ -40,7 +40,7 @@ export function resolveNav(
   depth = 0,
 ): DefaultTheme.NavItem[] {
   return nodes.map((node) => {
-    const common = { text: resolveText(node.key, text, fallback), activeMatch: node.activeMatch }
+    const common = { text: resolveText(node.key, text, fallback), activeMatch: node.activeMatch?.replace(/^\^\//, `^${prefix}`) }
     if (node.items) {
       if (node.link || depth >= 2)
         throw new Error(`导航分组无效或超过默认主题支持的层级: ${node.key}`)
@@ -53,6 +53,12 @@ export function resolveNav(
       throw new Error(`导航项没有链接: ${node.key}`)
     return { ...common, link: resolveLink(node.link, prefix) }
   })
+}
+
+export function filterMenu(nodes: readonly MenuNode[], language: string): MenuNode[] {
+  return nodes.filter(node => !node.languages || node.languages.includes(language))
+    .map(node => ({ ...node, ...(node.items ? { items: filterMenu(node.items, language) } : {}) }))
+    .filter(node => node.link || node.items?.length)
 }
 
 export function resolveSidebar(

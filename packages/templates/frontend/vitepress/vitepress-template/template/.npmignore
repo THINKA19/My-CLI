@@ -11,6 +11,8 @@
 **/.vitepress/cache/**
 **/.vitepress/.temp
 **/.vitepress/.temp/**
+**/.vitepress/config/generated
+**/.vitepress/config/generated/**
 
 # 2. 排除本地环境变量文件
 **/.env.local

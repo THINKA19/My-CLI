@@ -1,6 +1,16 @@
 ---
 title: Phát triển · Bố cục
 description: Phát triển · Bố cục
+menu:
+  id: development.3
+  sidebar:
+    text: Bố cục
+    order: 3
+  nav:
+    enabled: true
+    text: Bố cục
+    order: 3
+    parent: development
 ---
 
 # Phát triển · Bố cục
@@ -9,7 +19,6 @@ description: Phát triển · Bố cục
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -20,8 +20,11 @@ pnpm dev
 
 | 命令 | 用途 |
 | --- | --- |
-| `pnpm dev` | 启动开发服务 |
-| `pnpm build` | 构建静态站点，输出到 `dist/` |
+| `pnpm dev` | 生成菜单并启动开发服务 |
+| `pnpm build` | 生成菜单并构建静态站点，输出到 `dist/` |
+| `pnpm menus:generate` | 根据文档生成导航、侧边栏及多语言菜单文字 |
+| `pnpm menus:check` | 校验文档菜单，不写文件 |
+| `pnpm test:menus` | 运行菜单生成器测试 |
 | `pnpm preview` | 预览构建产物 |
 | `pnpm lint` | 检查代码规范 |
 | `pnpm lint:fix` | 自动修复代码规范问题 |
@@ -45,3 +48,6 @@ pnpm dev
 
 部署脚本的依赖与用法见 [脚本说明](scripts/deploy/README.md)。
 开发维护见 [维护指南](docs/ai/MAINTENANCE.md)；AI 助手入口见 [AGENTS.md](AGENTS.md)。
+
+文档菜单的字段规范、依赖和使用方式见 [菜单生成说明](scripts/menus/README.md)。
+新增文档后运行 `pnpm menus:generate`；生成目录不入库，无需手写菜单配置。

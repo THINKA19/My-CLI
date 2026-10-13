@@ -1,15 +1,24 @@
 ---
 title: 配置 · 语言
 description: 配置 · 语言
+menu:
+  id: configuration.3
+  sidebar:
+    text: 语言
+    order: 3
+  nav:
+    enabled: true
+    text: 语言
+    order: 3
+    parent: configuration
 ---
 
 # 配置 · 语言
 
-这是手动配置的扩展示例。菜单结构只维护一份，各语言使用相同 key。
+菜单由文档元数据自动生成，各语言使用相同菜单标识。
 
 ## 对应配置 {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/zh/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [首页](../index.md)

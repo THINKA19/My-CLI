@@ -7,7 +7,7 @@ import { navStructure } from '#config/nav/index'
 import { sidebarSections } from '#config/sidebar/index'
 import { themeConfig } from '#config/theme'
 import { languages } from './registry.ts'
-import { resolveNav, resolveSidebars } from './resolve.ts'
+import { filterMenu, resolveNav, resolveSidebars } from './resolve.ts'
 import { validateConfig } from './validate.ts'
 
 export const localeTexts = { zh, en, vi } satisfies Record<Language, LocaleText>
@@ -36,8 +36,8 @@ export const localesConfig: LocaleConfig<DefaultTheme.Config> = Object.fromEntri
         outline: { ...themeConfig.outline, ...text.theme.outline },
         editLink: { ...themeConfig.editLink, ...text.theme.editLink },
         lastUpdated: { ...themeConfig.lastUpdated, ...text.theme.lastUpdated },
-        nav: resolveNav(navStructure, text.nav, fallback.nav, locale.prefix),
-        sidebar: resolveSidebars(sidebarSections, text.sidebar, fallback.sidebar, locale.prefix),
+        nav: resolveNav(filterMenu(navStructure, code), text.nav, fallback.nav, locale.prefix),
+        sidebar: resolveSidebars(sidebarSections.map(section => ({ ...section, items: filterMenu(section.items, code) })).filter(section => section.items.length), text.sidebar, fallback.sidebar, locale.prefix),
       },
     }]
   }),

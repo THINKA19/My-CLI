@@ -1,6 +1,11 @@
 ---
 title: Tích hợp · Liên kết ngoài
 description: Tích hợp · Liên kết ngoài
+menu:
+  id: integrations.8
+  sidebar:
+    text: Liên kết ngoài
+    order: 8
 ---
 
 # Tích hợp · Liên kết ngoài
@@ -9,7 +14,6 @@ description: Tích hợp · Liên kết ngoài
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,11 @@
 ---
 title: Integrations · Notifications
 description: Integrations · Notifications
+menu:
+  id: integrations.7
+  sidebar:
+    text: Notifications
+    order: 7
 ---
 
 # Integrations · Notifications
@@ -9,7 +14,6 @@ This is a manual expansion example. Menu structure is shared; each language uses
 
 ## Configuration {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/en/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Home](../index.md)

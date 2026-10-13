@@ -1,6 +1,11 @@
 ---
 title: Cấu hình · Tìm kiếm
 description: Cấu hình · Tìm kiếm
+menu:
+  id: configuration.6
+  sidebar:
+    text: Tìm kiếm
+    order: 6
 ---
 
 # Cấu hình · Tìm kiếm
@@ -9,7 +14,6 @@ description: Cấu hình · Tìm kiếm
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

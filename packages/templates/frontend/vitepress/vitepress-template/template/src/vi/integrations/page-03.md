@@ -1,6 +1,16 @@
 ---
 title: Tích hợp · Thống kê
 description: Tích hợp · Thống kê
+menu:
+  id: integrations.3
+  sidebar:
+    text: Thống kê
+    order: 3
+  nav:
+    enabled: true
+    text: Thống kê
+    order: 3
+    parent: integrations
 ---
 
 # Tích hợp · Thống kê
@@ -9,7 +19,6 @@ description: Tích hợp · Thống kê
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

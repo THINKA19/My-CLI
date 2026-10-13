@@ -1,6 +1,16 @@
 ---
 title: Triển khai · Đầu ra
 description: Triển khai · Đầu ra
+menu:
+  id: deployment.2
+  sidebar:
+    text: Đầu ra
+    order: 2
+  nav:
+    enabled: true
+    text: Đầu ra
+    order: 2
+    parent: deployment
 ---
 
 # Triển khai · Đầu ra
@@ -9,7 +19,6 @@ description: Triển khai · Đầu ra
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

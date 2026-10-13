@@ -1,6 +1,16 @@
 ---
 title: Phát triển · Thành phần
 description: Phát triển · Thành phần
+menu:
+  id: development.2
+  sidebar:
+    text: Thành phần
+    order: 2
+  nav:
+    enabled: true
+    text: Thành phần
+    order: 2
+    parent: development
 ---
 
 # Phát triển · Thành phần
@@ -9,7 +19,6 @@ description: Phát triển · Thành phần
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

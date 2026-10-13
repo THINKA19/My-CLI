@@ -1,6 +1,11 @@
 ---
 title: Tham khảo · Chỉ mục
 description: Tham khảo · Chỉ mục
+menu:
+  id: reference.10
+  sidebar:
+    text: Chỉ mục
+    order: 10
 ---
 
 # Tham khảo · Chỉ mục
@@ -9,7 +14,6 @@ description: Tham khảo · Chỉ mục
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

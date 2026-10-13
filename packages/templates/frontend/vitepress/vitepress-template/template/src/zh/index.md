@@ -27,4 +27,10 @@ features:
   - title: 参考
     details: 浏览本分类的文档与菜单示例
     link: /zh/reference/page-01
+menu:
+  id: home
+  nav:
+    enabled: true
+    text: 首页
+    order: 0
 ---

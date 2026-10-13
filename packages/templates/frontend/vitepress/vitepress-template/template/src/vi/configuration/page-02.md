@@ -1,6 +1,16 @@
 ---
 title: Cấu hình · Giao diện
 description: Cấu hình · Giao diện
+menu:
+  id: configuration.2
+  sidebar:
+    text: Giao diện
+    order: 2
+  nav:
+    enabled: true
+    text: Giao diện
+    order: 2
+    parent: configuration
 ---
 
 # Cấu hình · Giao diện
@@ -9,7 +19,6 @@ description: Cấu hình · Giao diện
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,11 @@
 ---
 title: Bắt đầu · Tài nguyên
 description: Bắt đầu · Tài nguyên
+menu:
+  id: getting-started.7
+  sidebar:
+    text: Tài nguyên
+    order: 7
 ---
 
 # Bắt đầu · Tài nguyên
@@ -9,7 +14,6 @@ description: Bắt đầu · Tài nguyên
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/getting-started.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/getting-started.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,11 @@
 ---
 title: Phát triển · Bảo trì
 description: Phát triển · Bảo trì
+menu:
+  id: development.10
+  sidebar:
+    text: Bảo trì
+    order: 10
 ---
 
 # Phát triển · Bảo trì
@@ -9,7 +14,6 @@ description: Phát triển · Bảo trì
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,16 @@
 ---
 title: Bắt đầu · Môi trường
 description: Bắt đầu · Môi trường
+menu:
+  id: getting-started.2
+  sidebar:
+    text: Môi trường
+    order: 2
+  nav:
+    enabled: true
+    text: Môi trường
+    order: 2
+    parent: getting-started
 ---
 
 # Bắt đầu · Môi trường
@@ -9,7 +19,6 @@ description: Bắt đầu · Môi trường
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/getting-started.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/getting-started.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

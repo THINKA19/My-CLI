@@ -1,6 +1,16 @@
 ---
 title: Bắt đầu · Lệnh
 description: Bắt đầu · Lệnh
+menu:
+  id: getting-started.4
+  sidebar:
+    text: Lệnh
+    order: 4
+  nav:
+    enabled: true
+    text: Lệnh
+    order: 4
+    parent: getting-started
 ---
 
 # Bắt đầu · Lệnh
@@ -9,7 +19,6 @@ description: Bắt đầu · Lệnh
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/getting-started.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/getting-started.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

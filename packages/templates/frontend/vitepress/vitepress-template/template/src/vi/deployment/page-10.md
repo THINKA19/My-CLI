@@ -1,6 +1,11 @@
 ---
 title: Triển khai · Xác minh
 description: Triển khai · Xác minh
+menu:
+  id: deployment.10
+  sidebar:
+    text: Xác minh
+    order: 10
 ---
 
 # Triển khai · Xác minh
@@ -9,7 +14,6 @@ description: Triển khai · Xác minh
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

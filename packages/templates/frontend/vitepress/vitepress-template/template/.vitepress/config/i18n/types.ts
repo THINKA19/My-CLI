@@ -9,6 +9,7 @@ export type LinkTarget
 
 export interface MenuNode {
   key: string
+  languages?: readonly string[]
   link?: LinkTarget
   items?: readonly MenuNode[]
   collapsed?: boolean

@@ -1,6 +1,11 @@
 ---
 title: Phát triển · Kiểu
 description: Phát triển · Kiểu
+menu:
+  id: development.7
+  sidebar:
+    text: Kiểu
+    order: 7
 ---
 
 # Phát triển · Kiểu
@@ -9,7 +14,6 @@ description: Phát triển · Kiểu
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

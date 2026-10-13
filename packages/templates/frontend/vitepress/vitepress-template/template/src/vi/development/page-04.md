@@ -1,6 +1,16 @@
 ---
 title: Phát triển · Kiểu dáng
 description: Phát triển · Kiểu dáng
+menu:
+  id: development.4
+  sidebar:
+    text: Kiểu dáng
+    order: 4
+  nav:
+    enabled: true
+    text: Kiểu dáng
+    order: 4
+    parent: development
 ---
 
 # Phát triển · Kiểu dáng
@@ -9,7 +19,6 @@ description: Phát triển · Kiểu dáng
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

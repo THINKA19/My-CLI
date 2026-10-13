@@ -1,6 +1,16 @@
 ---
 title: Cấu hình · Điều hướng
 description: Cấu hình · Điều hướng
+menu:
+  id: configuration.4
+  sidebar:
+    text: Điều hướng
+    order: 4
+  nav:
+    enabled: true
+    text: Điều hướng
+    order: 4
+    parent: configuration
 ---
 
 # Cấu hình · Điều hướng
@@ -9,7 +19,6 @@ description: Cấu hình · Điều hướng
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/configuration.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/configuration.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

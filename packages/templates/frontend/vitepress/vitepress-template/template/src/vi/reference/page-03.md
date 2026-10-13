@@ -1,6 +1,16 @@
 ---
 title: Tham khảo · Kiểu
 description: Tham khảo · Kiểu
+menu:
+  id: reference.3
+  sidebar:
+    text: Kiểu
+    order: 3
+  nav:
+    enabled: true
+    text: Kiểu
+    order: 3
+    parent: reference
 ---
 
 # Tham khảo · Kiểu
@@ -9,7 +19,6 @@ description: Tham khảo · Kiểu
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

@@ -1,6 +1,16 @@
 ---
 title: Tích hợp · Lưu trữ tài nguyên
 description: Tích hợp · Lưu trữ tài nguyên
+menu:
+  id: integrations.4
+  sidebar:
+    text: Lưu trữ tài nguyên
+    order: 4
+  nav:
+    enabled: true
+    text: Lưu trữ tài nguyên
+    order: 4
+    parent: integrations
 ---
 
 # Tích hợp · Lưu trữ tài nguyên
@@ -9,7 +19,6 @@ description: Tích hợp · Lưu trữ tài nguyên
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

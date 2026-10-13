@@ -1,6 +1,16 @@
 ---
 title: Triển khai · Cloudflare
 description: Triển khai · Cloudflare
+menu:
+  id: deployment.5
+  sidebar:
+    text: Cloudflare
+    order: 5
+  nav:
+    enabled: true
+    text: Cloudflare
+    order: 5
+    parent: deployment
 ---
 
 # Triển khai · Cloudflare
@@ -9,7 +19,6 @@ description: Triển khai · Cloudflare
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/deployment.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/deployment.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

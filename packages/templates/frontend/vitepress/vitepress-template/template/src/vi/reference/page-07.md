@@ -1,6 +1,11 @@
 ---
 title: Tham khảo · Bản dịch
 description: Tham khảo · Bản dịch
+menu:
+  id: reference.7
+  sidebar:
+    text: Bản dịch
+    order: 7
 ---
 
 # Tham khảo · Bản dịch
@@ -9,7 +14,6 @@ description: Tham khảo · Bản dịch
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/reference.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/reference.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

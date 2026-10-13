@@ -1,6 +1,11 @@
 ---
 title: Phát triển · Dữ liệu
 description: Phát triển · Dữ liệu
+menu:
+  id: development.6
+  sidebar:
+    text: Dữ liệu
+    order: 6
 ---
 
 # Phát triển · Dữ liệu
@@ -9,7 +14,6 @@ description: Phát triển · Dữ liệu
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/development.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/development.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)

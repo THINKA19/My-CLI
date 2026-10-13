@@ -27,4 +27,10 @@ features:
   - title: Tham khảo
     details: Xem tài liệu và ví dụ menu trong nhóm này
     link: /vi/reference/page-01
+menu:
+  id: home
+  nav:
+    enabled: true
+    text: Trang chủ
+    order: 0
 ---

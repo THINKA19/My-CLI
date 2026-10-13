@@ -1,6 +1,11 @@
 ---
 title: Tích hợp · Quyền
 description: Tích hợp · Quyền
+menu:
+  id: integrations.9
+  sidebar:
+    text: Quyền
+    order: 9
 ---
 
 # Tích hợp · Quyền
@@ -9,7 +14,6 @@ description: Tích hợp · Quyền
 
 ## Cấu hình {#details}
 
-- `.vitepress/config/sidebar/demo/integrations.ts`
-- `.vitepress/config/locales/vi/sidebar/demo/integrations.ts`
+修改本文 frontmatter 后运行 `pnpm menus:generate`。
 
 [Trang chủ](../index.md)
