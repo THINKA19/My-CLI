@@ -1,32 +1,26 @@
 ---
+# https://vitepress.dev/reference/default-theme-home-page
 layout: home
-title: 多语言文档站点
+title: 我的文档站点
+description: 基于 VitePress 的项目文档
 hero:
-  name: 多语言文档站点
-  text: 按分类浏览文档与扩展示例
+  name: 我的文档站点
+  text: VitePress
+  tagline: 从这里开始编写你的文档
   actions:
     - theme: brand
-      text: 开始阅读
-      link: /zh/getting-started/page-01
+      text: Markdown 示例
+      link: /zh/markdown-examples
+    - theme: alt
+      text: API 示例
+      link: /zh/api-examples
 features:
-  - title: 入门
-    details: 浏览本分类的文档与菜单示例
-    link: /zh/getting-started/page-01
-  - title: 配置
-    details: 浏览本分类的文档与菜单示例
-    link: /zh/configuration/page-01
-  - title: 开发
-    details: 浏览本分类的文档与菜单示例
-    link: /zh/development/page-01
-  - title: 部署
-    details: 浏览本分类的文档与菜单示例
-    link: /zh/deployment/page-01
-  - title: 集成
-    details: 浏览本分类的文档与菜单示例
-    link: /zh/integrations/page-01
-  - title: 参考
-    details: 浏览本分类的文档与菜单示例
-    link: /zh/reference/page-01
+  - title: Markdown 扩展
+    details: 体验代码高亮和提示容器。
+  - title: 运行时 API
+    details: 读取站点、主题和页面数据。
+  - title: 多语言
+    details: 提供中文、英文和越南文版本。
 menu:
   id: home
   nav:

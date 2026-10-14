@@ -11,9 +11,28 @@
         {
           "text": "首页",
           "link": "/zh/"
+        },
+        {
+          "text": "Markdown 示例",
+          "link": "/zh/markdown-examples"
+        },
+        {
+          "text": "API 示例",
+          "link": "/zh/api-examples"
         }
       ],
-      "sidebar": [],
+      "sidebar": {
+        "/zh/": [
+          {
+            "text": "Markdown 示例",
+            "link": "/zh/markdown-examples"
+          },
+          {
+            "text": "API 示例",
+            "link": "/zh/api-examples"
+          }
+        ]
+      },
       "outline": {
         "level": [
           2,
@@ -72,9 +91,28 @@
         {
           "text": "Home",
           "link": "/en/"
+        },
+        {
+          "text": "Markdown Examples",
+          "link": "/en/markdown-examples"
+        },
+        {
+          "text": "API Examples",
+          "link": "/en/api-examples"
         }
       ],
-      "sidebar": [],
+      "sidebar": {
+        "/en/": [
+          {
+            "text": "Markdown Examples",
+            "link": "/en/markdown-examples"
+          },
+          {
+            "text": "API Examples",
+            "link": "/en/api-examples"
+          }
+        ]
+      },
       "outline": {
         "level": [
           2,
@@ -133,9 +171,28 @@
         {
           "text": "Trang chủ",
           "link": "/vi/"
+        },
+        {
+          "text": "Ví dụ Markdown",
+          "link": "/vi/markdown-examples"
+        },
+        {
+          "text": "Ví dụ API",
+          "link": "/vi/api-examples"
         }
       ],
-      "sidebar": [],
+      "sidebar": {
+        "/vi/": [
+          {
+            "text": "Ví dụ Markdown",
+            "link": "/vi/markdown-examples"
+          },
+          {
+            "text": "Ví dụ API",
+            "link": "/vi/api-examples"
+          }
+        ]
+      },
       "outline": {
         "level": [
           2,

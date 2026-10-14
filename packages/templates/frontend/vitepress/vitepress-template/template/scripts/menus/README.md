@@ -1,6 +1,7 @@
 # 文档菜单生成
 
-有正文的菜单在 Markdown frontmatter 中配置；`src/menu.config.ts` 仅用于外链和无正文导航分组。
+有正文的菜单在 Markdown frontmatter 中配置；可选的 `src/menu.config.ts` 仅用于外链和无正文导航分组。
+基础模板每种语言只包含首页、Markdown 示例和 API 示例；需要额外导航时自行创建该配置文件。
 脚本扫描 `src/` 各语言目录，生成一份公共结构和各语言文字，输出至 `.vitepress/config/generated/`。
 生成文件不入库，不要手动修改。
 
@@ -15,7 +16,7 @@ pnpm menus:check     # 校验输入和内存菜单，不写文件；适合 CI
 pnpm dev             # 先生成，再启动 VitePress
 pnpm build           # 先生成，再构建
 pnpm test:menus      # 生成器测试
-pnpm test:i18n       # 生成并检查多语言配置
+node --test tests/i18n/config.test.mjs  # 生成菜单后检查多语言配置
 ```
 
 ### generate 与 check 怎么使用
@@ -35,7 +36,7 @@ pnpm test:i18n       # 生成并检查多语言配置
 | 修改 `src/menu.config.ts` 中的外链或分组 | 运行 `pnpm menus:generate` |
 | 提交前想检查菜单，或在 CI 中校验 | 运行 `pnpm menus:check` |
 | 修改普通组件、样式等无关代码 | 不需要运行菜单检查 |
-| 修改生成脚本或 i18n 解析代码 | 运行 `pnpm test:menus`、`pnpm test:i18n`；check 不能替代测试 |
+| 修改生成脚本或 i18n 解析代码 | 运行 `pnpm test:menus`、`node --test tests/i18n/config.test.mjs`；check 不能替代测试 |
 
 检查范围包括缺少翻译、重复 ID/路径/菜单链接、未知字段、错误类型、无效父分组等。
 它不是全项目代码检查，也不检查正文中的全部链接。报错时先修正文档或菜单配置，再重新执行。
@@ -53,8 +54,8 @@ pnpm dev
 pnpm menus:check
 ```
 
-目前没有菜单变更 watch。开发服务已启动时，生成后建议重启服务，确保新菜单生效；check 不会刷新页面菜单。
-新克隆无需已有生成文件，`pnpm dev` 和 `pnpm build` 都会先生成。直接运行 VitePress 命令前应先生成，否则会提示具体命令。
+菜单通过显式命令生成；开发服务已启动时，生成文件的变化会触发配置重新加载。check 不会更新页面菜单。
+新克隆无需已有生成文件，`pnpm dev` 和 `pnpm build` 都会先生成。直接运行 VitePress 命令前应先生成。
 
 ## 文档配置
 

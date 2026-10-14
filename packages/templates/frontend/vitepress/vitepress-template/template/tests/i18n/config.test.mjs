@@ -20,8 +20,9 @@ it('保持三种语言的菜单、页面地址和主题文案', () => {
     const key = language === 'zh' ? 'root' : language
     const prefix = `/${language}/`
     const actual = api.localesConfig[key]
-    assert.deepEqual(JSON.parse(JSON.stringify(actual.themeConfig.nav.slice(0, original.themeConfig.nav.length))), original.themeConfig.nav)
-    assert.equal(actual.themeConfig.sidebar[prefix], undefined)
+    assert.deepEqual(JSON.parse(JSON.stringify(actual.themeConfig.nav)), original.themeConfig.nav)
+    assert.deepEqual(actual.themeConfig.sidebar, original.themeConfig.sidebar)
+    assert.equal(actual.themeConfig.sidebar[prefix].length, 2)
     assert.equal(actual.title, original.title)
     for (const field of ['footer', 'docFooter', 'notFound'])
       assert.deepEqual(actual.themeConfig[field], original.themeConfig[field])
@@ -188,24 +189,23 @@ it('默认图标引用模板内实际提供的资源', () => {
   }
 })
 
-it('生成菜单匹配文档分区，并保留外部导航', () => {
+it('生成菜单包含两篇基础示例，导航与实际文档一致', () => {
   const links = nodes => nodes.flatMap(node => [...(node.link ? [node.link] : []), ...(node.items ? links(node.items) : [])])
   for (const language of ['zh', 'en', 'vi']) {
     const locale = api.localesConfig[language === 'zh' ? 'root' : language]
-    for (const [prefix, items] of Object.entries(locale.themeConfig.sidebar)) {
-      const category = prefix.split('/')[2]
-      const pages = fs.readdirSync(path.join(root, 'src', language, category)).filter(file => file.endsWith('.md') && file !== 'index.md')
-      assert.equal(links(items).length, pages.length)
-      assert.ok(links(items).every(link => link.startsWith(prefix)))
-    }
+    assert.deepEqual(Object.keys(locale.themeConfig.sidebar), [`/${language}/`])
+    assert.deepEqual(links(locale.themeConfig.sidebar[`/${language}/`]), [
+      `/${language}/markdown-examples`,
+      `/${language}/api-examples`,
+    ])
     const navLinks = links(locale.themeConfig.nav)
-    assert.ok(navLinks.includes('https://vitepress.dev/guide/i18n'))
-    assert.ok(navLinks.includes('mailto:docs@example.com'))
-    assert.ok(!navLinks.some(link => link.includes('/demo/')))
+    assert.deepEqual(navLinks, [`/${language}/`, `/${language}/markdown-examples`, `/${language}/api-examples`])
+    for (const name of ['markdown-examples', 'api-examples'])
+      assert.ok(fs.existsSync(path.join(root, 'src', language, `${name}.md`)))
   }
 })
 
-it('根首页提供默认语言跳转，各语言顶层仅保留 index.md 和分类目录', () => {
+it('根首页提供默认语言跳转，各语言只提供首页和两篇基础示例', () => {
   const head = api.config.transformHead({
     page: 'index.md',
     title: 'Documentation',
@@ -218,7 +218,7 @@ it('根首页提供默认语言跳转，各语言顶层仅保留 index.md 和分
   assert.ok(fs.readFileSync(path.join(root, 'src/index.md'), 'utf8').includes('RootRedirect'))
   for (const language of ['zh', 'en', 'vi']) {
     const entries = fs.readdirSync(path.join(root, 'src', language), { withFileTypes: true })
-    assert.deepEqual(entries.filter(entry => entry.isFile()).map(entry => entry.name), ['index.md'])
-    assert.equal(entries.filter(entry => entry.isDirectory()).length, 6)
+    assert.deepEqual(entries.filter(entry => entry.isFile()).map(entry => entry.name).sort(), ['api-examples.md', 'index.md', 'markdown-examples.md'])
+    assert.equal(entries.filter(entry => entry.isDirectory()).length, 0)
   }
 })

@@ -1,32 +1,26 @@
 ---
+# https://vitepress.dev/reference/default-theme-home-page
 layout: home
-title: Multilingual documentation
+title: My Documentation Site
+description: Project documentation based on VitePress
 hero:
-  name: Multilingual documentation
-  text: Browse documentation and expansion examples by category
+  name: My Documentation Site
+  text: VitePress
+  tagline: Start writing your documentation here
   actions:
     - theme: brand
-      text: Get started
-      link: /en/getting-started/page-01
+      text: Markdown Examples
+      link: /en/markdown-examples
+    - theme: alt
+      text: API Examples
+      link: /en/api-examples
 features:
-  - title: Getting started
-    details: Browse documentation and menu examples in this category
-    link: /en/getting-started/page-01
-  - title: Configuration
-    details: Browse documentation and menu examples in this category
-    link: /en/configuration/page-01
-  - title: Development
-    details: Browse documentation and menu examples in this category
-    link: /en/development/page-01
-  - title: Deployment
-    details: Browse documentation and menu examples in this category
-    link: /en/deployment/page-01
-  - title: Integrations
-    details: Browse documentation and menu examples in this category
-    link: /en/integrations/page-01
-  - title: Reference
-    details: Browse documentation and menu examples in this category
-    link: /en/reference/page-01
+  - title: Markdown Extensions
+    details: Explore syntax highlighting and custom containers.
+  - title: Runtime API
+    details: Access site, theme and page data.
+  - title: Multiple Languages
+    details: Chinese, English and Vietnamese versions.
 menu:
   id: home
   nav:

@@ -3,12 +3,13 @@
 本目录负责站点设置、多语言配置、导航与侧边栏、搜索和 SEO。主入口 `.vitepress/config.ts`
 只组合这些模块；文档内容位于 `src/`，菜单生成逻辑位于 `scripts/menus/`。
 
-模板提供中文、英文和越南语，以及六个示例分类。侧边栏入口说明见 [侧边栏生成](sidebar/README.md)。
+模板提供中文、英文和越南语，每种语言保留首页、Markdown 示例和运行时 API 示例。
+示例正文采用 VitePress 官方模板内容，页面标题和首页按语言配置；侧边栏入口说明见 [侧边栏生成](sidebar/README.md)。
 
 ## 设计原则与数据流
 
 ```text
-Markdown frontmatter + src/menu.config.ts
+Markdown frontmatter + 可选的 src/menu.config.ts
     → scripts/menus 扫描、校验、生成
     → generated 保存共享结构与各语言菜单文字
     → nav/sidebar 汇总，locales 提供各语言站点与主题文案
@@ -41,8 +42,7 @@ i18n 入口负责统一解析，便于在新增语言时检查配置是否完整
 ├── generated/                  # 自动生成，不入库：栏目结构及多语言文字
 │   ├── index.ts
 │   ├── home.ts
-│   ├── configuration.ts
-│   └── ...
+│   └── ...                     # 文件名和数量由实际菜单决定
 ├── nav/index.ts                # 静态加载并汇总生成菜单
 ├── sidebar/index.ts            # 稳定侧边栏入口
 ├── locales/
@@ -59,7 +59,8 @@ i18n 入口负责统一解析，便于在新增语言时检查配置是否完整
 ```
 
 生成逻辑位于 `scripts/menus/`：index、schema、scan、build、output 五个实现文件。
-`src/menu.config.ts` 仅存外部链接与无正文分组。有正文的节点在 Markdown frontmatter 中配置。
+有正文的节点在 Markdown frontmatter 中配置。需要外部链接或无正文分组时，
+可自行创建 `src/menu.config.ts`；文件不存在时，生成器只读取文档菜单。
 
 ## 公共配置与语言差异
 
