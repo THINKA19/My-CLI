@@ -1,0 +1,58 @@
+name: Deploy COS
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - '.vitepress/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy-tencent-cos.yml'
+      - '.env.production'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-cos
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: ${{ vars.COS_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    env:
+      COS_PREFIX: ${{ vars.COS_PREFIX }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.27.1
+      - run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+      - name: Build
+        shell: bash
+        env:
+          DEPLOY_SITE_URL: ${{ vars.COS_SITE_URL }}
+        run: |
+          test -n "$DEPLOY_SITE_URL" || { echo "COS_SITE_URL is required"; exit 1; }
+          prefix="${COS_PREFIX#/}"
+          prefix="${prefix%/}"
+          export VITE_BASE="/"
+          if [ -n "$prefix" ]; then export VITE_BASE="/$prefix/"; fi
+          export VITE_SITE_URL="$DEPLOY_SITE_URL"
+          pnpm run build:deploy
+      - name: Upload
+        run: node scripts/deploy/cos.js
+        env:
+          COS_REGION: ${{ vars.COS_REGION }}
+          COS_BUCKET: ${{ vars.COS_BUCKET }}
+          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}

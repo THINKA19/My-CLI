@@ -1,0 +1,40 @@
+name: Deploy Cloudflare Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: ${{ vars.CLOUDFLARE_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.27.1
+      - run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+      - name: Build
+        run: pnpm run build:deploy
+        env:
+          VITE_BASE: /
+          VITE_SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL }}
+      - name: Deploy
+        run: |
+          test -n "$PROJECT_NAME"
+          pnpm dlx wrangler pages deploy dist --project-name "$PROJECT_NAME" --branch main

@@ -5,17 +5,22 @@
   "description": "VitePress project scaffold",
   "license": "ISC",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "pnpm menus:generate && vitepress dev",
     "build": "pnpm menus:generate && vitepress build",
+    "build:deploy": "pnpm menus:generate && node scripts/deploy/build.js",
     "preview": "vitepress preview",
-    "preinstall": "npx only-allow pnpm",
-    "typecheck": "pnpm menus:generate && vue-tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "typecheck": "pnpm menus:generate && vue-tsc --noEmit",
     "prepare": "husky",
     "menus:generate": "tsx scripts/menus/index.ts generate",
     "menus:check": "tsx scripts/menus/index.ts check",
-    "test:menus": "tsx --test tests/menus/generate.test.ts"
+    "test:menus": "tsx --test tests/menus/generate.test.ts",
+    "test:deploy": "node --test tests/deploy/deploy.test.mjs",
+    "deploy:oss": "pnpm run build:deploy && node scripts/deploy/oss.js",
+    "deploy:cos": "pnpm run build:deploy && node scripts/deploy/cos.js",
+    "deploy:vercel:prepare": "pnpm run build:deploy && node scripts/deploy/prepare-vercel.js"
   },
   "dependencies": {
     "vue": "^3.5.43"
@@ -25,6 +30,8 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@types/node": "^26.6.2",
+    "ali-oss": "^6.23.0",
+    "cos-nodejs-sdk-v5": "^3.0.0",
     "eslint": "^10.11.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",

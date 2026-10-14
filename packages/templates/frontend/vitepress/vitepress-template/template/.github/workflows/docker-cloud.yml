@@ -1,0 +1,92 @@
+name: Build and Push Docker Images
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aliyun
+            enabled: ${{ vars.ALIYUN_DOCKER_ENABLED }}
+            registry: ${{ vars.ALIYUN_ACR_REGISTRY }}
+            image: ${{ vars.ALIYUN_DOCKER_IMAGE }}
+            site_url: ${{ vars.ALIYUN_SITE_URL }}
+            base: ${{ vars.ALIYUN_BASE || '/' }}
+            username_secret: ALIYUN_REGISTRY_USERNAME
+            password_secret: ALIYUN_REGISTRY_PASSWORD
+          - target: tencent
+            enabled: ${{ vars.TENCENT_DOCKER_ENABLED }}
+            registry: ${{ vars.TENCENT_CCR_REGISTRY }}
+            image: ${{ vars.TENCENT_DOCKER_IMAGE }}
+            site_url: ${{ vars.TENCENT_SITE_URL }}
+            base: ${{ vars.TENCENT_BASE || '/' }}
+            username_secret: TENCENT_REGISTRY_USERNAME
+            password_secret: TENCENT_REGISTRY_PASSWORD
+          - target: dockerhub
+            enabled: ${{ vars.DOCKERHUB_ENABLED }}
+            registry: docker.io
+            image: ${{ vars.DOCKERHUB_IMAGE }}
+            site_url: ${{ vars.DOCKERHUB_SITE_URL }}
+            base: ${{ vars.DOCKERHUB_BASE || '/' }}
+            username_secret: DOCKERHUB_USERNAME
+            password_secret: DOCKERHUB_TOKEN
+    steps:
+      - uses: actions/checkout@v4
+        if: matrix.enabled == 'true'
+        with:
+          fetch-depth: 0
+      - name: Validate target
+        if: matrix.enabled == 'true'
+        shell: bash
+        env:
+          REGISTRY: ${{ matrix.registry }}
+          IMAGE: ${{ matrix.image }}
+          SITE_URL: ${{ matrix.site_url }}
+        run: |
+          test -n "$REGISTRY" && test -n "$IMAGE" && test -n "$SITE_URL"
+          case "$IMAGE" in "$REGISTRY"/*) ;; *) echo "Image must include registry and namespace"; exit 1 ;; esac
+      - uses: docker/setup-buildx-action@v3
+        if: matrix.enabled == 'true'
+      - uses: docker/login-action@v3
+        if: matrix.enabled == 'true'
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets[matrix.username_secret] }}
+          password: ${{ secrets[matrix.password_secret] }}
+      - uses: docker/metadata-action@v5
+        if: matrix.enabled == 'true'
+        id: meta
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+      - uses: docker/build-push-action@v6
+        if: matrix.enabled == 'true'
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_BASE=${{ matrix.base }}
+            VITE_SITE_URL=${{ matrix.site_url }}
+          cache-from: type=gha,scope=${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.target }}
+  deploy-server:
+    needs: publish
+    if: ${{ vars.SERVER_DEPLOY_ENABLED == 'true' && github.ref == 'refs/heads/main' }}
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit

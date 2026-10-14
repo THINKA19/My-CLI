@@ -73,6 +73,10 @@ pnpm add -D mermaid
 
 * 基本完整可用版完成
 
+### v0.7.0 (2026-10-14) 
+
+* 同一套项目支持选择部署到 GitHub Pages、Cloudflare、Vercel、阿里云或腾讯云
+
 
 
 ## v1 系列

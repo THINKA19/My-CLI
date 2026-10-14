@@ -1,0 +1,40 @@
+name: Deploy Vercel
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-vercel
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: ${{ vars.VERCEL_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.27.1
+      - run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+      - name: Build static site
+        run: pnpm run build:deploy
+        env:
+          VITE_BASE: /
+          VITE_SITE_URL: ${{ vars.VERCEL_SITE_URL }}
+      - name: Prepare prebuilt output
+        run: node scripts/deploy/prepare-vercel.js
+      - name: Deploy
+        run: pnpm dlx vercel deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN"

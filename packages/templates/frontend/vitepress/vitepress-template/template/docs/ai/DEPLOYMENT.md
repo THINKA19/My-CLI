@@ -19,6 +19,10 @@ ENABLED 变量必须是字符串 true。Pages、OSS、COS、Vercel、Cloudflare 
 | 腾讯云镜像 | TENCENT_DOCKER_ENABLED=true、TENCENT_CCR_REGISTRY、TENCENT_DOCKER_IMAGE、TENCENT_SITE_URL | TENCENT_REGISTRY_USERNAME、TENCENT_REGISTRY_PASSWORD |
 | Docker Hub | DOCKERHUB_ENABLED=true、DOCKERHUB_IMAGE、DOCKERHUB_SITE_URL | DOCKERHUB_USERNAME、DOCKERHUB_TOKEN |
 
+Docker 部署目录默认 `/`，可通过 ALIYUN_BASE、TENCENT_BASE 或 DOCKERHUB_BASE 设置对应镜像的子路径。
+例如 BASE=/docs/ 时，SITE_URL 应为 https://docs.example.com/docs/。镜像内部已按该目录保存文件。
+Cloudflare Pages 和 Vercel 的工作流部署到站点根目录；GitHub Pages 自动读取仓库站点路径。
+
 SITE_URL 填实际公开站点完整地址；上传子目录时包含该目录，例如 https://docs.example.com/docs。
 镜像 IMAGE 填不带 tag 的完整地址，例如 docker.io/account/vitepress-docs，
 或 registry.example.com/namespace/vitepress-docs。REGISTRY 只填域名，不包含 https:// 和路径。
@@ -45,14 +49,14 @@ PowerShell 示例：
 ```powershell
 $env:VITE_SITE_URL = 'https://docs.example.com'
 $env:VITE_BASE = '/'
-pnpm build
+pnpm build:deploy
 docker compose -f docker/docker-compose.yml up -d --build
 ```
 
 部署 SDK 已纳入根目录 devDependencies，统一运行 `pnpm install`。
 上传可运行 `pnpm deploy:oss` 或 `pnpm deploy:cos`（均先构建再上传）。
 依赖、环境变量和各脚本的用法见 [部署脚本说明](../../scripts/deploy/README.md)。
-脚本全量上传，HTML 最后上传，不删除远端文件、不修改存储桶权限。
+脚本全量上传，资源上传成功后再上传 HTML，上传失败立即停止；不删除远端文件、不修改存储桶权限。
 不要在浏览器端或 VITE_ 变量中放置访问密钥。
 
 ## 静态网站托管前提
@@ -64,6 +68,13 @@ OSS/COS 上传脚本不创建存储桶、CDN 或域名。须在控制台启用�
 COS_REGION 与 OSS_REGION 按实际地域设置，OSS_ENDPOINT 可用于指定对应服务端点。
 
 Vercel Workflow 使用 Build Output API 上传预构建产物，不使用根目录 vercel.json 的构建及重写设置。
-直接使用 Vercel Git 集成部署时，需另行检查该文件的 Node 版本设置和路由规则。
+直接使用 Vercel Git 集成部署时，应在平台设置 Node.js 24、构建命令 pnpm build:deploy 和输出目录 dist，
+并配置部署环境变量。本文工作流方式已经提供独立的预构建发布流程。
+
+## 验证与依赖锁定
+
+生成项目包含 pnpm-lock.yaml，需随项目提交。更改依赖后先运行 pnpm install 更新锁文件。
+本地执行 pnpm test:deploy、pnpm typecheck 和 pnpm build:deploy；Docker 执行步骤见
+[Docker 说明](../../docker/README.md)。测试和构建不会发布到云平台。
 
 上线前参考 [部署检查清单](DEPLOYMENT_CHECKLIST.md)，项目维护见 [维护指南](MAINTENANCE.md)。

@@ -5,6 +5,8 @@
 **/.pnpm/**
 **/dist
 **/dist/**
+**/.vercel
+**/.vercel/**
 **/.turbo
 **/.turbo/**
 **/.vitepress/cache
@@ -18,7 +20,6 @@
 **/.env.local
 **/.env.*.local
 
-# 3. 排除 lock 文件（脚手架模板保持干净，由用户初始化后自行 install 生成）
-**/pnpm-lock.yaml
+# 3. 保留 pnpm 锁文件供 CI/Docker 冻结安装；其他包管理器锁文件不分发
 **/yarn.lock
 **/package-lock.json

@@ -224,3 +224,14 @@ v0.6.0不可用，修正它的错误
 ## v0.6.6 (2026-10-14) 
 
 * 基本完整可用版完成
+
+## v0.7.0 (2026-10-14) 
+
+### 新增
+
+同一套项目支持选择部署到 GitHub Pages、Cloudflare、Vercel、阿里云或腾讯云
+
+* .github/workflows
+* docker
+* _dockerignore
+* package.json

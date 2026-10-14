@@ -19,7 +19,7 @@ const SKIP = new Set([
   '.git',
   '.DS_Store',
   '.npmignore',
-  'pnpm-lock.yaml',
+  '.vercel',
   'package-lock.json',
   'yarn.lock',
 ])

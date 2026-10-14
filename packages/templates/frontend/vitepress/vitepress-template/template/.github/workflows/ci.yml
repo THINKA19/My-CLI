@@ -52,6 +52,9 @@ jobs:
       - name: Type check
         run: pnpm run typecheck
 
+      - name: Deployment script tests
+        run: pnpm run test:deploy
+
       # Step 7: 运行 VitePress 预编译打包测试
       # 验证生产打包逻辑（pnpm docs:build / pnpm build），确认 Markdown / Vue 组件渲染无断裂风险，产出 VitePress dist 静态文件
       - name: Test Build
