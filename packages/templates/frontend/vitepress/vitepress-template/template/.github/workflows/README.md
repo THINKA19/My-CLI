@@ -8,6 +8,30 @@
 更新已有项目时须同步 scripts/deploy、tests/deploy、eslint.config.js 及根目录依赖配置，
 仅替换本目录不能解决脚本缺失或 ESLint 规则不一致。
 
+## Action 版本维护
+
+2026-10-14 已核对全部外部 Action 的官方最新稳定发布，使用明确版本号。
+各 Action 独立发布，不能统一替换成 v5。JavaScript Action 使用 Node.js 24，
+SSH 和 Pages 产物上传使用组合步骤。项目构建仍使用 Node.js 24、pnpm 11.27.1。
+Setup Node 显式关闭自动缓存，避免升级引入新的缓存查询行为。
+
+| Action | 使用版本 | 官方发布说明 |
+| --- | --- | --- |
+| actions/checkout | v7.0.1 | [发布说明](https://github.com/actions/checkout/releases/tag/v7.0.1) |
+| actions/setup-node | v7.1.0 | [发布说明](https://github.com/actions/setup-node/releases/tag/v7.1.0) |
+| pnpm/action-setup | v6.1.0 | [发布说明](https://github.com/pnpm/action-setup/releases/tag/v6.1.0) |
+| actions/configure-pages | v6.0.0 | [发布说明](https://github.com/actions/configure-pages/releases/tag/v6.0.0) |
+| actions/upload-pages-artifact | v5.0.0 | [发布说明](https://github.com/actions/upload-pages-artifact/releases/tag/v5.0.0) |
+| actions/deploy-pages | v5.0.1 | [发布说明](https://github.com/actions/deploy-pages/releases/tag/v5.0.1) |
+| docker/setup-buildx-action | v4.4.1 | [发布说明](https://github.com/docker/setup-buildx-action/releases/tag/v4.4.1) |
+| docker/login-action | v4.6.0 | [发布说明](https://github.com/docker/login-action/releases/tag/v4.6.0) |
+| docker/metadata-action | v6.2.0 | [发布说明](https://github.com/docker/metadata-action/releases/tag/v6.2.0) |
+| docker/build-push-action | v7.4.0 | [发布说明](https://github.com/docker/build-push-action/releases/tag/v7.4.0) |
+| appleboy/ssh-action | v1.2.5 | [发布说明](https://github.com/appleboy/ssh-action/releases/tag/v1.2.5) |
+
+当前使用 GitHub 托管 Ubuntu runner；迁移到自托管 runner 时须核对 Action 的最低 runner 版本。
+本地 YAML 和回归检查不执行远端 Action，升级后仍须推送生成项目并运行 CI 与全平台测试。
+
 | 分类 | 文件 | 触发与作用 |
 | --- | --- | --- |
 | 检查 | ci.yml | main 推送和 PR：代码、类型、构建检查 |

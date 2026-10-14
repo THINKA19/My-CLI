@@ -1,24 +1,47 @@
+# ==============================================================================
+# 📄 GitHub Actions CI/CD 工作流文件：GitHub Pages 网站部署执行子流
+# ------------------------------------------------------------------------------
+# 💡 【新手学习指南 / 本文件作用与使用说明】
+# 1. 这个文件是做什么的？
+#    这是一个可复用的部署子工作流（workflow_call）。它的作用是在被主发布流程
+#    （如 release.yml）调用时，自动获取当前 GitHub Pages 的域名和路径配置，
+#    打包编译前端静态项目，并将产物上传并发布至 GitHub Pages 服务。
+#
+# 2. 它是怎么运行和使用的？
+#    - 触发机制：仅支持 `workflow_call` 被动调用，不能由 Git 事件（push/PR）直接触发，
+#      从而有效避免了重复或冲突部署。
+#    - 前置权限：配置了 `pages: write` 与 `id-token: write` 权限，用于与官方 Pages 服务联动。
+# ==============================================================================
+
 # 执行 GitHub Pages 发布，只由 release.yml 调用。
 # Pages 仅由 release.yml 调用，避免重复部署。
 name: 网站部署执行 / GitHub Pages
+
+# 声明为可复用的子工作流，由外部父工作流通过 uses 关键字调用
 on:
   workflow_call:
+
+# 权限配置：允许写入 Pages 和获取 OIDC 身份令牌
 permissions:
   contents: read
   pages: write
   id-token: write
+
 jobs:
   deploy:
     name: 执行平台部署
     runs-on: ubuntu-latest
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: github-pages                        # 部署环境设置为 github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # 自动捕获发布后的站点 URL
     steps:
+      # Step 1: 完整拉取仓库代码
       - name: 检出项目代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
+
+      # Step 2: 检查核心配置文件与脚本完整性
       # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
       - name: 检查项目文件是否齐全
         shell: bash
@@ -31,30 +54,45 @@ jobs:
             fi
           done
           exit "$missing"
+
+      # Step 3: 配置 Node.js 24 运行环境
       - name: 配置 Node.js 24 环境
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: '24'
+          package-manager-cache: false
+
+      # Step 4: 安装统一版本的 pnpm 包管理器
       - name: 安装 pnpm 11.27.1
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6.1.0
         with:
           version: 11.27.1
+
+      # Step 5: 依据锁文件安装依赖，禁用 Husky 钩子加速 CI
       - name: 按锁文件安装依赖
         run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
+
+      # Step 6: 获取当前 GitHub 仓库配置的 Pages 站点基准路径与完整域名
       - name: 读取 GitHub Pages 域名和路径
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6.0.0
+
+      # Step 7: 动态注入 Pages 的 Base 路径并构建静态网站产物
       - name: 构建网站部署产物
         run: pnpm run build:deploy
         env:
           VITE_BASE: ${{ steps.pages.outputs.base_path }}/
           VITE_SITE_URL: ${{ steps.pages.outputs.base_url }}
+
+      # Step 8: 将 dist 打包目录打包为 GitHub Pages 官方要求的 Artifact 格式
       - name: 上传 GitHub Pages 网站产物
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: dist
+
+      # Step 9: 调用官方 Action 将产物正式发布至 GitHub Pages 生产环境
       - name: 发布到 GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5.0.1
         id: deployment

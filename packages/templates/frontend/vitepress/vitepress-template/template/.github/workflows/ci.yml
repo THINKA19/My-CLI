@@ -1,20 +1,44 @@
+# ==============================================================================
+# 📄 GitHub Actions CI 工作流文件：代码规范与构建检查
+# ------------------------------------------------------------------------------
+# 💡 【新手学习指南 / 本文件作用与使用说明】
+# 1. 这个文件是做什么的？
+#    这是一个 CI（持续集成）配置文件。它的作用是像一个自动化测试机器人一样，
+#    在代码提交或合并前，自动帮你检查代码格式、TypeScript 类型规范以及项目构建是否能通过。
+#
+# 2. 它是怎么运行和使用的？
+#    - 自动触发：当你向 main 分支推送代码（push）或提交合并请求（pull_request）时，
+#      GitHub 会自动在云端（ubuntu 虚拟环境）中按顺序执行下面定义的步骤。
+#    - 手动触发：你也可以在 GitHub 仓库的「Actions」标签页中找到此工作流，点击按钮手动运行。
+#    - 无需额外配置：本文件仅做代码质量检查，不涉及云平台部署或密钥配置，适合作为项目的第一道质量防线。
+# ==============================================================================
+
 # 仅验证项目质量，不登录云平台，也不发布网站。
 name: 检查 / 代码与构建
+
+# 定义工作流的触发条件（在什么情况下自动或手动运行）
 on:
   push:
-    branches: [main]
+    branches: [main]       # 当推送到 main 分支时触发
   pull_request:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main]       # 当向 main 分支发起 Pull Request 时触发
+  workflow_dispatch:        # 支持在 GitHub 界面手动点击运行
+
+# 赋予该工作流的基本权限：仅读取仓库内容
 permissions:
   contents: read
+
 jobs:
   check:
     name: 代码规范、类型与构建检查
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 指定运行环境为最新版的 Ubuntu 虚拟机
+
     steps:
+      # Step 1: 将 GitHub 仓库中的项目代码拉取（下载）到 CI 运行环境的虚拟机中
       - name: 检出项目代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
+
+      # Step 2: 校验项目核心文件与锁文件是否存在且非空，确保 CI 检查的基础文件完整
       # 锁文件必须随项目提交，CI 不会临时生成锁文件来绕过检查。
       - name: 检查依赖配置和测试文件
         shell: bash
@@ -22,24 +46,39 @@ jobs:
           for file in package.json pnpm-lock.yaml pnpm-workspace.yaml eslint.config.js tests/deploy/workflows.test.mjs; do
             test -s "$file" || { echo "::error file=$file::缺少或为空：$file，请提交完整项目。"; exit 1; }
           done
+
+      # Step 3: 在虚拟机中安装并配置指定版本的 Node.js（24.x），为后续运行脚本搭建 JavaScript 运行环境
       # 先配置 Node，再安装统一版本的 pnpm，避免混用默认环境。
       - name: 配置 Node.js 24 环境
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: '24'
+          package-manager-cache: false
+
+      # Step 4: 全局安装指定版本的 pnpm 包管理器（11.27.1），确保团队与 CI 环境的依赖安装工具版本一致
       - name: 安装 pnpm 11.27.1
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6.1.0
         with:
           version: 11.27.1
+
+      # Step 5: 严格按照 pnpm-lock.yaml 锁文件安装项目依赖，禁止更新锁文件；同时禁用 Git 钩子（HUSKY=0）加速 CI
       - name: 按锁文件安装依赖
         run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
+
+      # Step 6: 运行 ESLint 代码检查命令，确保项目代码符合预设的书写规范和样式要求
       - name: 检查代码规范
         run: pnpm run lint
+
+      # Step 7: 运行 TypeScript 类型检查，校验全局变量、函数及组件的类型定义是否正确
       - name: 检查 TypeScript 类型
         run: pnpm run typecheck
+
+      # Step 8: 执行部署脚本的回归测试，验证部署相关逻辑与自动化流程是否正常
       - name: 运行部署脚本回归测试
         run: pnpm run test:deploy
+
+      # Step 9: 执行项目的打包构建命令，验证生产环境打包过程无报错、无缺失依赖，确保可正常上线
       - name: 验证网站生产构建
         run: pnpm run build

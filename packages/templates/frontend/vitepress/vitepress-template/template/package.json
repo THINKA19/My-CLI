@@ -1,7 +1,7 @@
 {
   "name": "create-vitepress-template",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.7.3",
   "description": "VitePress project scaffold",
   "license": "ISC",
   "imports": {

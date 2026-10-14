@@ -1,24 +1,54 @@
+# ==============================================================================
+# 📄 GitHub Actions CI/CD 工作流文件：自动部署静态网站至腾讯云 COS 对象存储
+# ------------------------------------------------------------------------------
+# 💡 【新手学习指南 / 本文件作用与使用说明】
+# 1. 这个文件是做什么的？
+#    这是一个自动化部署（CD）配置文件。它的作用是在你将代码推送到 GitHub 后，
+#    自动在云端根据访问路径（Base URL）格式化并编译前端项目，随后将打包好的静态资源
+#    同步上传到腾讯云 COS 存储桶中，实现网站的自动发布更新。
+#
+# 2. 它是怎么运行和使用的？
+#    - 自动触发：推送代码到 main 分支时自动触发。
+#    - 手动触发：可在 GitHub 仓库的「Actions」界面找到此工作流，点击按钮手动触发。
+#    - 前置依赖：需在仓库 Settings（环境变量与密钥）中配置腾讯云 COS 参数：
+#      * Variables（变量）：COS_ENABLED（开启开关）、COS_SITE_URL、COS_REGION、COS_BUCKET、COS_PREFIX
+#      * Secrets（密钥）  ：COS_SECRET_ID、COS_SECRET_KEY
+# ==============================================================================
+
 # 发布腾讯云 COS；上传目录与网站访问路径必须一致。
 name: 网站部署 / 腾讯云 COS
+
+# 触发条件配置：推送代码到 main 分支或手动触发
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
+# 权限配置：赋予工作流读取仓库代码的权限
 permissions:
   contents: read
+
+# 并发控制：确保同一时间只有一个部署任务在运行，避免多次连续提交造成冲突
 concurrency:
   group: deploy-cos
   cancel-in-progress: false
+
 jobs:
+  # ----------------------------------------------------------------------------
+  # Job 1: 部署选择与状态校验（确定是否满足发布条件）
+  # ----------------------------------------------------------------------------
   selection:
     name: 部署选择与状态说明
     runs-on: ubuntu-latest
     outputs:
-      selected: ${{ steps.plan.outputs.selected }}
-      matrix: ${{ steps.plan.outputs.matrix }}
+      selected: ${{ steps.plan.outputs.selected }} # 输出是否允许继续部署的标志
+      matrix: ${{ steps.plan.outputs.matrix }}     # 输出部署矩阵信息
     steps:
+      # Step 1: 下载仓库代码到云端虚拟机
       - name: 检出项目代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
+
+      # Step 2: 校验项目基础文件与部署脚本是否存在且有效，避免中途报错
       # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
       - name: 检查项目文件是否齐全
         shell: bash
@@ -31,29 +61,42 @@ jobs:
             fi
           done
           exit "$missing"
+
+      # Step 3: 配置 Node.js 24 运行环境
       - name: 配置 Node.js 24 环境
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: '24'
+          package-manager-cache: false
+
+      # Step 4: 执行决策脚本，检查环境变量（如 COS_ENABLED）是否开启，决定是否触发发布
       - name: 判断部署目标并说明状态
         id: plan
         run: node scripts/deploy/plan.js cos
         env:
           DEPLOY_VARS: ${{ toJSON(vars) }}
           DEPLOY_EVENT: ${{ github.event_name }}
+
+  # ----------------------------------------------------------------------------
+  # Job 2: 执行实际的构建与腾讯云 COS 文件上传
+  # ----------------------------------------------------------------------------
   deploy:
     name: 执行平台部署
-    needs: selection
+    needs: selection # 依赖选择阶段：只有 Job 1 判定允许部署（outputs.selected == 'true'）时才执行
     # 未选中平台时跳过实际发布，原因显示在选择任务的摘要中。
     if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
+    # 注入目录前缀环境变量
     env:
       COS_PREFIX: ${{ vars.COS_PREFIX }}
     steps:
+      # Step 1: 完整拉取代码（fetch-depth: 0 表示获取完整 Git 提交历史，便于部署分析）
       - name: 检出项目代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
+
+      # Step 2: 二次校验部署必须文件
       # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
       - name: 检查项目文件是否齐全
         shell: bash
@@ -66,10 +109,15 @@ jobs:
             fi
           done
           exit "$missing"
+
+      # Step 3: 配置 Node.js 24 环境
       - name: 配置 Node.js 24 环境
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: '24'
+          package-manager-cache: false
+
+      # Step 4: 检查平台部署配置，验证 COS_REGION、COS_BUCKET 及 SecretID/SecretKey 是否配置齐全
       - name: 检查平台部署配置
         run: node scripts/deploy/check-config.js cos
         env:
@@ -78,14 +126,20 @@ jobs:
           COS_BUCKET: ${{ vars.COS_BUCKET }}
           COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
           COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+
+      # Step 5: 安装统一版本的 pnpm 工具
       - name: 安装 pnpm 11.27.1
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6.1.0
         with:
           version: 11.27.1
+
+      # Step 6: 依据锁文件安装依赖，禁用 Husky 钩子加速 CI
       - name: 按锁文件安装依赖
         run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
+
+      # Step 7: 格式化 COS_PREFIX 目录前缀，并根据访问路径自动设置 VITE_BASE 后打包编译静态产物
       - name: 构建网站部署产物
         shell: bash
         env:
@@ -98,6 +152,8 @@ jobs:
           if [ -n "$prefix" ]; then export VITE_BASE="/$prefix/"; fi
           export VITE_SITE_URL="$DEPLOY_SITE_URL"
           pnpm run build:deploy
+
+      # Step 8: 调用自定义 Node.js 脚本，利用腾讯云 COS SDK 将 dist 目录打包产物同步上传至目标 Bucket
       - name: 上传静态网站文件
         run: node scripts/deploy/cos.js
         env:
