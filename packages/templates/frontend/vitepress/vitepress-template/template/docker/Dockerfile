@@ -24,8 +24,10 @@ COPY . .
 # 6. 执行编译打包
 ARG VITE_BASE=/
 ARG VITE_SITE_URL
-RUN VITE_BASE="$VITE_BASE" VITE_SITE_URL="$VITE_SITE_URL" pnpm run build:deploy \
-    && mkdir -p "/site${VITE_BASE}" \
+# 构建上下文不包含 .git；关闭依赖 Git 历史的更新时间功能。
+RUN VITE_LAST_UPDATED=false VITE_BASE="$VITE_BASE" VITE_SITE_URL="$VITE_SITE_URL" pnpm run build:deploy
+# 独立整理产物，使构建失败和文件复制失败在日志中清楚区分。
+RUN mkdir -p "/site${VITE_BASE}" \
     && cp -a dist/. "/site${VITE_BASE}" \
     && cp dist/404.html /site/404.html
 

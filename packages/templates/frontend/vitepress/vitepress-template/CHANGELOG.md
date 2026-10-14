@@ -81,6 +81,10 @@ pnpm add -D mermaid
 
 * docker 和 CICD  修复
 
+### v0.7.2 (2026-10-14) 
+
+* docker 和 CICD 测试全部通过
+
 
 
 ## v1 系列

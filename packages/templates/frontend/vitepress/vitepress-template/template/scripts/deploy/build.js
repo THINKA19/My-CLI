@@ -18,4 +18,12 @@ if (url.search || url.hash || url.username || url.password)
   throw new Error('VITE_SITE_URL 不应包含查询参数、锚点或账号凭据')
 
 // SEO 与 sitemap 的地址统一由 site.ts 处理，保留部署子路径及页面级分享设置。
-await build(root)
+await build(root, {
+  // 在站点配置解析后覆盖，确保 Docker 开关不会因配置文件版本不同而失效。
+  onAfterConfigResolve(config) {
+    if (env.VITE_LAST_UPDATED === 'false') {
+      config.lastUpdated = false
+      console.log('本次部署构建不读取 Git 更新时间')
+    }
+  },
+})

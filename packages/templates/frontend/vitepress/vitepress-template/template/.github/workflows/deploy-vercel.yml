@@ -1,3 +1,4 @@
+# 发布 Vercel；自动发布需开启 VERCEL_ENABLED。
 name: 网站部署 / Vercel
 on:
   push:
@@ -16,18 +17,34 @@ jobs:
       selected: ${{ steps.plan.outputs.selected }}
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: 检出项目代码
+        uses: actions/checkout@v4
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Resolve deployment selection
+      - name: 判断部署目标并说明状态
         id: plan
         run: node scripts/deploy/plan.js vercel
         env:
           DEPLOY_VARS: ${{ toJSON(vars) }}
           DEPLOY_EVENT: ${{ github.event_name }}
   deploy:
+    name: 执行平台部署
     needs: selection
+    # 未选中平台时跳过实际发布，原因显示在选择任务的摘要中。
     if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
     env:
@@ -35,31 +52,47 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 检出项目代码
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Check deployment configuration
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: 检查平台部署配置
         run: node scripts/deploy/check-config.js vercel
         env:
           VERCEL_SITE_URL: ${{ vars.VERCEL_SITE_URL }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - uses: pnpm/action-setup@v4
+      - name: 安装 pnpm 11.27.1
+        uses: pnpm/action-setup@v4
         with:
           version: 11.27.1
-      - run: pnpm install --frozen-lockfile
+      - name: 按锁文件安装依赖
+        run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
-      - name: Build static site
+      - name: 构建静态网站
         run: pnpm run build:deploy
         env:
           VITE_BASE: /
           VITE_SITE_URL: ${{ vars.VERCEL_SITE_URL }}
-      - name: Prepare prebuilt output
+      - name: 准备 Vercel 发布产物
         run: node scripts/deploy/prepare-vercel.js
-      - name: Deploy
+      - name: 发布网站
         run: pnpm dlx vercel deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN"

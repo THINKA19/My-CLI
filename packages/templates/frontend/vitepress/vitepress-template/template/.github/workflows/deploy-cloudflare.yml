@@ -1,3 +1,4 @@
+# 发布 Cloudflare Pages；自动发布需开启 CLOUDFLARE_ENABLED。
 name: 网站部署 / Cloudflare Pages
 on:
   push:
@@ -16,18 +17,34 @@ jobs:
       selected: ${{ steps.plan.outputs.selected }}
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: 检出项目代码
+        uses: actions/checkout@v4
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Resolve deployment selection
+      - name: 判断部署目标并说明状态
         id: plan
         run: node scripts/deploy/plan.js cloudflare
         env:
           DEPLOY_VARS: ${{ toJSON(vars) }}
           DEPLOY_EVENT: ${{ github.event_name }}
   deploy:
+    name: 执行平台部署
     needs: selection
+    # 未选中平台时跳过实际发布，原因显示在选择任务的摘要中。
     if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
     env:
@@ -35,31 +52,47 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 检出项目代码
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Check deployment configuration
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: 检查平台部署配置
         run: node scripts/deploy/check-config.js cloudflare
         env:
           CLOUDFLARE_SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - uses: pnpm/action-setup@v4
+      - name: 安装 pnpm 11.27.1
+        uses: pnpm/action-setup@v4
         with:
           version: 11.27.1
-      - run: pnpm install --frozen-lockfile
+      - name: 按锁文件安装依赖
+        run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
-      - name: Build
+      - name: 构建网站部署产物
         run: pnpm run build:deploy
         env:
           VITE_BASE: /
           VITE_SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL }}
-      - name: Deploy
+      - name: 发布网站
         run: |
           test -n "$PROJECT_NAME"
           pnpm dlx wrangler pages deploy dist --project-name "$PROJECT_NAME" --branch main

@@ -1,3 +1,4 @@
+# 执行 GitHub Pages 发布，只由 release.yml 调用。
 # Pages 仅由 release.yml 调用，避免重复部署。
 name: 网站部署执行 / GitHub Pages
 on:
@@ -8,33 +9,52 @@ permissions:
   id-token: write
 jobs:
   deploy:
+    name: 执行平台部署
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 检出项目代码
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - uses: pnpm/action-setup@v4
+      - name: 安装 pnpm 11.27.1
+        uses: pnpm/action-setup@v4
         with:
           version: 11.27.1
-      - run: pnpm install --frozen-lockfile
+      - name: 按锁文件安装依赖
+        run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
-      - name: Resolve Pages URL
+      - name: 读取 GitHub Pages 域名和路径
         id: pages
         uses: actions/configure-pages@v5
-      - name: Build
+      - name: 构建网站部署产物
         run: pnpm run build:deploy
         env:
           VITE_BASE: ${{ steps.pages.outputs.base_path }}/
           VITE_SITE_URL: ${{ steps.pages.outputs.base_url }}
-      - uses: actions/upload-pages-artifact@v3
+      - name: 上传 GitHub Pages 网站产物
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-      - uses: actions/deploy-pages@v4
+      - name: 发布到 GitHub Pages
+        uses: actions/deploy-pages@v4
         id: deployment

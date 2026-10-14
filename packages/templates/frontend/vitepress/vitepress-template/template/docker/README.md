@@ -47,3 +47,8 @@ HTTPS 可由服务器前方的反向代理或负载均衡提供。
 GitHub Actions 可以独立推送到阿里云 ACR、腾讯云镜像仓库或 Docker Hub，
 再由通用服务器工作流拉取提交 SHA 对应的镜像。镜像推送与服务器运行是两个步骤。
 启用开关、域名和凭据见 [多平台部署指南](../docs/ai/DEPLOYMENT.md)。
+# Docker 构建中的 Git 历史
+
+构建上下文不包含 `.git`，Alpine 构建阶段也不安装 Git。
+Dockerfile 设置 `VITE_LAST_UPDATED=false`，关闭需要 Git 历史的更新时间显示；
+普通构建保持默认开启。Docker 测试仍需完成镜像构建与 HTTP 检查才算通过。

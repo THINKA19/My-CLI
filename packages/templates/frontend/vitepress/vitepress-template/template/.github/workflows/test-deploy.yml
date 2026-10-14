@@ -1,3 +1,4 @@
+# 测试各平台构建适配与容器访问，不使用云账号，也不发布。
 name: 测试 / 全平台部署适配（不发布）
 on:
   push:
@@ -9,7 +10,7 @@ permissions:
   contents: read
 jobs:
   static:
-    name: 静态产物 / ${{ matrix.target }} / ${{ matrix.layout }}
+    name: 静态产物 / ${{ matrix.target == 'oss' && '阿里云 OSS' || matrix.target == 'cos' && '腾讯云 COS' || matrix.target == 'pages' && 'GitHub Pages' || matrix.target == 'vercel' && 'Vercel' || 'Cloudflare Pages' }} / ${{ matrix.layout == 'root' && '根路径' || '子路径' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -22,29 +23,48 @@ jobs:
           - target: cloudflare
             layout: subpath
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: 检出项目代码
+        uses: actions/checkout@v4
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - uses: pnpm/action-setup@v4
+      - name: 安装 pnpm 11.27.1
+        uses: pnpm/action-setup@v4
         with:
           version: 11.27.1
-      - run: pnpm install --frozen-lockfile
+      - name: 按锁文件安装依赖
+        run: pnpm install --frozen-lockfile
         env:
           HUSKY: '0'
-      - run: pnpm test:deploy
-      - run: pnpm build:deploy
+      - name: 运行部署脚本回归测试
+        run: pnpm test:deploy
+      - name: 构建测试网站
+        run: pnpm build:deploy
         env:
           VITE_BASE: ${{ matrix.layout == 'subpath' && '/docs/' || '/' }}
           VITE_SITE_URL: ${{ matrix.layout == 'subpath' && 'https://example.com/docs' || 'https://example.com' }}
-      - name: Verify static output
+      - name: 检查页面、资源和站点地图
         run: node scripts/deploy/verify-output.js
         env:
           VITE_BASE: ${{ matrix.layout == 'subpath' && '/docs/' || '/' }}
           VITE_SITE_URL: ${{ matrix.layout == 'subpath' && 'https://example.com/docs' || 'https://example.com' }}
-      - if: matrix.target == 'vercel'
+      - name: 准备 Vercel 测试产物
+        if: matrix.target == 'vercel'
         run: node scripts/deploy/prepare-vercel.js
-      - name: Record verification boundary
+      - name: 记录测试范围
         run: echo '本任务仅验证构建和适配；未执行云端发布。' >> "$GITHUB_STEP_SUMMARY"
   docker:
     name: Docker 构建与 HTTP / ${{ matrix.base }}
@@ -54,20 +74,60 @@ jobs:
       matrix:
         base: [/, /docs/]
     steps:
-      - uses: actions/checkout@v4
-      - name: Build image
+      - name: 检出项目代码
+        uses: actions/checkout@v4
+      # 在执行脚本前检查提交内容，避免文件遗漏变成不明原因的失败。
+      - name: 检查项目文件是否齐全
+        shell: bash
+        run: |
+          missing=0
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/deploy/plan.js scripts/deploy/check-config.js scripts/deploy/build.js scripts/deploy/verify-output.js; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::缺少或为空：$file。请完整生成项目并提交此文件。"
+              missing=1
+            fi
+          done
+          exit "$missing"
+      - name: 配置 Node.js 24 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: 构建测试镜像
         run: docker build -f docker/Dockerfile --build-arg VITE_BASE="$BASE" --build-arg VITE_SITE_URL="https://example.com${BASE}" -t docs-test .
         env:
           BASE: ${{ matrix.base }}
-      - name: Start and verify
+      - name: 启动容器并验证页面
+        shell: bash
         env:
           BASE: ${{ matrix.base }}
         run: |
           docker run -d --name docs-test -p 8080:80 docs-test
-          curl --retry 15 --retry-connrefused --retry-delay 2 --fail http://localhost:8080/healthz
-          for page in zh/ en/ vi/; do
-            curl --fail "http://localhost:8080${BASE}${page}"
+          # docker run 返回不代表 Nginx 已就绪；连接重置也需等待重试。
+          ready=false
+          for attempt in $(seq 1 30); do
+            if [ "$(docker inspect --format '{{.State.Running}}' docs-test)" != true ]; then
+              echo "::error::测试容器已退出，请查看容器诊断日志。"
+              exit 1
+            fi
+            if curl --silent --show-error --fail --connect-timeout 2 --max-time 3 http://127.0.0.1:8080/healthz; then
+              ready=true
+              break
+            fi
+            sleep 2
           done
-          test "$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080${BASE}missing-page")" = 404
-      - if: always()
+          [ "$ready" = true ] || { echo "::error::容器在等待期限内未就绪。"; exit 1; }
+          # 就绪后严格检查页面；失败仍让任务报错，不掩盖服务问题。
+          for page in zh/ en/ vi/; do
+            curl --silent --show-error --fail --max-time 10 "http://127.0.0.1:8080${BASE}${page}" -o /dev/null
+          done
+          test "$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' "http://127.0.0.1:8080${BASE}missing-page")" = 404
+      - name: 输出失败容器诊断
+        if: failure()
+        run: |
+          docker ps -a --filter name=docs-test
+          docker inspect docs-test || true
+          docker logs --tail 100 docs-test || true
+          docker exec docs-test nginx -t || true
+      - name: 清理测试容器
+        if: always()
         run: docker rm -f docs-test || true

@@ -31,7 +31,8 @@ export const siteConfig = {
   outDir: './dist',
   ignoreDeadLinks: [/^https?:\/\/localhost/],
   appearance: true,
-  lastUpdated: true,
+  // Docker 不携带 Git 历史，允许关闭更新时间，避免构建时调用不存在的 Git。
+  lastUpdated: env.VITE_LAST_UPDATED !== 'false',
   sitemap: { hostname: siteUrl, transformItems: transformSitemapItems },
   vite: {
     publicDir: '../public',
