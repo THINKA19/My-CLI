@@ -1,5 +1,8 @@
 # 部署检查清单
 
+工作流分类见 [工作流说明](../../.github/workflows/README.md)，全平台测试与结果记录见
+[部署测试指南](DEPLOYMENT_TESTING.md)。
+
 本项目支持选择一个或多个部署目标，各目标独立配置。平台凭据和域名通过环境变量、
 GitHub Variables 与 Secrets 提供，配置项以 [部署指南](DEPLOYMENT.md) 为准。
 

@@ -1,17 +1,7 @@
-name: Deploy OSS
+name: 网站部署 / 阿里云 OSS
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - '.vitepress/**'
-      - 'scripts/**'
-      - '.github/workflows/deploy-aliyun-oss.yml'
-      - '.env.production'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,8 +9,26 @@ concurrency:
   group: deploy-oss
   cancel-in-progress: false
 jobs:
+  selection:
+    name: 部署选择与状态说明
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.plan.outputs.selected }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Resolve deployment selection
+        id: plan
+        run: node scripts/deploy/plan.js oss
+        env:
+          DEPLOY_VARS: ${{ toJSON(vars) }}
+          DEPLOY_EVENT: ${{ github.event_name }}
   deploy:
-    if: ${{ vars.OSS_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    needs: selection
+    if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
     env:
       OSS_PREFIX: ${{ vars.OSS_PREFIX }}
@@ -28,6 +36,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Check deployment configuration
+        run: node scripts/deploy/check-config.js oss
+        env:
+          OSS_SITE_URL: ${{ vars.OSS_SITE_URL }}
+          OSS_REGION: ${{ vars.OSS_REGION }}
+          OSS_BUCKET: ${{ vars.OSS_BUCKET }}
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

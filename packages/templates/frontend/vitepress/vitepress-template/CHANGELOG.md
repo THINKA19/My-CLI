@@ -77,6 +77,10 @@ pnpm add -D mermaid
 
 * 同一套项目支持选择部署到 GitHub Pages、Cloudflare、Vercel、阿里云或腾讯云
 
+### v0.7.1 (2026-10-14) 
+
+* docker 和 CICD  修复
+
 
 
 ## v1 系列

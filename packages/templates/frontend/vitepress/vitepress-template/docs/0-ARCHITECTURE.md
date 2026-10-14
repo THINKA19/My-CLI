@@ -235,3 +235,7 @@ v0.6.0不可用，修正它的错误
 * docker
 * _dockerignore
 * package.json
+
+## v0.7.1 (2026-10-14) 
+
+* docker 和 CICD  修复

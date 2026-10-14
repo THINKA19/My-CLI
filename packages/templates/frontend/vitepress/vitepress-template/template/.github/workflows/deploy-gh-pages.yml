@@ -1,5 +1,5 @@
 # Pages 仅由 release.yml 调用，避免重复部署。
-name: Deploy GitHub Pages
+name: 网站部署执行 / GitHub Pages
 on:
   workflow_call:
 permissions:

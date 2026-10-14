@@ -1,4 +1,4 @@
-name: Deploy Cloudflare Pages
+name: 网站部署 / Cloudflare Pages
 on:
   push:
     branches: [main]
@@ -9,8 +9,26 @@ concurrency:
   group: deploy-cloudflare
   cancel-in-progress: false
 jobs:
+  selection:
+    name: 部署选择与状态说明
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.plan.outputs.selected }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Resolve deployment selection
+        id: plan
+        run: node scripts/deploy/plan.js cloudflare
+        env:
+          DEPLOY_VARS: ${{ toJSON(vars) }}
+          DEPLOY_EVENT: ${{ github.event_name }}
   deploy:
-    if: ${{ vars.CLOUDFLARE_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    needs: selection
+    if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -20,6 +38,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Check deployment configuration
+        run: node scripts/deploy/check-config.js cloudflare
+        env:
+          CLOUDFLARE_SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

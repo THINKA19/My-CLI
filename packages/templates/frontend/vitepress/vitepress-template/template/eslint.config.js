@@ -11,6 +11,8 @@ export default antfu({
    * 自定义 ESLint 规则覆盖
    */
   rules: {
+    // 包管理器策略由项目维护，避免格式检查自动改变锁文件信任策略。
+    'pnpm/yaml-enforce-settings': 'off',
     // 允许使用 Node.js 全局对象 process（避免频繁 import process）
     'node/prefer-global/process': 'off',
     // 允许使用 Node.js 全局对象 Buffer（避免频繁 import Buffer）
@@ -26,6 +28,7 @@ export default antfu({
     '**/template/**', // 忽略脚手架模板生成目录（防止模板插值语法影响 Lint）
     '**/node_modules/**', // 忽略第三方依赖包目录
     '**/dist/**', // 忽略构建产物输出目录
+    '**/.vercel/**', // 忽略 Vercel 预构建产物
     '**/.vitepress/**', // 忽略 VitePress 文档站点的本地配置与缓存目录
   ],
 })

@@ -1,0 +1,73 @@
+name: 测试 / 全平台部署适配（不发布）
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static:
+    name: 静态产物 / ${{ matrix.target }} / ${{ matrix.layout }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [pages, vercel, cloudflare, oss, cos]
+        layout: [root, subpath]
+        exclude:
+          - target: vercel
+            layout: subpath
+          - target: cloudflare
+            layout: subpath
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.27.1
+      - run: pnpm install --frozen-lockfile
+        env:
+          HUSKY: '0'
+      - run: pnpm test:deploy
+      - run: pnpm build:deploy
+        env:
+          VITE_BASE: ${{ matrix.layout == 'subpath' && '/docs/' || '/' }}
+          VITE_SITE_URL: ${{ matrix.layout == 'subpath' && 'https://example.com/docs' || 'https://example.com' }}
+      - name: Verify static output
+        run: node scripts/deploy/verify-output.js
+        env:
+          VITE_BASE: ${{ matrix.layout == 'subpath' && '/docs/' || '/' }}
+          VITE_SITE_URL: ${{ matrix.layout == 'subpath' && 'https://example.com/docs' || 'https://example.com' }}
+      - if: matrix.target == 'vercel'
+        run: node scripts/deploy/prepare-vercel.js
+      - name: Record verification boundary
+        run: echo '本任务仅验证构建和适配；未执行云端发布。' >> "$GITHUB_STEP_SUMMARY"
+  docker:
+    name: Docker 构建与 HTTP / ${{ matrix.base }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        base: [/, /docs/]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -f docker/Dockerfile --build-arg VITE_BASE="$BASE" --build-arg VITE_SITE_URL="https://example.com${BASE}" -t docs-test .
+        env:
+          BASE: ${{ matrix.base }}
+      - name: Start and verify
+        env:
+          BASE: ${{ matrix.base }}
+        run: |
+          docker run -d --name docs-test -p 8080:80 docs-test
+          curl --retry 15 --retry-connrefused --retry-delay 2 --fail http://localhost:8080/healthz
+          for page in zh/ en/ vi/; do
+            curl --fail "http://localhost:8080${BASE}${page}"
+          done
+          test "$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080${BASE}missing-page")" = 404
+      - if: always()
+        run: docker rm -f docs-test || true

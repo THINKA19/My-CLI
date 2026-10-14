@@ -1,5 +1,5 @@
 # 通用服务器部署：阿里云、腾讯云及其他安装 Docker 的 Linux 服务器。
-name: Deploy Docker to Server
+name: 服务器部署 / Docker
 on:
   workflow_call:
   workflow_dispatch:
@@ -9,10 +9,40 @@ concurrency:
   group: deploy-server
   cancel-in-progress: false
 jobs:
+  selection:
+    name: 部署选择与状态说明
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.plan.outputs.selected }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Resolve deployment selection
+        id: plan
+        run: node scripts/deploy/plan.js server
+        env:
+          DEPLOY_VARS: ${{ toJSON(vars) }}
+          DEPLOY_EVENT: ${{ github.event_name }}
   deploy:
-    if: ${{ vars.SERVER_DEPLOY_ENABLED == 'true' }}
+    needs: selection
+    if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: Check server configuration
+        run: node scripts/deploy/check-config.js server
+        env:
+          SERVER_IMAGE: ${{ vars.SERVER_IMAGE }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_FINGERPRINT: ${{ secrets.SERVER_FINGERPRINT }}
+          SERVER_REGISTRY: ${{ vars.SERVER_REGISTRY }}
+          SERVER_REGISTRY_USERNAME: ${{ secrets.SERVER_REGISTRY_USERNAME }}
+          SERVER_REGISTRY_PASSWORD: ${{ secrets.SERVER_REGISTRY_PASSWORD }}
       - name: Deploy immutable image
         uses: appleboy/ssh-action@v1.2.0
         env:

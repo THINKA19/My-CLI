@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "VitePress project scaffold",
   "license": "ISC",
+  "imports": {
+    "#config/*": "./.vitepress/config/*.ts"
+  },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm menus:generate && vitepress dev",
@@ -17,7 +20,8 @@
     "menus:generate": "tsx scripts/menus/index.ts generate",
     "menus:check": "tsx scripts/menus/index.ts check",
     "test:menus": "tsx --test tests/menus/generate.test.ts",
-    "test:deploy": "node --test tests/deploy/deploy.test.mjs",
+    "deploy:check": "node scripts/deploy/check-config.js",
+    "test:deploy": "node --test --test-isolation=none tests/deploy/*.test.mjs",
     "deploy:oss": "pnpm run build:deploy && node scripts/deploy/oss.js",
     "deploy:cos": "pnpm run build:deploy && node scripts/deploy/cos.js",
     "deploy:vercel:prepare": "pnpm run build:deploy && node scripts/deploy/prepare-vercel.js"
@@ -52,8 +56,5 @@
       "version": "^11.22.0",
       "onFail": "download"
     }
-  },
-  "imports": {
-    "#config/*": "./.vitepress/config/*.ts"
   }
 }

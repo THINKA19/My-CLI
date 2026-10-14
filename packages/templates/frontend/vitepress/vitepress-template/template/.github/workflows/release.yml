@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: 网站部署入口 / GitHub Pages
 on:
   push:
     branches: [main]
@@ -11,8 +11,25 @@ concurrency:
   group: pages
   cancel-in-progress: false
 jobs:
+  selection:
+    name: 部署选择与状态说明
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.plan.outputs.selected }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Resolve deployment selection
+        id: plan
+        run: node scripts/deploy/plan.js pages
+        env:
+          DEPLOY_VARS: ${{ toJSON(vars) }}
+          DEPLOY_EVENT: ${{ github.event_name }}
   pages:
-    # 自动部署需设置仓库变量；也可在 Actions 中手动运行。
-    if: ${{ vars.PAGES_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    needs: selection
+    if: needs.selection.outputs.selected == 'true'
     uses: ./.github/workflows/deploy-gh-pages.yml
     secrets: inherit

@@ -38,6 +38,8 @@ pnpm install
 | 脚本 | 用途 | 用法 |
 | --- | --- | --- |
 | `build.js` | 校验部署参数并构建到 `dist/`；SEO 和 sitemap 由站点配置统一处理 | `pnpm build:deploy` |
+| `check-config.js` | 发布前检查目标配置，只显示变量名 | `pnpm deploy:check vercel` |
+| `verify-output.js` | 检查构建页面、资源及 sitemap，使用构建时相同的 VITE_ 环境变量 | `node scripts/deploy/verify-output.js` |
 | `oss.js` | 将已有 `dist/` 上传到 OSS | `node scripts/deploy/oss.js` |
 | `cos.js` | 将已有 `dist/` 上传到 COS | `node scripts/deploy/cos.js` |
 | `prepare-vercel.js` | 将已有 `dist/` 转成 Vercel 预构建产物 | `node scripts/deploy/prepare-vercel.js` |
@@ -146,6 +148,8 @@ Docker 使用 `docker/Dockerfile` 和 `pnpm build:deploy` 构建，无需 OSS/CO
 Docker 支持 `/` 和 `/docs/` 等部署目录，文件位置与 VITE_BASE 一致，健康检查地址为 `/healthz`。
 
 部署脚本的本地回归检查使用 `pnpm test:deploy`，测试只操作临时目录和模拟上传，不连接云平台。
+
+全平台 Actions 测试与真实发布验收见 [部署测试指南](../../docs/ai/DEPLOYMENT_TESTING.md)。
 
 各平台的启用开关、账号凭据和服务器部署步骤见
 [部署指南](../../docs/ai/DEPLOYMENT.md)，上线前参考

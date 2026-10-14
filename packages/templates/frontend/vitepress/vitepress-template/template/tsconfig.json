@@ -17,8 +17,6 @@
 
     /* [特化: 构建工具] 模块解析策略。"bundler" 专为 Vite/Webpack 等打包工具设计 */
     "moduleResolution": "bundler",
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
     "paths": {
       "#config/*": ["./.vitepress/config/*.ts"]
     },
@@ -28,6 +26,7 @@
 
     /* [特化: 运行环境] 注入 Node.js 全局变量类型 (如 process, path, __dirname) */
     "types": ["node", "vite/client"],
+    "allowImportingTsExtensions": true,
     /* ========================================================================= */
     /* 1. 通用底座配置 (Universal Defaults) - 几乎所有现代 Vite/TS 项目都需要    */
     /* ========================================================================= */
@@ -35,6 +34,7 @@
     /* 开启最高级别的类型安全检查，防止隐式 any、未初始化变量等隐患 */
     "strict": true,
 
+    "noEmit": true,
     /* 为调试生成源映射文件 (.map) */
     "sourceMap": true,
     /* 兼容 CommonJS 和 ES Module 的导入规范 (如支持 import React from 'react') */

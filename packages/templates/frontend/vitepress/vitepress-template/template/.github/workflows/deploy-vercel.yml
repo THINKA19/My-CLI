@@ -1,4 +1,4 @@
-name: Deploy Vercel
+name: 网站部署 / Vercel
 on:
   push:
     branches: [main]
@@ -9,8 +9,26 @@ concurrency:
   group: deploy-vercel
   cancel-in-progress: false
 jobs:
+  selection:
+    name: 部署选择与状态说明
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.plan.outputs.selected }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Resolve deployment selection
+        id: plan
+        run: node scripts/deploy/plan.js vercel
+        env:
+          DEPLOY_VARS: ${{ toJSON(vars) }}
+          DEPLOY_EVENT: ${{ github.event_name }}
   deploy:
-    if: ${{ vars.VERCEL_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    needs: selection
+    if: needs.selection.outputs.selected == 'true'
     runs-on: ubuntu-latest
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -20,6 +38,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Check deployment configuration
+        run: node scripts/deploy/check-config.js vercel
+        env:
+          VERCEL_SITE_URL: ${{ vars.VERCEL_SITE_URL }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

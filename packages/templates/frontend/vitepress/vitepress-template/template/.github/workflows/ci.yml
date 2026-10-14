@@ -1,5 +1,5 @@
 # 工作流名称：展示在 GitHub Actions 页面的标识
-name: CI Check
+name: 检查 / 代码与构建
 
 # 触发条件配置 (Workflow Triggers)
 on:

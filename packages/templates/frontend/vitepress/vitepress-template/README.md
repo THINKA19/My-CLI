@@ -34,7 +34,7 @@ pnpm publish --access public
 
 ## 快速开始
 
-* 使用 npx 直接运行（推荐）
+* 使用 npx 直接运行（不推荐）
 
 ```bash
 npx @dengzhibo/create-vitepress-template my-doc
@@ -43,6 +43,19 @@ npx @dengzhibo/create-vitepress-template my-doc
 * 或全局安装使用
 
 ```Bash
+# 步骤一
 pnpm add -g @dengzhibo/create-vitepress-template
+# 步骤二
 create-vitepress-template my-doc
 ```
+
+* 使用 `pnpm create`（推荐）：
+
+```bash
+# 创建项目目录并生成模板
+pnpm dlx @dengzhibo/create-vitepress-template@latest my-docs
+
+# 推荐
+pnpm create @dengzhibo/vitepress-template@latest my-docs
+```
+
