@@ -40,6 +40,7 @@ export function resolveNav(
   depth = 0,
 ): DefaultTheme.NavItem[] {
   return nodes.map((node) => {
+    // activeMatch 使用共同的 ^/ 起点，多路径写成 ^/(guide|api)/，只添加一次语言前缀。
     const common = { text: resolveText(node.key, text, fallback), activeMatch: node.activeMatch?.replace(/^\^\//, `^${prefix}`) }
     if (node.items) {
       if (node.link || depth >= 2)
@@ -56,6 +57,7 @@ export function resolveNav(
 }
 
 export function filterMenu(nodes: readonly MenuNode[], language: string): MenuNode[] {
+  // 先递归过滤语言，再移除没有链接和可见子项的空分组。
   return nodes.filter(node => !node.languages || node.languages.includes(language))
     .map(node => ({ ...node, ...(node.items ? { items: filterMenu(node.items, language) } : {}) }))
     .filter(node => node.link || node.items?.length)
@@ -81,6 +83,7 @@ export function resolveSidebars(
   fallback: Record<string, string>,
   prefix: string,
 ): SidebarMap {
+  // 默认主题按前缀查找分区，具体路径必须排在通用路径之前。
   return Object.fromEntries([...sections].sort((a, b) => b.prefix.length - a.prefix.length).map(section => [
     resolvePath(section.prefix, prefix),
     resolveSidebar(section.items, text, fallback, prefix),

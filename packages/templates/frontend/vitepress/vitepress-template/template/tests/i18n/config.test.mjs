@@ -106,6 +106,48 @@ it('页面 canonical 与部署 base 组合一次，首页和文章各有自己�
   assert.equal(api.pageUrl('en/api-examples.html', 'https://example.com/', false), 'https://example.com/en/api-examples.html')
 })
 
+it('分享图片区分部署相对路径、域名绝对路径和 CDN 地址', () => {
+  const base = 'https://example.com/docs/'
+  assert.equal(api.imageUrl('share.png', base), `${base}share.png`)
+  assert.equal(api.imageUrl('/share.png', base), 'https://example.com/share.png')
+  assert.equal(api.imageUrl('/docs/share.png', base), `${base}share.png`)
+  assert.equal(api.imageUrl('//cdn.example.com/share.png', base), 'https://cdn.example.com/share.png')
+  assert.equal(api.imageUrl('https://cdn.example.com/share.png', base), 'https://cdn.example.com/share.png')
+  assert.throws(() => api.imageUrl('data:image/png;base64,abc', base), /HTTP/)
+})
+
+it('sitemap 关联三种语言的真实页面，保留元数据且不制造缺失译文', () => {
+  const items = [
+    { url: 'zh/guide/', lastmod: '2026-10-13' },
+    { url: 'en/guide/', links: [{ lang: 'en-US', url: 'en/guide/' }] },
+    { url: 'vi/guide/' },
+    { url: 'zh/only-chinese' },
+    { url: '' },
+  ]
+  const result = api.transformSitemapItems(items)
+  const variants = [
+    { lang: 'zh-CN', url: 'zh/guide/' },
+    { lang: 'en-US', url: 'en/guide/' },
+    { lang: 'vi-VN', url: 'vi/guide/' },
+  ]
+  for (const item of result.slice(0, 3)) assert.deepEqual(item.links, variants)
+  assert.equal(result[0].lastmod, '2026-10-13')
+  assert.equal(result[3].links, undefined)
+  assert.equal(result[4].links, undefined)
+  assert.equal(items[0].links, undefined)
+})
+
+it('导航高亮的多个栏目共用语言路径起点', () => {
+  const resolve = prefix => api.resolveNav([
+    { key: 'guide', link: { path: '/guide/' }, activeMatch: '^/(guide|api)/' },
+  ], { guide: 'Guide' }, {}, prefix)[0].activeMatch
+  const pattern = new RegExp(resolve('/en/'))
+  assert.ok(pattern.test('/en/guide/page'))
+  assert.ok(pattern.test('/en/api/page'))
+  assert.ok(!pattern.test('/api/page'))
+  assert.ok(!pattern.test('/zh/guide/page'))
+})
+
 it('SEO 使用页面标题和描述，并保留显式的页面分享标签', () => {
   const context = {
     page: 'en/api-examples.md',
@@ -119,11 +161,31 @@ it('SEO 使用页面标题和描述，并保留显式的页面分享标签', () 
   assert.equal(result.find(([, attrs]) => attrs.property === 'og:title')[1].content, 'API page')
   assert.equal(result.find(([, attrs]) => attrs.name === 'twitter:description')[1].content, 'Page description')
   assert.ok(result.find(([, attrs]) => attrs.rel === 'canonical')[1].href.endsWith('/en/api-examples'))
+  assert.equal(result.find(([, attrs]) => attrs.name === 'twitter:card')[1].content, 'summary')
+  assert.ok(!result.some(([, attrs]) => attrs.property === 'og:image' || attrs.name === 'twitter:image'))
+  const withImage = api.config.transformHead({ ...context, pageData: { frontmatter: { image: '//cdn.example.com/share.png' } } })
+  assert.ok(withImage.find(([, attrs]) => attrs.property === 'og:image')[1].content.endsWith('//cdn.example.com/share.png'))
+  assert.equal(withImage.find(([, attrs]) => attrs.name === 'twitter:card')[1].content, 'summary_large_image')
   const custom = api.config.transformHead({
     ...context,
     head: [['meta', { property: 'og:title', content: 'Custom' }], ['link', { rel: 'canonical', href: 'https://example.com/custom' }]],
   })
   assert.ok(!custom.some(([, attrs]) => attrs.property === 'og:title' || attrs.rel === 'canonical'))
+  const customImage = api.config.transformHead({
+    ...context,
+    head: [['meta', { property: 'og:image', content: 'https://example.com/custom.png' }]],
+  })
+  assert.ok(!customImage.some(([, attrs]) => attrs.property === 'og:image'))
+  assert.equal(customImage.find(([, attrs]) => attrs.name === 'twitter:card')[1].content, 'summary_large_image')
+})
+
+it('默认图标引用模板内实际提供的资源', () => {
+  const icons = api.config.head.filter(([tag, attrs]) => tag === 'link' && ['icon', 'apple-touch-icon'].includes(attrs.rel))
+  assert.ok(icons.length)
+  for (const [, attrs] of icons) {
+    assert.ok(attrs.href.startsWith(api.config.base))
+    assert.ok(fs.existsSync(path.join(root, 'public', attrs.href.slice(api.config.base.length))))
+  }
 })
 
 it('生成菜单匹配文档分区，并保留外部导航', () => {

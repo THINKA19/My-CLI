@@ -45,7 +45,7 @@ PowerShell 示例：
 ```powershell
 $env:VITE_SITE_URL = 'https://docs.example.com'
 $env:VITE_BASE = '/'
-pnpm build:deploy
+pnpm build
 docker compose -f docker/docker-compose.yml up -d --build
 ```
 

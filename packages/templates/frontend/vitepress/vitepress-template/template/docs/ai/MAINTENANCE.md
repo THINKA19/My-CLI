@@ -4,8 +4,8 @@
 
 ## 内容与配置
 
-- 文档分别位于 `src/zh/`、`src/en/`、`src/vi/`；中文页面通过站点配置映射到根路径。
-- 新增或移动页面时，检查 `.vitepress/config/nav/`、`sidebar/` 和 `locales/` 中对应配置。
+- 文档分别位于 `src/zh/`、`src/en/`、`src/vi/`，路由保留语言前缀；根首页跳转到 `/zh/`。
+- 新增或移动页面时维护 frontmatter，并运行 `pnpm menus:generate`；独立校验使用 `pnpm menus:check`。
 - 站点信息、SEO、搜索和语言配置位于 `.vitepress/config/`，主入口为 `.vitepress/config.ts`。
 - 主题和 Mermaid 相关代码位于 `.vitepress/theme/`；公共静态资源位于 `public/`。
 
@@ -16,13 +16,12 @@
 遇到已有错误应说明实际结果，不将未执行或未通过的检查记录为成功。
 
 依赖版本与命令以 `package.json` 为准，不在文档中重复维护全部工具版本。
-多语言专项测试使用 `pnpm test:i18n`，没有通用的 `pnpm test` 命令。
+生成菜单后，多语言专项测试使用 `node --test tests/i18n/config.test.mjs`，没有通用的 `pnpm test` 命令。
 菜单与翻译的扩展约定见 [多语言配置说明](../../.vitepress/config/README.md)。
 
 ## 部署说明
 
-普通构建使用 `pnpm build`；部署流程使用 `pnpm build:deploy`，
-由部署脚本处理路径、域名及相关 SEO 信息。现有站点配置中的 `import.meta.env`
-不能作为 Node.js 配置阶段读取环境文件的依据。
+构建使用 `pnpm build`，部署前设置 `VITE_BASE` 和 `VITE_SITE_URL`。
+配置通过 Vite 的 `loadEnv` 读取环境文件；Node.js 配置阶段不使用 `import.meta.env`。
 
 部署参数见 [部署指南](DEPLOYMENT.md)，上线检查见 [部署检查清单](DEPLOYMENT_CHECKLIST.md)。

@@ -13,6 +13,7 @@ export function validateMenu(
   language: Language,
   sourceRoot = srcDir,
 ): void {
+  // 文档路径从当前语言的源目录解析，校验时不附加部署 base。
   const keys = new Set<string>()
   const links = new Set<string>()
   const sourceDir = path.resolve(sourceRoot, languages[language].sourceDir)
@@ -43,6 +44,7 @@ export function validateMenu(
               throw new Error(`结构路径不能带语言前缀: ${route}`)
           }
           const decoded = decodeURIComponent(route)
+          // 解码后再检查目录边界，防止编码路径绕过普通字符串校验。
           const local = path.resolve(sourceDir, `.${decoded}`)
           if (local !== sourceDir && !local.startsWith(sourceDir + path.sep))
             throw new Error(`路径超出文档目录: ${route}`)

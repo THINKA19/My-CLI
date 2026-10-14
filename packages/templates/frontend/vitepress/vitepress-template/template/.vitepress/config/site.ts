@@ -1,12 +1,14 @@
 import type { DefaultTheme, UserConfig } from 'vitepress'
 import { fileURLToPath } from 'node:url'
 import { loadEnv } from 'vite'
+import { transformSitemapItems } from './sitemap.ts'
 
 const env = loadEnv(process.env.NODE_ENV === 'production' ? 'production' : 'development', fileURLToPath(new URL('../../', import.meta.url)), 'VITE_')
 const base = env.VITE_BASE || '/'
 if (!base.startsWith('/') || !base.endsWith('/'))
   throw new Error('VITE_BASE 必须以 / 开头和结尾')
 
+/** 统一域名和部署子路径，SEO 与 sitemap 共用同一地址，避免重复拼接 base。 */
 export function resolveSiteUrl(value: string, basePath: string): string {
   const url = new URL(value)
   if (!['http:', 'https:'].includes(url.protocol))
@@ -30,7 +32,7 @@ export const siteConfig = {
   ignoreDeadLinks: [/^https?:\/\/localhost/],
   appearance: true,
   lastUpdated: true,
-  sitemap: { hostname: siteUrl },
+  sitemap: { hostname: siteUrl, transformItems: transformSitemapItems },
   vite: {
     publicDir: '../public',
     optimizeDeps: { include: ['mermaid'] },

@@ -17,10 +17,10 @@ import { defineConfig } from 'vitepress'
 
 // 国际化配置：多语言标签与链接配置
 import { localesConfig } from '#config/i18n/index'
-// 搜索引擎配置：内置 Algolia DocSearch 或 本地 FlexSearch/MinSearch 检索参数
+// 搜索引擎配置：本地 MiniSearch 检索参数与多语言搜索文案
 import { searchConfig } from '#config/search'
 import { seoConfig, transformHead } from '#config/seo'
-// 基础站点配置：包含 title, description, lang, base, srcDir 等全局静态元数据
+// 基础站点配置：维护 base、源码与输出目录及构建设置；标题、描述和语言由各语言配置提供
 import { siteConfig } from '#config/site'
 // 与语言无关的公共主题设置
 import { themeConfig } from '#config/theme'

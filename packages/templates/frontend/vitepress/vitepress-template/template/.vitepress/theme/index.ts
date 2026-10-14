@@ -1,12 +1,10 @@
-// https://vitepress.dev/guide/custom-theme
-import { h, onMounted, watch, nextTick } from 'vue'
 import type { Theme } from 'vitepress'
-import DefaultTheme from 'vitepress/theme'
-import { useRoute } from 'vitepress'
-import './styles/style.css'
-
-// 导入 Mermaid
 import mermaid from 'mermaid'
+import { useRoute } from 'vitepress'
+import DefaultTheme from 'vitepress/theme'
+import { h, nextTick, onMounted, watch } from 'vue'
+
+import './styles/style.css'
 
 export default {
   extends: DefaultTheme,
@@ -15,12 +13,10 @@ export default {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
     })
   },
-  enhanceApp({ app, router, siteData }) {
-    // ...
-  },
   setup() {
     const route = useRoute()
-    
+    const pending = new WeakSet<Element>()
+
     // 初始化 Mermaid
     onMounted(() => {
       mermaid.initialize({
@@ -28,31 +24,43 @@ export default {
         theme: 'default',
         securityLevel: 'loose',
       })
-      renderMermaid()
+      void renderMermaid()
     })
-    
+
     // 监听路由变化，重新渲染 Mermaid 图表
     watch(
       () => route.path,
-      () => nextTick(() => renderMermaid())
+      () => nextTick(() => { void renderMermaid() }),
     )
-    
-    function renderMermaid() {
+
+    async function renderMermaid() {
       const mermaidElements = document.querySelectorAll('.mermaid:not([data-processed])')
-      if (mermaidElements.length === 0) return
-      
-      mermaidElements.forEach((element, index) => {
+      if (mermaidElements.length === 0)
+        return
+
+      // 顺序渲染，pending 防止重复的路由回调处理同一节点。
+      for (const [index, element] of mermaidElements.entries()) {
+        if (pending.has(element))
+          continue
         const id = `mermaid-${Date.now()}-${index}`
-        element.setAttribute('data-processed', id)
-        
+        pending.add(element)
+
         try {
-          mermaid.render(id, element.textContent || '', (svgCode) => {
-            element.innerHTML = svgCode
-          })
-        } catch (error) {
+          // Mermaid 返回 Promise；成功后标记完成，并绑定图表交互事件。
+          const { svg, bindFunctions } = await mermaid.render(id, element.textContent || '')
+          if (element.isConnected) {
+            element.innerHTML = svg
+            element.setAttribute('data-processed', 'true')
+            bindFunctions?.(element as HTMLElement)
+          }
+        }
+        catch (error) {
           console.error('Mermaid rendering error:', error)
         }
-      })
+        finally {
+          pending.delete(element)
+        }
+      }
     }
-  }
+  },
 } satisfies Theme

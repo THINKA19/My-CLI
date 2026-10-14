@@ -81,6 +81,19 @@ export function metadata(value: unknown, file: string): Metadata {
       if (key === 'activeMatch') {
         if (!(item as string).startsWith('^/'))
           fail('nav.activeMatch 必须以 ^/ 开头，且不带语言前缀')
+        // 各分支共用一个路径起点，无需在解析器中改写任意正则。
+        if ((item as string).includes('|^'))
+          fail('nav.activeMatch 多路径请使用 ^/(guide|api)/，不要重复根路径起点')
+        // 只允许分组内部的分支；跳过转义和字符组，避免误判字面量 |。
+        let depth = 0
+        for (const token of (item as string).match(/\\.|\[(?:\\.|[^\]\\])*\]|[()|]/g) ?? []) {
+          if (token === '(')
+            depth++
+          else if (token === ')')
+            depth--
+          else if (token === '|' && depth === 0)
+            fail('nav.activeMatch 多路径请使用 ^/(guide|api)/，各分支必须共用根路径起点')
+        }
         try {
           const pattern = new RegExp(item as string)
           pattern.test('')

@@ -1,8 +1,36 @@
-# 多语言配置维护
+# 多语言配置架构与维护
 
-可运行的大规模菜单示例见 [扩展示例](sidebar/README.md)，包含六个分类和三种语言页面。
+本目录负责站点设置、多语言配置、导航与侧边栏、搜索和 SEO。主入口 `.vitepress/config.ts`
+只组合这些模块；文档内容位于 `src/`，菜单生成逻辑位于 `scripts/menus/`。
 
-菜单结构只维护一份，语言文案按栏目提供。当前包含六个分类，各语言内容目录顶层仅保留 index.md。
+模板提供中文、英文和越南语，以及六个示例分类。侧边栏入口说明见 [侧边栏生成](sidebar/README.md)。
+
+## 设计原则与数据流
+
+```text
+Markdown frontmatter + src/menu.config.ts
+    → scripts/menus 扫描、校验、生成
+    → generated 保存共享结构与各语言菜单文字
+    → nav/sidebar 汇总，locales 提供各语言站点与主题文案
+    → i18n 校验目标页面、添加语言前缀、组装语言配置
+    → .vitepress/config.ts 组合站点配置
+```
+
+菜单元数据与正文放在一起，页面路径由文件位置推导，新增或移动文档时无需维护另一份链接清单。
+默认语言提供菜单层级、顺序和显示开关，各译文提供对应文字；同一份结构确保三种语言的栏目一致。
+生成结果按栏目保存，便于检查和定位，但最终配置仍会汇总全部菜单。
+
+公共站点行为与语言文案分开维护。各语言入口负责组合自己的 site、theme、search、seo 和菜单文字，
+i18n 入口负责统一解析，便于在新增语言时检查配置是否完整。嵌套主题对象显式合并，
+使语言文案可以覆盖标签，同时保留公共的大纲层级、编辑地址和时间格式。
+
+菜单生成是显式的构建步骤。dev、build 和 typecheck 在启动前生成菜单；开发期间修改菜单元数据后，
+运行 `pnpm menus:generate`。静态导入使生成文件进入 VitePress 的配置依赖，变化时重新加载配置。
+这种方式让生成时机明确，正文的普通保存不会启动额外的菜单生成任务。
+
+生成阶段检查 frontmatter、页面对应关系和菜单结构；配置加载阶段确认文案与目标页面可用。
+两处校验分别覆盖输入和实际使用结果，错误在构建阶段暴露。搜索直接读取搜索文案，
+不依赖完整菜单组装；SEO 和 sitemap 共用部署地址，避免路径拼接各自维护。
 
 ## 目录职责
 
@@ -15,7 +43,7 @@
 │   ├── home.ts
 │   ├── configuration.ts
 │   └── ...
-├── nav/index.ts                # 加载生成菜单，缺文件时给出生成提示
+├── nav/index.ts                # 静态加载并汇总生成菜单
 ├── sidebar/index.ts            # 稳定侧边栏入口
 ├── locales/
 │   ├── zh/                     # 手写：index、site、theme、search、seo
@@ -26,6 +54,7 @@
 ├── theme.ts
 ├── search.ts
 ├── seo.ts
+├── sitemap.ts                  # 根据真实页面关联各语言替代链接
 └── README.md
 ```
 
@@ -38,6 +67,8 @@
 - `theme.ts`：维护 Logo、社交地址、大纲层级、编辑地址和时间格式。
 - `search.ts`：维护搜索参数，直接组合各语言 search.ts 的文案，避免依赖完整 i18n 组装入口。
 - `seo.ts`：维护公共标签，通过 transformHead 按页面生成 canonical、分享标题、描述及图片地址。
+- `sitemap.ts`：按去掉语言前缀的页面路径关联译文，只列出真实存在的语言版本。中文的配置 key 为 root，
+  实际路径为 /zh/，因此需要依据真实路径建立三语言的替代链接。
 - `locales/*/site.ts`：仅保留站点标题、标题后缀和描述；语言代码由 registry.ts 登记。
 - `locales/*/theme.ts`：仅保留主题文字，组装时明确合并 outline、editLink、lastUpdated 等嵌套对象。
 - `locales/*/seo.ts`：仅保留作者、关键词和 Open Graph 语言标识；标题和描述复用当前页面数据。
@@ -45,22 +76,27 @@
 VITE_SITE_URL 可填域名或带部署子路径的站点地址；子路径必须与 VITE_BASE 一致。
 SEO 和 sitemap 统一使用该地址，避免重复添加 base。页面可通过 frontmatter 的 image
 设置分享图片；已有的 canonical 和分享标签会保留。
+默认图标使用模板提供的 `public/logo.svg`。没有显式分享图片时输出文字摘要卡片，不输出图片标签；
+提供 `image` 或页面 head 中的分享图片时使用大图卡片，显式的 `twitter:card` 设置优先。
+站内分享图片由维护者放入 `public/`，外部图片需提供可访问的 HTTP(S) 地址。
+相对图片地址（如 `share.png`）以部署目录为根，`/share.png` 表示域名根路径，
+`/docs/share.png` 已含部署路径时不会重复拼接；HTTP(S) 和 `//cdn.example.com/share.png` 支持外部图片。
 
 ## 新增菜单与栏目
 
 1. 在各语言 src 目录新增对应 Markdown，提供 title 和所需 menu 元数据。
 2. 普通文章默认进入侧边栏；顶部导航需要显式启用 nav.enabled。
 3. 栏目 index.md 描述分组；结构和顺序以默认语言为准，文字取各语言文档。
-4. 运行 `pnpm menus:generate`；开发和构建命令会先自动生成。
-5. 运行 `pnpm menus:check` 校验但不写文件；`pnpm test:menus` 和 `pnpm test:i18n` 验证生成与解析。
+4. 运行 `pnpm menus:generate`；开发和构建命令会先自动生成。开发期间修改菜单元数据后，手动重新生成。
+5. 运行 `pnpm menus:check` 校验但不写文件；`pnpm test:menus` 验证生成逻辑。
 
-不再手写菜单结构或 locales 中的菜单文案文件。生成文件中的路径不带语言前缀和部署 base。
+菜单结构和菜单文字由文档生成。生成文件中的路径不带语言前缀和部署 base。
 中文、英文、越南语分别使用 /zh/、/en/、/vi/，不使用路径重写。
 
 ## 新增语言
 
 在 i18n/registry.ts 登记语言代码、VitePress configKey、标签、路径前缀、
-正文目录和 fallback；在 locales 中提供对应语言配置，并加入 i18n/index.ts 的 localeTexts。
+正文目录和 fallback；在 locales 中提供对应语言配置，并加入 i18n/index.ts 的 localeTexts 和 search.ts 的 translations。
 正文位于 `src/语言目录/`，访问路径保留该语言目录。
 
 所有语言的栏目文案遵循同一组推导出的 key。配置加载时校验菜单、翻译、
@@ -134,6 +170,8 @@ menu:
 `/configuration/site`，语言前缀由现有 i18n 解析器添加。
 `activeMatch` 示例匹配不带语言前缀的栏目路径；生成器需要按语言转换为
 `^/zh/configuration/`、`^/en/configuration/` 等，不能直接原样用于当前语言地址。
+匹配多个栏目时写成 `^/(guide|api)/`，分支只能放在括号分组中，各分支共用根路径起点。
+`^/guide/|^/api/` 和 `^/guide/|/api/` 都会被拒绝，避免分支绕过当前语言前缀。
 
 ### 栏目首页与分组
 
@@ -185,9 +223,10 @@ menu:
 
 ## 验证
 
-`pnpm test:i18n` 检查菜单解析、页面校验、语言链接、原有菜单行为和文案类型约束。
-tests/i18n/baseline.json 记录迁移前的示例菜单；有意修改示例菜单或文案时，同步更新该回归基线。
-全项目 typecheck 可能报告其他模块已有错误，必须如实区分。
+生成菜单后，`node --test tests/i18n/config.test.mjs` 检查菜单解析、页面校验、语言链接和 SEO。
+`node node_modules/typescript/bin/tsc --noEmit -p tests/i18n/tsconfig.json` 检查文案类型约束。
+tests/i18n/baseline.json 记录示例菜单的回归预期；有意修改示例菜单或文案时，同步更新该基线。
+`pnpm typecheck` 检查全项目类型，`pnpm build` 验证配置加载、页面生成和 sitemap 输出。
 
 ## 导入约定
 
@@ -198,4 +237,4 @@ tests/i18n/baseline.json 记录迁移前的示例菜单；有意修改示例菜�
 目录入口显式使用 `#config/nav/index`。
 别名由 package.json 的 imports 和 tsconfig.json 的 paths 对齐配置，
 支持 VitePress 配置加载及类型检查，不依赖配置加载后的 Vite alias。
-菜单结构和文字统一由 generated 中的栏目文件提供，不再增加 demo 层。
+菜单结构和文字统一由 generated 中的栏目文件提供。

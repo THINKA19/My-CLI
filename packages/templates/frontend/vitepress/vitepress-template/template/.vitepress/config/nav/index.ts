@@ -1,16 +1,15 @@
 import type { Bundle } from '../../../scripts/menus/schema.ts'
-import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { loadConfigFromFile } from 'vite'
+import generated from '#config/generated/index'
+import { languages } from '#config/i18n/registry'
+import { mergeText } from '#config/i18n/resolve'
 
-const file = fileURLToPath(new URL('../generated/index.ts', import.meta.url))
-if (!fs.existsSync(file)) throw new Error('菜单生成文件不存在，请先运行 pnpm menus:generate（pnpm dev / build 会自动生成）。')
-const loaded = await loadConfigFromFile({ command: 'serve', mode: 'development' }, file)
-if (!loaded) throw new Error('菜单生成文件加载失败，请运行 pnpm menus:generate。')
-const chunks = (loaded.config as unknown as { chunks: Bundle[] }).chunks
+// 静态导入让 VitePress 跟踪所有生成文件；更新菜单后会重新加载主配置。
+// dev/build/typecheck 已先生成菜单，直接运行 vitepress 前也需 menus:generate。
+const chunks: Bundle[] = generated.chunks
 export const navStructure = chunks.flatMap(chunk => chunk.nav)
 export const generatedSidebar = chunks.flatMap(chunk => chunk.sidebar)
-export const generatedTexts = Object.fromEntries(Object.keys(chunks[0]?.texts ?? {}).map(code => [code, {
-  nav: Object.assign({}, ...chunks.map(chunk => chunk.texts[code].nav)) as Record<string, string>,
-  sidebar: Object.assign({}, ...chunks.map(chunk => chunk.texts[code].sidebar)) as Record<string, string>,
+// 以语言注册表为准收集文字，并拒绝跨栏目重复 key，避免静默覆盖。
+export const generatedTexts = Object.fromEntries(Object.keys(languages).map(code => [code, {
+  nav: mergeText(...chunks.map(chunk => chunk.texts[code].nav)),
+  sidebar: mergeText(...chunks.map(chunk => chunk.texts[code].sidebar)),
 }]))

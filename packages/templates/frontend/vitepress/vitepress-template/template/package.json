@@ -10,7 +10,6 @@
     "preview": "vitepress preview",
     "preinstall": "npx only-allow pnpm",
     "typecheck": "pnpm menus:generate && vue-tsc --noEmit",
-    "test:i18n": "pnpm menus:generate && node node_modules/typescript/bin/tsc --noEmit -p tests/i18n/tsconfig.json && node --test tests/i18n/config.test.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepare": "husky",

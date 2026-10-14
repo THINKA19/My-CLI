@@ -10,8 +10,10 @@ import { languages } from './registry.ts'
 import { filterMenu, resolveNav, resolveSidebars } from './resolve.ts'
 import { validateConfig } from './validate.ts'
 
+// 各语言入口负责组装，类型检查确保新增语言时补齐配置。
 export const localeTexts = { zh, en, vi } satisfies Record<Language, LocaleText>
 
+// 构建前检查目标页面，阻止缺失译文或无效链接进入最终站点。
 validateConfig(navStructure, sidebarSections, localeTexts)
 
 export const localesConfig: LocaleConfig<DefaultTheme.Config> = Object.fromEntries(
@@ -33,6 +35,7 @@ export const localesConfig: LocaleConfig<DefaultTheme.Config> = Object.fromEntri
       themeConfig: {
         ...themeConfig,
         ...text.theme,
+        // 嵌套对象显式合并，让翻译只覆盖文字而不丢失公共行为设置。
         outline: { ...themeConfig.outline, ...text.theme.outline },
         editLink: { ...themeConfig.editLink, ...text.theme.editLink },
         lastUpdated: { ...themeConfig.lastUpdated, ...text.theme.lastUpdated },
