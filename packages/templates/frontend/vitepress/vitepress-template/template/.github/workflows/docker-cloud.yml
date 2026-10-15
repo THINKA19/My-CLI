@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       selected: ${{ steps.plan.outputs.selected }} # 输出是否继续执行构建的标志
-      matrix: ${{ steps.plan.outputs.matrix }}     # 输出选中的目标镜像仓库矩阵 JSON
+      matrix: ${{ steps.plan.outputs.matrix }} # 输出选中的目标镜像仓库矩阵 JSON
     steps:
       # Step 1: 拉取项目代码到云端虚拟机
       - name: 检出项目代码

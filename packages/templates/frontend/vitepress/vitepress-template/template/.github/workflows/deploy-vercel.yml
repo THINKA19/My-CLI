@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       selected: ${{ steps.plan.outputs.selected }} # 输出是否继续部署的标志
-      matrix: ${{ steps.plan.outputs.matrix }}     # 输出部署矩阵信息
+      matrix: ${{ steps.plan.outputs.matrix }} # 输出部署矩阵信息
     steps:
       # Step 1: 下载仓库代码到云端虚拟机
       - name: 检出项目代码

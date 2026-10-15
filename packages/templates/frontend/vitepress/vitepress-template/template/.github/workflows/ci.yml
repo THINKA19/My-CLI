@@ -19,10 +19,10 @@ name: 检查 / 代码与构建
 # 定义工作流的触发条件（在什么情况下自动或手动运行）
 on:
   push:
-    branches: [main]       # 当推送到 main 分支时触发
+    branches: [main] # 当推送到 main 分支时触发
   pull_request:
-    branches: [main]       # 当向 main 分支发起 Pull Request 时触发
-  workflow_dispatch:        # 支持在 GitHub 界面手动点击运行
+    branches: [main] # 当向 main 分支发起 Pull Request 时触发
+  workflow_dispatch: # 支持在 GitHub 界面手动点击运行
 
 # 赋予该工作流的基本权限：仅读取仓库内容
 permissions:
@@ -31,7 +31,7 @@ permissions:
 jobs:
   check:
     name: 代码规范、类型与构建检查
-    runs-on: ubuntu-latest  # 指定运行环境为最新版的 Ubuntu 虚拟机
+    runs-on: ubuntu-latest # 指定运行环境为最新版的 Ubuntu 虚拟机
 
     steps:
       # Step 1: 将 GitHub 仓库中的项目代码拉取（下载）到 CI 运行环境的虚拟机中

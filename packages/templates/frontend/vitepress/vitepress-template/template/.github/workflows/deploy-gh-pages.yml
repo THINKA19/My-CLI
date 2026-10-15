@@ -32,7 +32,7 @@ jobs:
     name: 执行平台部署
     runs-on: ubuntu-latest
     environment:
-      name: github-pages                        # 部署环境设置为 github-pages
+      name: github-pages # 部署环境设置为 github-pages
       url: ${{ steps.deployment.outputs.page_url }} # 自动捕获发布后的站点 URL
     steps:
       # Step 1: 完整拉取仓库代码

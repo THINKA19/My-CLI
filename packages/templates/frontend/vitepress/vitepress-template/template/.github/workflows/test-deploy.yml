@@ -39,7 +39,7 @@ jobs:
       fail-fast: false # 某个平台组合测试失败时不终止其他组合的测试
       matrix:
         target: [pages, vercel, cloudflare, oss, cos] # 测试目标平台列表
-        layout: [root, subpath]                        # 测试路径模式：根路径 / 独立子路径
+        layout: [root, subpath] # 测试路径模式：根路径 / 独立子路径
         exclude:
           - target: vercel
             layout: subpath
