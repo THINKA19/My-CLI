@@ -100,3 +100,7 @@ pnpm add -D mermaid
 ### 0.9.0-alpha.1
 
 * 交互式 CLI 程序，原代码改造而来
+
+### 0.9.0-alpha.2
+
+* 代码优化
