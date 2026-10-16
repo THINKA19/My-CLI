@@ -18,7 +18,7 @@
  *
  * 实现要点：
  *   - 基于 Node 原生 readline 的按键事件，开启 Raw 模式后自行绘制界面，不依赖第三方库。
- *   - 重绘方式：用 ANSI 转义序列把光标移回上一次输出的起点并清屏，再整体重画。
+ *   - 当前问题限制在终端可视高度内，长列表随当前选项滚动；完成后收起为一行摘要。
  *   - 选中状态用符号和颜色双重表示：即使终端不支持颜色，符号也能区分选中与否。
  *   - 颜色在 NO_COLOR 环境变量存在时自动关闭。
  *
@@ -59,6 +59,8 @@ const stripAnsi = text => text.replace(/\x1B\[[0-9;]*m/g, '')
 // 单个字符的显示宽度：中日韩、全角字符和表情占 2 格，其余占 1 格
 function charWidth(char) {
   const code = char.codePointAt(0)
+  if (/\p{Mark}/u.test(char) || code === 0x200D)
+    return 0
   const wide
     = (code >= 0x1100 && code <= 0x115F)
       || (code >= 0x2E80 && code <= 0xA4CF)
@@ -72,10 +74,25 @@ function charWidth(char) {
   return wide ? 2 : 1
 }
 
-// 一行内容在终端中会占用的行数（考虑自动换行），用于重绘时回退光标
-function countRows(line, columns) {
-  const width = [...stripAnsi(line)].reduce((total, char) => total + charWidth(char), 0)
-  return Math.max(1, Math.ceil(width / columns))
+// 每行保留一格，避免行尾自动换行使光标回退行数失真；不截断颜色转义序列。
+function fitLine(line, columns) {
+  const limit = Math.max(1, columns - 1)
+  if ([...stripAnsi(line)].reduce((width, char) => width + charWidth(char), 0) <= limit)
+    return line
+  let result = ''
+  let width = 0
+  // eslint-disable-next-line no-control-regex
+  for (const token of line.match(/\x1B\[[0-9;]*m|[\s\S]/gu) || []) {
+    if (token.startsWith('\x1B')) {
+      result += token
+      continue
+    }
+    width += charWidth(token)
+    if (width > limit - 1)
+      break
+    result += token
+  }
+  return `${result}…\x1B[0m`
 }
 
 // ---------------------------------------------------------------------------
@@ -121,19 +138,40 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
   }
   let rows = 0
   let message = ''
+  let offset = 0
+  let columns = output.columns || 80
 
-  // 重绘：先回到上次输出的起点并清屏，再逐行输出最新状态
-  const draw = () => {
-    if (rows)
+  const clearFrame = () => {
+    if (rows) {
       output.write(`\x1B[${rows}A\r\x1B[0J`)
+      rows = 0
+    }
+  }
 
-    const lines = [`${cyan('◆')} ${title}`]
+  // 最后一行留给光标，整个活动问题始终处于可见屏幕中，不回退到历史缓冲区。
+  const draw = (resized = false) => {
+    const height = Math.max(1, (output.rows || 24) - 1)
+    const nextColumns = Math.max(2, output.columns || 80)
+    if (resized && (nextColumns !== columns || rows > height)) {
+      // 改变宽度会使旧输出重新折行，缩小高度也可能丢失旧起点，不能再按旧行数回退。
+      output.write('\x1B[H\x1B[2J')
+      rows = 0
+    }
+    else {
+      clearFrame()
+    }
+    columns = nextColumns
+
+    const entries = []
+    let activeRow = 0
     if (choices) {
       for (const [i, choice] of choices.entries()) {
         if (choice.group && choice.group !== choices[i - 1]?.group)
-          lines.push(`  ${gray(choice.group)}`)
+          entries.push(`  ${gray(choice.group)}`)
 
         const active = index === i
+        if (active)
+          activeRow = entries.length
         const selected = multiple ? checked.has(choice.value) : active
         const on = multiple ? MARK_ON : RADIO_ON
         const off = multiple ? MARK_OFF : RADIO_OFF
@@ -141,21 +179,41 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
         const pointer = active ? cyan('›') : gray('│')
         const label = active ? cyan(choice.label) : choice.label
         const required = choice.required ? gray('（必需）') : ''
-        lines.push(`${pointer} ${mark} ${label}${required}`)
+        entries.push(`${pointer} ${mark} ${label}${required}`)
       }
     }
     else {
-      lines.push(`${gray('│')} ${value || gray(`${defaultValue}（默认）`)}`)
+      entries.push(`${gray('│')} ${value || gray(`${defaultValue}（默认）`)}`)
     }
 
-    if (hint)
-      lines.push(...hint.split('\n').map(line => `${gray('│')} ${gray(line)}`))
-
+    const hints = hint ? hint.split('\n').slice(0, Math.max(0, height - 5)).map(line => `${gray('│')} ${gray(line)}`) : []
     const tip = choices ? (multiple ? '↑↓ 移动，Space 勾选，Enter 确认' : '↑↓ 选择，Enter 确认') : 'Enter 确认'
-    lines.push(`${gray('└')} ${message ? red(message) : gray(tip)}`)
+    let lines
+    if (height < 3) {
+      // 极小窗口优先保留当前选项；两行可用时同时显示校验或操作提示。
+      lines = [entries[activeRow]]
+      if (height === 2)
+        lines.push(`${gray('└')} ${message ? red(message) : gray(tip)}`)
+    }
+    else {
+      const budget = height - hints.length - 2
+      const overflow = entries.length > budget
+      const indicators = overflow && budget >= 3
+      const capacity = indicators ? budget - 2 : budget
+      offset = Math.max(0, Math.min(offset, activeRow, entries.length - capacity))
+      if (activeRow >= offset + capacity)
+        offset = activeRow - capacity + 1
+      const visible = entries.slice(offset, offset + capacity)
+      if (indicators) {
+        visible.unshift(gray(offset ? '│ ↑ 上方还有选项' : '│ 已到列表顶部'))
+        visible.push(gray(offset + capacity < entries.length ? '│ ↓ 下方还有选项' : '│ 已到列表底部'))
+      }
+      const position = overflow && choices ? ` [${index + 1}/${choices.length}]` : ''
+      lines = [`${cyan('◆')} ${title}`, ...visible, ...hints, `${gray('└')} ${message ? red(message) : gray(`${position} ${tip}`.trim())}`]
+    }
 
-    rows = lines.reduce((total, line) => total + countRows(line, output.columns || 80), 0)
-    output.write(`${lines.join('\n')}\n`)
+    rows = lines.length
+    output.write(`${lines.map(line => fitLine(line, columns)).join('\n')}\n`)
   }
 
   return new Promise((resolve, reject) => {
@@ -164,17 +222,22 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
       input.removeListener('keypress', onKey)
       input.removeListener('end', onEnd)
       input.removeListener('error', onError)
+      output.removeListener('resize', onResize)
       input.setRawMode(Boolean(wasRaw))
       input.pause()
       output.write('\x1B[?25h')
     }
     function onEnd() {
+      clearFrame()
       cleanup()
       reject(new Cancelled('已取消'))
     }
     function onError(error) {
       cleanup()
       reject(error)
+    }
+    function onResize() {
+      draw(true)
     }
 
     // 按键处理：取消、确认、上下移动、空格勾选、文本输入
@@ -195,6 +258,11 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
           draw()
           return
         }
+        const answer = choices
+          ? choices.filter(choice => multiple ? checked.has(choice.value) : choice.value === result).map(choice => choice.label).join('、') || '未选择'
+          : result
+        clearFrame()
+        output.write(`${fitLine(`${green('✓')} ${title}：${answer}`, columns)}\n`)
         cleanup()
         resolve(result)
         return
@@ -226,6 +294,7 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
     input.on('keypress', onKey)
     input.once('end', onEnd)
     input.once('error', onError)
+    output.on('resize', onResize)
     output.write('\x1B[?25l')
     draw()
   })
@@ -256,7 +325,7 @@ export async function collectOptions(previous = {}, ask = prompt) {
 
   // 语言联动：多语言至少选两种并指定默认语言；单语言直接单选
   if (i18n) {
-    selectedLanguages = await ask({ title: '需要支持哪些语言？', choices: choicesFor(languages), multiple: true, initial: previous.i18n ? previous.languages : ['zh', 'en'], hint: '至少选择两种语言', validate: values => values.length < 2 ? '请至少选择两种语言' : undefined })
+    selectedLanguages = await ask({ title: '需要支持哪些语言？', choices: choicesFor(languages), multiple: true, initial: previous.i18n ? previous.languages ?? [] : [], hint: '至少选择两种语言', validate: values => values.length < 2 ? '请至少选择两种语言' : undefined })
     defaultLanguage = await ask({ title: '默认语言', choices: choicesFor(languages).filter(choice => selectedLanguages.includes(choice.value)), initial: selectedLanguages.includes(previous.defaultLanguage) ? previous.defaultLanguage : selectedLanguages[0] })
   }
   else {

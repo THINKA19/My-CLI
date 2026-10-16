@@ -1,7 +1,7 @@
 {
   "name": "@dengzhibo/create-vitepress-template",
   "type": "module",
-  "version": "0.9.0-alpha.2",
+  "version": "0.9.0-alpha.3",
   "private": false,
   "description": "基于 VitePress 的开箱即用文档脚手架",
   "bin": {
