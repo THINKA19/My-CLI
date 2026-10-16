@@ -1,170 +1,150 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
-
-import { execSync } from 'node:child_process'
-import fs from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const templateDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '../template',
-)
-
-// 按名称排除，适用于模板内所有层级。
-const SKIP = new Set([
-  'node_modules',
-  'dist',
-  'cache',
-  '.git',
-  '.DS_Store',
-  '.npmignore',
-  '.vercel',
-  'package-lock.json',
-  'yarn.lock',
-])
-
-// 按模板相对路径排除，只针对指定位置。
-const SKIP_PATHS = new Set([
-  '.vitepress/config/generated',
-])
-
-// 模板里以 _ 开头的文件，生成后改回正式名称（npm 发布时会丢弃/改写点文件）
-const RENAME = {
-  _gitignore: '.gitignore',
-  _npmrc: '.npmrc',
-  _dockerignore: '.dockerignore',
-}
-
-// 判断目录是否“实质为空”时忽略的条目
-const IGNORABLE = new Set(['.git', '.DS_Store'])
+import { assertTarget, createPlan, writePlan } from '../lib/generate.js'
+import { Cancelled, collectOptions, prompt, summary } from '../lib/prompts.js'
 
 const HELP = `
-用法:
-  npx create-xxx <项目名> [选项]
-  npx create-xxx .            在当前空目录中创建
+用法：
+  create-vitepress-template [创建位置] [选项]
+  create-vitepress-template .               在当前空目录创建
+  create-vitepress-template my-docs         新建子目录，进入交互问答
 
-选项:
-  --install     创建后自动安装依赖（默认不安装）
-  -h, --help    显示帮助
+交互：↑↓ 选择，Space 多选，Enter 确认；Ctrl+C / Esc 取消。
+创建位置默认 .；输入 my-docs 新建目录，输入 . 或直接回车使用当前目录。
+
+自动化选项（--yes 跳过交互，未指定功能默认不启用）：
+  --yes, -y
+  --features=eslint,git-hooks,ci
+  --enhancements=mermaid
+  --i18n --languages=zh,en,vi --default-language=zh
+  --languages=en                           单语言 English
+  --targets=github-pages,vercel,cloudflare,oss,cos,server
+  --automation=github-pages,vercel          生成所选目标的自动部署工作流
+  --docker
+  --registries=aliyun,tencent,dockerhub     Docker 镜像发布
+  --package-name=@scope/docs
+  --install                               创建后安装依赖
+  -h, --help
+
+当前 GitHub Pages、自有服务器沿用已有 GitHub Actions 部署。
+自有服务器需要 --automation=server 和至少一个镜像仓库。
+不包含尚未实现的 GSAP 或服务器静态文件部署。
 `
 
-function fail(message) {
-  console.error(`\n✖ ${message}\n`)
-  process.exit(1)
-}
-
-// 根据启动方式识别包管理器：npm / pnpm / yarn / bun
-function detectPackageManager() {
-  const ua = process.env.npm_config_user_agent || ''
-  const name = ua.split(' ')[0]?.split('/')[0]
-  return ['pnpm', 'yarn', 'bun'].includes(name) ? name : 'npm'
-}
-
-// ---------- 参数解析 ----------
-const args = process.argv.slice(2)
-
-if (args.includes('-h') || args.includes('--help')) {
-  console.log(HELP)
-  process.exit(0)
-}
-
-const knownFlags = new Set(['--install'])
-const unknownFlag = args.find(a => a.startsWith('-') && !knownFlags.has(a))
-if (unknownFlag) {
-  fail(`未知参数 "${unknownFlag}"，使用 --help 查看用法`)
-}
-
-const shouldInstall = args.includes('--install')
-const name = args.find(a => !a.startsWith('-'))
-
-if (!name) {
-  fail('请指定项目名，例如: npx create-xxx my-docs（在当前空目录创建请用 .）')
-}
-
-const targetDir = path.resolve(process.cwd(), name)
-const projectName = path.basename(targetDir)
-
-// 与 npm 包名规则保持一致：小写字母、数字、点、下划线、连字符
-if (!/^[a-z0-9][a-z0-9._-]*$/.test(projectName)) {
-  fail(`项目名 "${projectName}" 不合法，只能包含小写字母、数字、点、下划线和连字符，且以字母或数字开头`)
-}
-
-// ---------- 前置校验 ----------
-if (!fs.existsSync(templateDir)) {
-  fail(`未找到模板目录: ${templateDir}`)
-}
-
-if (fs.existsSync(targetDir)) {
-  const entries = fs.readdirSync(targetDir).filter(f => !IGNORABLE.has(f))
-  if (entries.length > 0) {
-    fail(`目录 "${targetDir}" 不为空，请换一个项目名或在空目录中执行`)
+function parseArgs(args) {
+  const result = {}
+  let yes = false
+  const list = { features: 'features', enhancements: 'enhancements', languages: 'languages', targets: 'targets', automation: 'automation', registries: 'registries' }
+  const scalar = { 'default-language': 'defaultLanguage', 'package-name': 'packageName' }
+  for (const arg of args) {
+    if (arg === '--yes' || arg === '-y') {
+      yes = true
+    }
+    else if (arg === '--install') {
+      result.install = true
+    }
+    else if (arg === '--docker') {
+      result.docker = true
+    }
+    else if (arg === '--i18n') {
+      result.i18n = true
+    }
+    else if (arg.startsWith('--') && arg.includes('=')) {
+      const [name, ...rest] = arg.slice(2).split('=')
+      const value = rest.join('=')
+      if (list[name])
+        result[list[name]] = value ? value.split(',') : []
+      else if (scalar[name])
+        result[scalar[name]] = value
+      else throw new Error(`未知参数 ${arg}`)
+    }
+    else if (arg.startsWith('-')) {
+      throw new Error(`未知参数 ${arg}`)
+    }
+    else if (result.location !== undefined) {
+      throw new Error('只能指定一个创建位置')
+    }
+    else {
+      result.location = arg
+    }
   }
+  return { options: result, yes }
 }
 
-console.log('\n🚀 正在创建 VitePress 项目...\n')
+function installDependencies(plan) {
+  const cwd = plan.workspace?.root || plan.target
+  console.log(`\n正在安装依赖：${cwd}\n`)
+  // Fixed command: no user-controlled strings are interpolated into the shell.
+  const result = spawnSync('pnpm install', { cwd, stdio: 'inherit', shell: true, windowsHide: true })
+  if (result.error || result.status !== 0) {
+    console.warn(`依赖安装未完成，请在 ${cwd} 手动运行 pnpm install。项目文件已保留。`)
+    process.exitCode = 1
+    return false
+  }
+  return true
+}
 
-// ---------- 1. 复制模板（复制时过滤，而不是事后删除） ----------
-fs.cpSync(templateDir, targetDir, {
-  recursive: true,
-  filter: (src) => {
-    const relative = path.relative(templateDir, src).split(path.sep).join('/')
-    return !SKIP.has(path.basename(src)) && !SKIP_PATHS.has(relative)
-  },
+async function main() {
+  if (process.argv.slice(2).some(arg => ['-h', '--help'].includes(arg))) {
+    console.log(HELP)
+    return
+  }
+  const parsed = parseArgs(process.argv.slice(2))
+  let options = parsed.options
+  let plan
+  if (parsed.yes) {
+    plan = createPlan(options)
+    assertTarget(plan)
+    console.log(summary(plan))
+  }
+  else {
+    while (true) {
+      options = await collectOptions(options)
+      try {
+        plan = createPlan(options)
+        assertTarget(plan)
+      }
+      catch (error) {
+        console.error(`\n${error.message}\n`)
+        const action = await prompt({ title: '调整创建配置', choices: [{ value: 'edit', label: '返回修改' }, { value: 'cancel', label: '取消' }] })
+        if (action === 'cancel')
+          throw new Cancelled('已取消')
+        continue
+      }
+      console.log(summary(plan))
+      const action = await prompt({ title: '确认创建配置', choices: [{ value: 'create', label: '开始创建' }, { value: 'edit', label: '返回修改' }, { value: 'cancel', label: '取消' }] })
+      if (action === 'cancel')
+        throw new Cancelled('已取消')
+      if (action === 'create')
+        break
+    }
+  }
+  writePlan(plan)
+  console.log(`\n✔ 项目已创建：${plan.target}`)
+  const installed = plan.options.install && installDependencies(plan)
+  const steps = []
+  if (plan.workspace) {
+    console.log('请确认子项目路径已包含在 workspace packages 范围内；根目录配置未修改。')
+    if (!installed)
+      steps.push(`在 ${plan.workspace.root} 执行 pnpm install`)
+  }
+  if (plan.target !== process.cwd())
+    steps.push(`cd "${path.relative(process.cwd(), plan.target)}"`)
+  if (!installed && !plan.workspace)
+    steps.push('pnpm install')
+  steps.push('pnpm dev')
+  console.log(`\n接下来：\n${steps.map(step => `  ${step}`).join('\n')}\n`)
+}
+
+main().catch((error) => {
+  if (error instanceof Cancelled) {
+    console.log('\n已取消，未生成项目文件。')
+    process.exitCode = 130
+  }
+  else {
+    console.error(`\n✖ ${error.message}\n`)
+    process.exitCode = 1
+  }
 })
-
-// npm 不保存空目录：复制时排除生成物，再为新项目创建空的输出目录。
-fs.mkdirSync(path.join(targetDir, '.vitepress/config/generated'), { recursive: true })
-
-// ---------- 2. 还原被重命名的点文件 ----------
-for (const [from, to] of Object.entries(RENAME)) {
-  const fromPath = path.join(targetDir, from)
-  if (fs.existsSync(fromPath)) {
-    fs.renameSync(fromPath, path.join(targetDir, to))
-  }
-}
-
-// ---------- 3. 写入项目名 ----------
-const pkgPath = path.join(targetDir, 'package.json')
-if (fs.existsSync(pkgPath)) {
-  try {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-    pkg.name = projectName
-    fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`)
-  }
-  catch {
-    fail('模板中的 package.json 解析失败，请检查模板文件')
-  }
-}
-
-console.log('✔ 模板已生成')
-
-// ---------- 4. 可选：安装依赖 ----------
-const pm = detectPackageManager()
-let installed = false
-
-if (shouldInstall && fs.existsSync(pkgPath)) {
-  try {
-    console.log(`\n📦 正在使用 ${pm} 安装依赖...\n`)
-    execSync(`${pm} install`, { cwd: targetDir, stdio: 'inherit' })
-    installed = true
-    console.log('\n✔ 依赖安装完成')
-  }
-  catch {
-    console.warn(`\n⚠ 依赖安装失败（可能未安装 ${pm} 或网络异常），请稍后手动执行 ${pm} install`)
-  }
-}
-
-// ---------- 5. 后续提示 ----------
-const steps = []
-const relative = path.relative(process.cwd(), targetDir)
-
-if (relative)
-  steps.push(`cd ${relative}`)
-
-if (!installed)
-  steps.push(`${pm} install`)
-
-steps.push(pm === 'npm' ? 'npm run dev' : `${pm} dev`)
-
-console.log(`\n🎉 项目已创建: ${targetDir}\n\n接下来:\n${steps.map(s => `  ${s}`).join('\n')}\n`)

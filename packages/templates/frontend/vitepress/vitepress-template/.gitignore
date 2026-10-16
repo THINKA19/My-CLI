@@ -6,13 +6,14 @@ node_modules/
 *.tgz
 .turbo
 
-# 模板目录内不应出现的安装产物
-# （你曾在 template/ 里执行过 pnpm install，这里作为兜底）
-template/node_modules/
-template/pnpm-lock.yaml
-template/.turbo/
-template/dist/
-template/.vitepress/config/generated/
+# 模块模板内不应出现安装产物、缓存和生成菜单
+templates/**/node_modules/
+templates/**/.turbo/
+templates/**/dist/
+templates/**/.vercel/
+templates/**/.vitepress/cache/
+templates/**/.vitepress/.temp/
+templates/**/.vitepress/config/generated/
 
 # 日志
 *.log
@@ -23,6 +24,8 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+!templates/base/.env.development
+!templates/base/.env.production
 
 # 操作系统文件
 .DS_Store

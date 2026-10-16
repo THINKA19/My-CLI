@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "deploy:vercel:prepare": "pnpm run build:deploy && node scripts/deploy/prepare-vercel.js"
+  }
+}

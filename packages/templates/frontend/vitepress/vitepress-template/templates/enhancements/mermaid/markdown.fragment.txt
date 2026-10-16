@@ -1,0 +1,18 @@
+  // Markdown 配置
+  markdown: {
+    // 配置 Mermaid 支持
+    config: (md) => {
+      // Mermaid 代码块将被包装在特殊的容器中，供前端渲染
+      const fence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (...args) => {
+        const [tokens, idx] = args
+        const token = tokens[idx]
+        const lang = token.info.trim()
+
+        if (lang === 'mermaid') {
+          return `<div class="mermaid-container"><pre class="mermaid">${md.utils.escapeHtml(token.content)}</pre></div>`
+        }
+        return fence(...args)
+      }
+    },
+  },

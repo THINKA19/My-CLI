@@ -1,20 +1,22 @@
 {
   "name": "@dengzhibo/create-vitepress-template",
   "type": "module",
-  "version": "0.7.4",
+  "version": "0.9.0-alpha.1",
   "private": false,
   "description": "基于 VitePress 的开箱即用文档脚手架",
   "bin": {
     "create-vitepress-template": "./bin/index.js"
   },
   "scripts": {
-    "test": "pnpm pack --dry-run",
+    "test": "node --test tests/*.test.mjs",
+    "test:pack": "node scripts/check-package.mjs",
     "help": "node bin/index.js --help",
     "pub": "pnpm publish"
   },
   "files": [
     "bin",
-    "template",
+    "lib",
+    "templates",
     "CHANGELOG.md",
     "README.md",
     "LICENSE"

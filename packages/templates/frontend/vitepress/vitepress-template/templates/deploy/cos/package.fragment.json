@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "deploy:cos": "pnpm run build:deploy && node scripts/deploy/cos.js"
+  },
+  "devDependencies": {
+    "cos-nodejs-sdk-v5": "^3.0.0"
+  }
+}

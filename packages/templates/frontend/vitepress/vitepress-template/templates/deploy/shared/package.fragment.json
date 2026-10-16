@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build:deploy": "pnpm menus:generate && node scripts/deploy/build.js",
+    "deploy:check": "node scripts/deploy/check-config.js"
+  }
+}

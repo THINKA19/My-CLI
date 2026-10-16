@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "deploy:oss": "pnpm run build:deploy && node scripts/deploy/oss.js"
+  },
+  "devDependencies": {
+    "ali-oss": "^6.23.0"
+  }
+}
