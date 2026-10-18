@@ -19,7 +19,7 @@ pnpm dlx @dengzhibo/create-vitepress-template .
 1. **项目创建位置**：输入目录或使用当前目录。
 2. **国际化配置**：默认关闭。关闭后单选中文、英文或越南语；开启后至少勾选两种语言，再从所选语言中单选默认语言。
 3. **代码质量与检查**：ESLint、Git 提交检查、GitHub Actions CI，多选且默认空选。
-4. **内容与交互增强**：Mermaid 图表，默认空选；不包含尚未接入的 GSAP。
+4. **内容与交互增强**：Mermaid 图表、图片放大、阅读进度，默认空选。图片放大使用 Medium Zoom，可用 `data-no-zoom` 排除图片；阅读进度以页面顶部细条展示，仅在文章页显示，无额外依赖。
 5. **部署目标与容器支持**：GitHub Pages、Vercel、Cloudflare Pages、阿里云 OSS、腾讯云 COS、自有服务器；另有 Docker 本地构建与预览。可全部不选。
 6. **必要追问**：按已选目标选择已有自动部署流程；需要发布镜像时选择阿里云 ACR、腾讯云 TCR 或 Docker Hub。
 7. **是否安装依赖**：默认暂不安装。
@@ -36,7 +36,7 @@ GitHub Pages、自有服务器沿用现有 GitHub Actions 部署；自有服务�
 node bin/index.js my-docs --yes --languages=en
 
 # 多语言 + Mermaid + 代码检查 + GitHub Pages
-node bin/index.js my-docs --yes --i18n --languages=zh,en --default-language=zh --enhancements=mermaid --features=eslint,git-hooks,ci --targets=github-pages --automation=github-pages
+node bin/index.js my-docs --yes --i18n --languages=zh,en --default-language=zh --enhancements=mermaid,image-zoom,reading-progress --features=eslint,git-hooks,ci --targets=github-pages --automation=github-pages
 
 # Docker 镜像发布及自有服务器部署
 node bin/index.js my-docs --yes --targets=server --automation=server --registries=dockerhub

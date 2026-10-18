@@ -52,7 +52,7 @@ const HELP = `
 自动化选项（--yes 跳过交互，未指定功能默认不启用）：
   --yes, -y
   --features=eslint,git-hooks,ci
-  --enhancements=mermaid
+  --enhancements=mermaid,image-zoom,reading-progress
   --i18n --languages=zh,en,vi --default-language=zh
   --languages=en                           单语言 English
   --targets=github-pages,vercel,cloudflare,oss,cos,server

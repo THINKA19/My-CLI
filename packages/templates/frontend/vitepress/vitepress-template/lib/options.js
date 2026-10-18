@@ -26,7 +26,7 @@ export const languages = {
   vi: { label: 'Tiếng Việt', lang: 'vi-VN' },
 }
 export const features = { 'eslint': 'ESLint 代码检查', 'git-hooks': 'Git 提交检查', 'ci': 'GitHub Actions CI' }
-export const enhancements = { mermaid: 'Mermaid 图表（流程图、时序图等）' }
+export const enhancements = { 'mermaid': 'Mermaid 图表（流程图、时序图等）', 'image-zoom': '图片放大', 'reading-progress': '文章阅读进度' }
 export const targets = {
   'github-pages': 'GitHub Pages',
   'vercel': 'Vercel',

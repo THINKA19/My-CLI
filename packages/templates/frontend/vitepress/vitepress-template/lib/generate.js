@@ -230,6 +230,21 @@ export function createPlan(input = {}, cwd = process.cwd()) {
     config = replaceOnce(config, /\}\)\s*$/, `${read('enhancements/mermaid', 'markdown.fragment.txt')}})\n`, '.vitepress/config.ts')
     edit('.vitepress/config/site.ts', '    publicDir: \'../public\',', '    publicDir: \'../public\',\n    optimizeDeps: { include: [\'mermaid\'] },')
   }
+  // 基础主题统一接入增强，模块只提供自己的实现，不覆盖主题入口。
+  const themeImports = []
+  const themeSetup = []
+  if (options.enhancements.includes('mermaid')) {
+    themeImports.push('import { setupMermaid } from \'./enhancements/mermaid\'')
+    themeSetup.push('setupMermaid()')
+  }
+  for (const [name, setup] of [['image-zoom', 'setupImageZoom'], ['reading-progress', 'setupReadingProgress']]) {
+    if (options.enhancements.includes(name)) {
+      themeImports.push(`import { ${setup} } from './enhancements/${name}'`)
+      themeSetup.push(`${setup}()`)
+    }
+  }
+  edit('.vitepress/theme/index.ts', '// __ENHANCEMENT_IMPORTS__', themeImports.join('\n'))
+  edit('.vitepress/theme/index.ts', '    // __ENHANCEMENT_SETUP__', themeSetup.map(call => `    ${call}`).join('\n'))
   put('.vitepress/config.ts', config)
 
   // --- Docker 与部署 --------------------------------------------------------
@@ -311,6 +326,10 @@ function projectReadme(options, pkg, workspace) {
     '```sh\npnpm dev\npnpm build\npnpm preview\n```',
     '构建产物位于 `dist/`。',
   ]
+  if (options.enhancements.includes('image-zoom'))
+    sections.push('## 图片放大', '点击正文图片可放大；链接内图片不接管。为图片添加 `data-no-zoom` 属性可排除放大，例如 `<img src="/example.png" data-no-zoom>`。')
+  if (options.enhancements.includes('reading-progress'))
+    sections.push('## 阅读进度', '文章页顶部显示正文滚动进度，首页隐藏。短文章无需滚动时显示完成状态；该进度表示浏览位置。')
   if (options.docker)
     sections.push('Docker 用法见 [docker/README.md](docker/README.md)。构建前先安装依赖并提交匹配的锁文件。')
   if (hasDeploy)

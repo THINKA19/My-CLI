@@ -18,7 +18,7 @@ const full = {
   languages: ['zh', 'en', 'vi'],
   defaultLanguage: 'zh',
   features: ['eslint', 'git-hooks', 'ci'],
-  enhancements: ['mermaid'],
+  enhancements: ['mermaid', 'image-zoom', 'reading-progress'],
   targets: Object.keys(targets),
   automation: Object.keys(targets),
   registries: ['aliyun', 'tencent', 'dockerhub'],
@@ -54,6 +54,8 @@ test('基础版只有单语言站点，不包含可选功能或本机产物', ()
   assert.ok(!plan.files.has('.npmignore'))
   assert.ok(!text(plan, '.vitepress/config.ts').includes('locales:'))
   assert.ok(!text(plan, '.vitepress/theme/index.ts').includes('mermaid'))
+  assert.ok(!plan.files.has('.vitepress/theme/enhancements/mermaid.ts'))
+  assert.ok(!text(plan, '.vitepress/theme/index.ts').includes('__ENHANCEMENT_'))
 })
 
 test('三种单语言只生成自身页面、文案和根路径链接', () => {
@@ -87,7 +89,10 @@ test('Mermaid 完整接入可选依赖、主题、Markdown 与样式', () => {
   const plan = createPlan({ enhancements: ['mermaid'] })
   assert.ok(pkg(plan).devDependencies.mermaid)
   assert.match(text(plan, '.vitepress/config.ts'), /lang === 'mermaid'/)
-  assert.match(text(plan, '.vitepress/theme/index.ts'), /mermaid.render/)
+  assert.match(text(plan, '.vitepress/theme/index.ts'), /import \{ setupMermaid \} from '.\/enhancements\/mermaid'/)
+  assert.match(text(plan, '.vitepress/theme/index.ts'), /setupMermaid\(\)/)
+  assert.match(text(plan, '.vitepress/theme/index.ts'), /extends: DefaultTheme/)
+  assert.match(text(plan, '.vitepress/theme/enhancements/mermaid.ts'), /mermaid.render/)
   assert.ok(plan.files.has('.vitepress/theme/styles/mermaid.css'))
 })
 
@@ -208,3 +213,16 @@ test('CLI 非交互需显式 --yes，帮助和错误调用不生成文件', () =
   assert.equal(created.status, 0, created.stderr)
   assert.ok(fs.existsSync(path.join(directory, 'src/index.md')))
 }))
+
+test('阅读增强按需接入，且与 Mermaid 共存', () => {
+  for (const enhancements of [['image-zoom'], ['reading-progress'], ['mermaid', 'image-zoom', 'reading-progress']]) {
+    const plan = createPlan({ enhancements })
+    const theme = text(plan, '.vitepress/theme/index.ts')
+    for (const name of ['image-zoom', 'reading-progress'])
+      assert.equal(plan.files.has(`.vitepress/theme/enhancements/${name}.ts`), enhancements.includes(name))
+    assert.equal(Boolean(pkg(plan).devDependencies['medium-zoom']), enhancements.includes('image-zoom'))
+    assert.equal(theme.includes('setupImageZoom()'), enhancements.includes('image-zoom'))
+    assert.equal(theme.includes('setupReadingProgress()'), enhancements.includes('reading-progress'))
+    assert.ok(!theme.includes('__ENHANCEMENT_'))
+  }
+})

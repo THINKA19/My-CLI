@@ -108,3 +108,7 @@ pnpm add -D mermaid
 ### 0.9.0-alpha.3
 
 * 修复错误
+
+### 0.9.0-beta.1
+
+* 基础测试版

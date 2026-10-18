@@ -15,8 +15,10 @@ const installed = process.env.VITEPRESS_TEST_NODE_MODULES
 const root = fileURLToPath(new URL('../', import.meta.url))
 const cases = [
   ...['zh', 'en', 'vi'].map(code => ({ name: `single-${code}`, languages: [code] })),
+  { name: 'reading', enhancements: ['image-zoom', 'reading-progress'] },
+  { name: 'mermaid', enhancements: ['mermaid'] },
   { name: 'subset', i18n: true, languages: ['en', 'vi'], defaultLanguage: 'vi' },
-  { name: 'full', i18n: true, languages: ['zh', 'en', 'vi'], features: ['eslint', 'git-hooks', 'ci'], enhancements: ['mermaid'], targets: Object.keys(targets), automation: Object.keys(targets), registries: ['aliyun', 'tencent', 'dockerhub'] },
+  { name: 'full', i18n: true, languages: ['zh', 'en', 'vi'], features: ['eslint', 'git-hooks', 'ci'], enhancements: ['mermaid', 'image-zoom', 'reading-progress'], targets: Object.keys(targets), automation: Object.keys(targets), registries: ['aliyun', 'tencent', 'dockerhub'] },
 ]
 
 for (const options of cases) {
