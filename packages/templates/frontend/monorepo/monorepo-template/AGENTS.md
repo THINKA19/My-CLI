@@ -1,12 +1,12 @@
 # CLI 开发与维护指南
 
-## 项目定位
-本项目是一个 Node.js CLI 脚手架工具（`@dengzhibo/create-monorepo-template`），用于快速生成 Monorepo 初始模板。
+本包为 @dengzhibo/create-monorepo-template。
 
-## 开发规范
-- 源码核心逻辑位于 `bin/` 目录。
-- 模板资源全量放置在 `templates/` 目录下。
-- 修改 `templates/` 内的文件时，切勿在 `templates` 内部进行 `pnpm install` 产生 `node_modules`。
-
-## 关键命令
-- 本地打包测试：`pnpm pack --dry-run`（确保产物不包含任何 `node_modules`）
+- bin/index.js 仅编排流程。lib/options.js、prompts.js、generate.js 维护选项、交互和生成。
+- lib/deploy/ 维护目标增删改查、工作流模板渲染、文件安装；不要把平台执行代码写进管理入口。
+- templates/base 是默认模板；features/docker 是可选容器示例；features/deploy 按 shared 和各平台分类。
+- 各平台维护独立执行脚本、package.fragment.json 和工作流 .tpl 文件；shared 仅维护跨平台公共职责。
+- 生成项目 deploy/tools 和 deploy/templates 支持后续离线添加平台；scripts/deploy 是实际执行代码，按选择安装。
+- 不在 templates 内安装依赖，使用临时生成项目验证。
+- 保护已有脚本和修改过的工作流，凭据只使用环境变量或 Secrets。
+- node --test tests/*.test.mjs 验证；node scripts/check-package.mjs 检查发布范围。

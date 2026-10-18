@@ -1,24 +1,26 @@
 {
   "name": "@dengzhibo/create-monorepo-template",
   "type": "module",
-  "version": "0.5.0-alpha.1",
+  "version": "0.5.0",
   "private": false,
-  "description": "基于 pnpm workspace + Turborepo 的全栈 Monorepo 脚手架 (集成分包、Vue 3、React、Node.js)",
+  "description": "基于 pnpm workspace + Turborepo 的 Monorepo 基础脚手架，支持工程规范与可维护的多平台部署目标",
   "main": "bin/index.js",
   "bin": {
     "@dengzhibo/create-monorepo-template": "./bin/index.js",
     "create-monorepo-template": "./bin/index.js"
   },
   "scripts": {
-    "test": "pnpm pack --dry-run",
-    "pub": "pnpm publish"
+    "test": "node --test tests/*.test.mjs",
+    "pub": "pnpm publish",
+    "test:pack": "node scripts/check-package.mjs"
   },
   "files": [
     "bin",
     "templates",
     "CHANGELOG.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "lib"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
@@ -37,13 +39,14 @@
     "scaffold",
     "create"
   ],
-  "homepage": "https://github.com/dengzhibo/create-vitepress-template#readme",
+  "homepage": "https://github.com/THINKA19/My-CLI/tree/main/packages/templates/frontend/monorepo/monorepo-template#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dengzhibo/create-vitepress-template.git"
+    "url": "git+https://github.com/THINKA19/My-CLI.git",
+    "directory": "packages/templates/frontend/monorepo/monorepo-template"
   },
   "bugs": {
-    "url": "https://github.com/dengzhibo/create-vitepress-template/issues"
+    "url": "https://github.com/THINKA19/My-CLI/issues"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
