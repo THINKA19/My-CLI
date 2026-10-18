@@ -1,0 +1,26 @@
+name: Setup
+description: 安装 pnpm、Node.js 和项目依赖
+
+# 定义该 Action 的运行引擎类型
+runs:
+  # 复合类型：将多个现成的 Actions 步骤（steps）组合在一起复用（最适合 setup 环境准备）
+  # 可选参数：composite、node、docker、shell
+  using: composite
+  steps:
+    # pnpm 版本读取根 package.json 的 packageManager 字段，无需在此重复指定
+    - name: 安装 pnpm
+      uses: pnpm/action-setup@v4
+
+    # Node 版本读取 .nvmrc，并缓存 pnpm 依赖以加速后续安装
+    - name: 安装 Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: pnpm
+
+    # 复合 Action 中的 run 步骤必须声明 shell
+    # --frozen-lockfile 表示 CI 里严格按 pnpm-lock.yaml 安装，lockfile 缺失或与 package.json 不一致会直接报错
+    # 这样能保证 CI 环境和本地一致。所以首次使用前必须先提交 pnpm-lock.yaml
+    - name: 安装依赖
+      run: pnpm install --frozen-lockfile
+      shell: bash
