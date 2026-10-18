@@ -29,6 +29,8 @@ import path from 'node:path'
  *   将下方 MARK_ON / MARK_OFF 改为 '[x]' / '[ ]' 即可。
  */
 import readline from 'node:readline'
+import { dockerFeatures, normalizeDocker, validateDocker } from './docker/options.js'
+import { collectDockerOptions } from './docker/prompts.js'
 import { platforms, validate } from './options.js'
 
 /** 用户主动中断（Ctrl+C 或 Esc）时抛出，由调用方统一捕获 */
@@ -302,9 +304,11 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
 
 // ---------------------------------------------------------------------------
 
-export async function collectTarget(unused, original = {}, ask = prompt) {
+const platformLabels = { 'github-pages': 'GitHub Pages', 'vercel': 'Vercel', 'cloudflare': 'Cloudflare Pages', 'oss': '阿里云 OSS', 'cos': '腾讯云 COS', 'registry': '镜像发布', 'server': '服务器容器部署' }
+
+export async function collectTarget(unused, original = {}, ask = prompt, selectedPlatform) {
   const field = async (key, title, fallback = '') => ask({ title, initial: original[key] ?? fallback, defaultValue: String(original[key] ?? fallback) })
-  const platform = await ask({ title: '部署平台', choices: platforms.map(value => ({ value, label: value })), initial: original.platform || 'oss' })
+  const platform = selectedPlatform || await ask({ title: '部署平台', choices: platforms.map(value => ({ value, label: platformLabels[value] })), initial: original.platform || 'oss' })
   const t = { version: 1, name: await field('name', '唯一目标名称', 'web-production'), platform, environment: await field('environment', 'GitHub Environment', 'production'), app: await field('app', '应用目录', 'apps/frontend/web'), build: await field('build', '从仓库根执行的构建命令', 'pnpm --filter web... build') }
   if (!['registry', 'server'].includes(platform))
     t.output = await field('output', '产物目录', `${t.app}/dist`)
@@ -335,23 +339,30 @@ export async function collectTarget(unused, original = {}, ask = prompt) {
   }
   return t
 }
-const boolChoices = [{ value: false, label: '否' }, { value: true, label: '是' }]
 export async function collectOptions(previous = {}, ask = prompt) {
   const options = { ...previous, targets: [...(previous.targets || [])] }
-  options.location = await ask({ title: '项目创建位置', initial: previous.location || '.', defaultValue: '.' })
-  options.docker = await ask({ title: '包含 Docker 示例？', choices: boolChoices, initial: previous.docker || false })
-  options.deploy = await ask({ title: '启用部署目标管理？', choices: boolChoices, initial: previous.deploy || false })
-  if (options.deploy) {
-    while (await ask({ title: '现在添加一个部署目标？', choices: boolChoices, initial: false })) {
-      const target = await collectTarget(undefined, {}, ask)
+  options.location = await ask({ title: '项目创建位置', initial: previous.location === '.' ? '' : previous.location ?? '', defaultValue: '.', hint: '输入 my-monorepo：新建 my-monorepo 文件夹\n输入 . 或直接回车：在当前目录创建\n也支持其他相对路径；Ctrl+U 清空输入' }) || '.'
+  options.docker = await collectDockerOptions(previous.docker, ask)
+  validateDocker(path.resolve(options.location), options.docker)
+  const selected = await ask({ title: '选择部署平台', multiple: true, choices: platforms.map(value => ({ value, label: platformLabels[value] })), initial: [...new Set(options.targets.map(t => t.platform))], hint: '可全部不选；仅生成所选平台配置，不立即部署' })
+  options.targets = []
+  let shared = {}
+  for (const platform of selected) {
+    const existing = (previous.targets || []).filter(t => t.platform === platform)
+    const drafts = existing.length ? existing : [{ ...shared, name: `web-${platform}-production`, platform }]
+    for (const draft of drafts) {
+      console.log(`配置部署目标：${platformLabels[platform]}`)
+      const target = await collectTarget(undefined, draft, ask, platform)
       validate(path.resolve(options.location), target)
+      if (options.targets.some(t => t.name === target.name))
+        throw new Error('部署目标名称重复')
       options.targets.push(target)
+      const { app, build, output, environment, trigger, branch, paths } = target
+      shared = { app, build, output, environment, trigger, branch, paths }
     }
   }
-  else {
-    options.targets = []
-  }
-  options.install = await ask({ title: '创建后安装依赖？', choices: boolChoices, initial: previous.install || false })
+  options.deploy = options.targets.length > 0
+  options.install = await ask({ title: '是否立即安装依赖？', choices: [{ value: false, label: '暂不安装' }, { value: true, label: '立即安装' }], initial: previous.install ?? false })
   console.log(summary(options))
   const action = await ask({ title: '确认配置', choices: [{ value: 'create', label: '开始创建' }, { value: 'edit', label: '返回修改' }, { value: 'cancel', label: '取消' }] })
   if (action === 'edit')
@@ -359,5 +370,5 @@ export async function collectOptions(previous = {}, ask = prompt) {
   return action === 'create' ? options : null
 }
 export function summary(options) {
-  return `创建位置：${path.resolve(options.location)}\nDocker：${options.docker ? '启用' : '关闭'}\n部署管理：${options.deploy ? '启用' : '关闭'}\n初始目标：${options.targets.map(t => t.name).join(', ') || '无'}\n安装依赖：${options.install ? '是' : '否'}`
+  return `创建位置：${path.resolve(options.location)}\nDocker：${normalizeDocker(options.docker).features.map(f => dockerFeatures[f]).join('、') || '不包含'}\n部署管理：${options.deploy ? '启用' : '关闭'}\n初始目标：${options.targets.map(t => t.name).join(', ') || '无'}\n安装依赖：${options.install ? '立即安装' : '暂不安装'}`
 }

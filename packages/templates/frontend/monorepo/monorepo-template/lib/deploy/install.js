@@ -22,6 +22,7 @@ export function installation(root, platform) {
   }
   for (const name of ['options.js', 'prompts.js']) files.set(`deploy/tools/${name}`, fs.readFileSync(path.join(lib, name)))
   collect(path.join(lib, 'deploy'), 'deploy/tools/deploy')
+  collect(path.join(lib, 'docker'), 'deploy/tools/docker', name => ['options.js', 'prompts.js'].includes(name))
   // Catalog stays separate from executable scripts and supports later offline additions.
   collect(templates, 'deploy/templates/features/deploy')
   collect(path.join(templates, 'shared/scripts/deploy'), 'scripts/deploy', name => name !== 'upload-utils.js')

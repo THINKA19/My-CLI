@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { enable, saveTarget } from './deploy/targets.js'
+import { dockerPlan } from './docker/generate.js'
 import { assertTarget, normalizeOptions, validate } from './options.js'
 
 const templateDir = fileURLToPath(new URL('../templates/', import.meta.url))
@@ -47,12 +48,13 @@ export function createPlan(input = {}, cwd = process.cwd()) {
     }
   }
   add(path.join(templateDir, 'base'), '', true)
-  if (docker)
-    add(path.join(templateDir, 'features/docker'))
+  const containers = dockerPlan(target, docker, name)
+  for (const [relative, content] of containers.files) files.set(relative, content)
+  pkg.scripts = { ...pkg.scripts, ...containers.scripts }
 
   pkg.name = name
   files.set('package.json', `${JSON.stringify(pkg, null, 2)}\n`)
-  files.set('README.md', `${files.get('README.md')}\n## 本次生成的可选配置\n\n${docker ? '- Docker 示例已包含：见 docker/README.md，运行前适配实际应用路径。' : '- 未启用 Docker。'}\n${deploy ? '- 部署管理已包含：部署目标管理，可运行 pnpm run deploy add；见 deploy/README.md。' : '- 未启用部署配置。'}\n`)
+  files.set('README.md', `${files.get('README.md')}\n## 本次生成的可选配置\n\n${docker.features.length ? '- Docker 配置已包含：见 docker/README.md，应用由项目自行实现。' : '- 未启用 Docker。'}\n${deploy ? '- 部署管理已包含：部署目标管理，可运行 pnpm run deploy add；见 deploy/README.md。' : '- 未启用部署配置。'}\n`)
   files.set('.github/README.md', `# GitHub 自动化\n\n默认 CI 执行 Lint、类型检查和构建。首次安装后请提交根 pnpm-lock.yaml，供冻结安装使用。\n\n${deploy ? '使用 pnpm run deploy add 添加目标，每个目标生成独立手动工作流；Secrets 放对应 GitHub Environment。' : '本次未生成 CD 工作流，仅包含 CI。'}\n`)
 
   return { target, options, files }

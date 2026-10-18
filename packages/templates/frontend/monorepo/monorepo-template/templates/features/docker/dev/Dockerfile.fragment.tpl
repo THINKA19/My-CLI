@@ -1,0 +1,3 @@
+FROM base AS dev
+EXPOSE __DEV_PORT__
+CMD __DEV_COMMAND__

@@ -11,7 +11,9 @@ node bin/index.js my-repo --yes --docker --deploy
 node bin/index.js my-repo --yes --deploy-config=target.json
 ```
 
-交互时可启用 Docker 示例和部署管理，并连续添加多个初始目标。`--cd` 保留为 `--deploy` 的兼容别名。Ctrl+C 取消，最终确认前不创建项目。Docker 示例需要适配实际应用。
+交互顺序：创建位置 → Docker 用途多选 → 对应应用/服务配置 → 部署平台多选 → 各目标必要配置 → 依赖安装 → 摘要确认。多选均可全部不选，不再询问是否启用部署管理。平台选过后不重复询问，其他平台字段按需出现。Ctrl+C 取消，最终确认前不创建项目。
+
+非交互兼容 `--docker`（默认 web/api 的开发、生产镜像及编排配置）和 `--deploy` / `--cd`（只启用管理工具）。精准 Docker 配置使用 `--docker-config=文件`；平台目标仍使用可重复的 `--deploy-config=文件`。这些配置不会创建业务应用。
 
 ## 在已有仓库添加部署
 
@@ -82,7 +84,7 @@ node --test tests/*.test.mjs
 pnpm test:pack
 ```
 
-`templates/base` 是默认模板，`templates/features/docker` 是 Docker 示例，`templates/features/deploy` 按 shared、oss、cos、github-pages、vercel、cloudflare、registry、server 分类。每个平台保留独立脚本、依赖片段和工作流模板；VitePress 原稿在 docs/reference，不发布。
+`templates/base` 是默认模板，`templates/features/docker` 按 shared、dev、image、compose 维护 Docker 模板，`templates/features/deploy` 按 shared、oss、cos、github-pages、vercel、cloudflare、registry、server 分类。每个平台保留独立脚本、依赖片段和工作流模板；VitePress 原稿在 docs/reference，不发布。
 
 本地测试可验证配置、生成和执行控制流。真实平台权限、上传结果、GitHub Actions 和服务器运行情况需要对应云账号进行验收；dry-run 不代表部署成功。
 
@@ -98,3 +100,41 @@ pnpm test:pack
 生成后，scripts/deploy 存放公共工具和已选择的平台执行脚本；deploy/targets 存放目标配置；deploy/tools 存放离线管理工具；deploy/templates 存放可供以后添加平台的模板目录。模板目录不参与实际部署，不安装未选择平台的 SDK。deploy/manage.mjs 只负责调用管理命令，平台工作流调用 scripts/deploy/run.js。
 
 已有集中式 manage.mjs 的旧生成项目不会被静默覆盖；请先备份配置、审查迁移，使用新生成的模块化工具替换后再继续管理。
+
+## Docker 用途与特殊配置
+
+- dev：指定应用的容器开发环境。
+- image：静态前端或 Node 应用的生产镜像。
+- compose：服务编排，可独立引用已有镜像或 Dockerfile，不强制生成应用容器。
+
+选择开发或生产镜像时填写应用目录、命令和端口；静态前端填写产物目录，Node 服务填写启动命令。应用可稍后创建，实际构建前安装依赖并提交根锁文件。编排中的已有 Dockerfile 使用仓库根相对路径，context 也是仓库根相对路径。
+
+自定义编排示例 docker-options.json：
+
+```json
+{
+  "features": ["compose"],
+  "apps": [],
+  "services": [
+    {
+      "name": "cache",
+      "source": "image",
+      "image": "redis:7",
+      "ports": ["6379:6379"],
+      "volumes": ["cache-data:/data"]
+    }
+  ]
+}
+```
+
+```sh
+node bin/index.js my-repo --yes --docker-config=docker-options.json
+# 默认应用参数下选择部分用途
+node bin/index.js my-repo --yes --docker=dev,image
+```
+
+应用配置位于 apps 数组：name、kind（static/node）、app、package；dev 使用 devCommand/devPort/devHostPort；image 使用 buildCommand/port/hostPort，以及 static 的 output 或 node 的 startCommand。支持多个应用。
+
+services 支持 image 或 dockerfile 来源、ports、volumes、environment；敏感变量使用 .env 引用。普通命名卷会自动声明；挂载相对路径遵循 Compose 文件所在 docker 目录。生成文件可继续编辑以加入网络、代理等项目配置，不增加未经实现的选项。
+
+Dockerfile/Compose 是实际配置，docker/config.json 保存生成参数并供独立运行脚本读取；修改时同步对应文件。选择 dev 和 image 时，Compose 开发/生产分别使用 docker:dev 和 docker:prod，docker:up 默认采用生产配置。静态镜像不强制依赖后端或配置 API 代理。Node 生产镜像保留 workspace 依赖。

@@ -189,3 +189,12 @@ TypeScript
 ## v0.5.0 (2026-10-18) 
 
 * 交互式问答，大调整
+
+## v0.5.0 (2026-10-18) 
+
+### 修改
+
+交互式问答优化
+
+* monorepo-template/lib
+* templates/features/docker

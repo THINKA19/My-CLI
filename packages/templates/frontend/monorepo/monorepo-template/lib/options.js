@@ -1,9 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { normalizeDocker } from './docker/options.js'
 
 export { platforms, validate } from '../templates/features/deploy/shared/scripts/deploy/check-config.js'
 export function normalizeOptions(input = {}) {
-  return { location: input.location || '.', docker: Boolean(input.docker), deploy: Boolean(input.deploy), install: Boolean(input.install), targets: input.targets || [] }
+  return { location: input.location || '.', docker: normalizeDocker(input.docker), deploy: Boolean(input.deploy), install: Boolean(input.install), targets: input.targets || [] }
 }
 export function assertTarget(target) {
   let current = target
@@ -21,7 +22,9 @@ export function assertTarget(target) {
 
 export const help = `用法：create-monorepo-template [目录] [选项]
   --yes, -y             非交互创建
-  --docker              包含 Docker 示例
+  --docker              兼容默认开发/镜像/编排配置
+  --docker=dev,image,compose  选择 Docker 用途
+  --docker-config=文件   指定应用与 Compose 服务配置
   --deploy              启用部署目标管理（--cd 兼容别名）
   --deploy-config=文件   初始目标配置，可重复
   --install             安装依赖
@@ -43,7 +46,13 @@ export function parseArgs(args) {
       yes = true
     }
     else if (arg === '--docker') {
-      options.docker = true
+      options.docker = normalizeDocker(true)
+    }
+    else if (arg.startsWith('--docker=')) {
+      options.docker = normalizeDocker(arg.slice('--docker='.length).split(',').filter(Boolean))
+    }
+    else if (arg.startsWith('--docker-config=')) {
+      options.docker = normalizeDocker(JSON.parse(fs.readFileSync(path.resolve(arg.slice('--docker-config='.length)), 'utf8')))
     }
     else if (['--deploy', '--cd'].includes(arg)) {
       options.deploy = true
