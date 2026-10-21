@@ -1,0 +1,49 @@
+{
+  "name": "@dengzhibo/create-vue-template",
+  "type": "module",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Vue + Vite 应用脚手架，可选代码规范、单元测试和端到端测试",
+  "main": "bin/index.js",
+  "bin": {
+    "create-vue-template": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "pub": "pnpm publish",
+    "test:pack": "node scripts/check-package.mjs"
+  },
+  "files": [
+    "bin",
+    "templates",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE",
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "author": "THINKA <your-email@example.com>",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "vite",
+    "typescript",
+    "scaffold",
+    "create"
+  ],
+  "homepage": "https://github.com/THINKA19/My-CLI/tree/main/packages/templates/frontend/vite/vue-template#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/THINKA19/My-CLI.git",
+    "directory": "packages/templates/frontend/vite/vue-template"
+  },
+  "bugs": {
+    "url": "https://github.com/THINKA19/My-CLI/issues"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

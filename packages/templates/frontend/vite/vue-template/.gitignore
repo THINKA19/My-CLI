@@ -1,0 +1,44 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 打包产物：pnpm pack 生成的 tgz
+*.tgz
+.turbo
+
+# 模板目录内不应出现的安装产物
+# （你曾在 templates/**/ 里执行过 pnpm install，这里作为兜底）
+templates/**/node_modules/
+templates/**/pnpm-lock.yaml
+templates/**/.turbo/
+templates/**/dist/
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# 环境变量与本地私密配置
+.env
+.env.*
+!.env.example
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器个人配置
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# AI 工具本地配置
+.claude/settings.local.json
+.claude/*.local.json
+.claude/worktrees/
+
+# 测试与缓存
+coverage/
+*.tsbuildinfo
+.eslintcache

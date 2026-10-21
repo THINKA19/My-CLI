@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "test:unit": "vitest"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@vue/test-utils": "^2.5.0",
+    "jsdom": "^30.0.1",
+    "vitest": "^4.1.11"
+  }
+}
