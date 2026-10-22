@@ -1,11 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-export const featureLabels = { 'code-quality': '代码规范', 'unit-test': '单元测试', 'e2e': '端到端测试' }
+export const featureLabels = { 'code-quality': '代码规范', 'unit-test': '单元测试', 'e2e': '端到端测试', 'jsx': 'JSX 支持' }
 export function normalizeOptions(input = {}) {
   const features = input.features ?? []
   if (!Array.isArray(features) || features.some(f => !Object.hasOwn(featureLabels, f)))
-    throw new Error('功能仅支持 code-quality、unit-test、e2e')
+    throw new Error('功能仅支持 code-quality、unit-test、e2e、jsx')
   return { location: input.location || '.', features: Object.keys(featureLabels).filter(f => features.includes(f)), install: Boolean(input.install) }
 }
 export function assertTarget(target) {
@@ -24,7 +24,7 @@ export function assertTarget(target) {
 
 export const help = `用法：create-vue-template [目录] [选项]
   --yes, -y           非交互创建
-  --features=code-quality,unit-test,e2e  选择功能，默认全部不选
+  --features=code-quality,unit-test,e2e,jsx  选择功能，默认全部不选
   --features=         全部不选
   --install           安装依赖，默认不安装
   --help, -h          帮助

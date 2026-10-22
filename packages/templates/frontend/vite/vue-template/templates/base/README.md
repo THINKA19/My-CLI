@@ -1,4 +1,4 @@
-# base
+# vue-project
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -53,7 +53,7 @@ pnpm test:unit
 
 ```sh
 # Install browsers for the first run
-pnpm exec playwright install
+npx playwright install
 
 # When testing on CI, must build the project first
 pnpm build
@@ -63,7 +63,7 @@ pnpm test:e2e
 # Runs the tests only on Chromium
 pnpm test:e2e --project=chromium
 # Runs the tests of a specific file
-pnpm test:e2e e2e/vue.spec.ts
+pnpm test:e2e tests/example.spec.ts
 # Runs the tests in debug mode
 pnpm test:e2e --debug
 ```

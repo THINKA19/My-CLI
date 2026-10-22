@@ -1,29 +1,39 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+// eslint-disable-next-line test/prefer-vitest -- CLI tests run with node --test
 import test from 'node:test'
 import { createPlan, writePlan } from '../lib/generate.js'
 import { parseArgs } from '../lib/options.js'
 import { collectOptions } from '../lib/prompts.js'
+
 const cli = fileURLToPath(new URL('../bin/index.js', import.meta.url))
 const run = args => spawnSync(process.execPath, [cli, ...args], { encoding: 'utf8' })
-const choices = ['code-quality', 'unit-test', 'e2e']
-for (let mask = 0; mask < 8; mask++) {
+const choices = ['code-quality', 'unit-test', 'e2e', 'jsx']
+for (let mask = 0; mask < 16; mask++) {
   const features = choices.filter((_, index) => mask & (1 << index))
-  test('generation: ' + (features.join(',') || 'none'), () => {
+  test(`generation: ${features.join(',') || 'none'}`, () => {
     const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'vue-template-'))
     try {
       const target = path.join(temp, 'my-vue-app')
-      const result = run([target, '--yes', '--features=' + features.join(',')])
+      const result = run([target, '--yes', `--features=${features.join(',')}`])
       assert.equal(result.status, 0, result.stderr)
       const has = file => fs.existsSync(path.join(target, file))
       const read = file => fs.readFileSync(path.join(target, file), 'utf8')
       const pkg = JSON.parse(read('package.json'))
-      const quality = features.includes('code-quality'), unit = features.includes('unit-test'), e2e = features.includes('e2e')
+      const quality = features.includes('code-quality')
+      const unit = features.includes('unit-test')
+      const e2e = features.includes('e2e')
       assert.equal(pkg.name, 'my-vue-app')
+      assert.equal(Boolean(pkg.devDependencies['@vitejs/plugin-vue-jsx']), features.includes('jsx'))
+      assert.equal(read('vite.config.ts').includes('vueJsx()'), features.includes('jsx'))
+      assert.equal(read('tsconfig.app.json').includes('"jsxImportSource": "vue"'), features.includes('jsx'))
+      assert.deepEqual(Object.keys(pkg.devDependencies), Object.keys(pkg.devDependencies).sort())
+      const order = ['dev', 'build', 'preview', 'test:unit', 'test:e2e', 'build-only', 'type-check', 'lint', 'lint:oxlint', 'lint:eslint', 'format']
+      assert.deepEqual(Object.keys(pkg.scripts), order.filter(key => key in pkg.scripts))
       for (const file of ['src/App.vue', 'vite.config.ts', 'tsconfig.app.json', '.gitignore']) assert.ok(has(file), file)
       for (const file of ['.github', '.husky', 'deploy', 'docker', 'features', 'package.fragment.json']) assert.equal(has(file), false, file)
       assert.equal(has('eslint.config.ts'), quality)
@@ -72,10 +82,10 @@ test('CLI defaults, flags and errors', () => {
 test('multi-select, edit, installation preference and cancellation', async () => {
   const answers = ['my-vue-app', choices, true, 'edit', 'my-vue-app', [], false, 'create']
   let count = 0
-  const result = await collectOptions({}, async question => {
+  const result = await collectOptions({}, async (question) => {
     if (question.title === '选择可选功能') {
       assert.equal(question.multiple, true)
-      assert.deepEqual(question.choices.map(c => c.label), ['代码规范', '单元测试', '端到端测试'])
+      assert.deepEqual(question.choices.map(c => c.label), ['代码规范', '单元测试', '端到端测试', 'JSX 支持'])
       assert.deepEqual(question.initial, count === 1 ? [] : choices)
     }
     return answers[count++]

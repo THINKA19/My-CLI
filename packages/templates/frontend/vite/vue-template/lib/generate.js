@@ -38,7 +38,7 @@ export function createPlan(input = {}, cwd = process.cwd()) {
   const parse = file => JSON.parse(files.get(file).toString())
   const pkg = parse('package.json')
   for (const feature of options.features) {
-    const directory = path.join(templateDir, 'features', feature)
+    const directory = path.join(templateDir, 'features', ({ 'unit-test': 'Vitest', 'jsx': 'JSX' })[feature] || feature)
     add(directory)
     const fragment = JSON.parse(fs.readFileSync(path.join(directory, 'package.fragment.json'), 'utf8'))
     for (const field of ['scripts', 'dependencies', 'devDependencies']) {
@@ -49,6 +49,12 @@ export function createPlan(input = {}, cwd = process.cwd()) {
         pkg[field][key] = value
       }
     }
+  }
+  if (has('jsx')) {
+    const vite = files.get('vite.config.ts').toString().replace(/\r\n/g, '\n').replace('import vue from \'@vitejs/plugin-vue\'', 'import vue from \'@vitejs/plugin-vue\'\nimport vueJsx from \'@vitejs/plugin-vue-jsx\'').replace('    vue(),', '    vue(),\n    vueJsx(),')
+    files.set('vite.config.ts', vite)
+    const tsconfig = files.get('tsconfig.app.json').toString().replace('"compilerOptions": {', '"compilerOptions": {\n    "jsx": "preserve",\n    "jsxImportSource": "vue",')
+    files.set('tsconfig.app.json', tsconfig)
   }
   const extensions = parse('.vscode/extensions.json')
   if (has('unit-test')) {
@@ -79,6 +85,10 @@ export function createPlan(input = {}, cwd = process.cwd()) {
   }
   files.set('.vscode/extensions.json', encode(extensions))
   pkg.name = name
+  const scriptOrder = ['dev', 'build', 'preview', 'test:unit', 'test:e2e', 'build-only', 'type-check', 'lint', 'lint:oxlint', 'lint:eslint', 'format']
+  pkg.scripts = Object.fromEntries(scriptOrder.filter(key => Object.hasOwn(pkg.scripts, key)).map(key => [key, pkg.scripts[key]]))
+  for (const field of ['dependencies', 'devDependencies'])
+    pkg[field] = Object.fromEntries(Object.entries(pkg[field]).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0))
   files.set('package.json', encode(pkg))
   let readme = files.get('README.md').toString().replace(/\r\n/g, '\n')
   const sections = [['unit-test', 'Run Unit Tests'], ['e2e', 'Run End-to-End Tests'], ['code-quality', 'Lint with']]
