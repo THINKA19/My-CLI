@@ -28,6 +28,7 @@ for (let mask = 0; mask < 16; mask++) {
       const unit = features.includes('unit-test')
       const e2e = features.includes('e2e')
       assert.equal(pkg.name, 'my-vue-app')
+      assert.equal(pkg.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version)
       assert.equal(Boolean(pkg.devDependencies['@vitejs/plugin-vue-jsx']), features.includes('jsx'))
       assert.equal(read('vite.config.ts').includes('vueJsx()'), features.includes('jsx'))
       assert.equal(read('tsconfig.app.json'), fs.readFileSync(new URL('../templates/base/tsconfig.app.json', import.meta.url), 'utf8'))
@@ -106,4 +107,10 @@ test('current directory generation preserves .git and rejects occupied destinati
     assert.throws(() => createPlan({ location: 'invalid name' }, temp), /项目名/)
   }
   finally { fs.rmSync(temp, { recursive: true, force: true }) }
+})
+
+test('default project name', () => {
+  assert.equal(parseArgs(['--yes']).options.location, 'vue-project')
+  const plan = createPlan({}, os.tmpdir())
+  assert.equal(JSON.parse(plan.files.get('package.json')).name, 'vue-project')
 })

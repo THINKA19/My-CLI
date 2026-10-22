@@ -303,7 +303,7 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
 
 export async function collectOptions(previous = {}, ask = prompt) {
   const options = normalizeOptions(previous)
-  options.location = await ask({ title: '项目创建位置', initial: options.location === '.' ? '' : options.location, defaultValue: '.', hint: '输入 my-vue-app：新建项目文件夹；输入 .：在当前目录创建；支持相对或绝对路径' }) || '.'
+  options.location = await ask({ title: '项目创建位置', initial: options.location === '.' ? '' : options.location, defaultValue: 'vue-project', hint: '输入 my-vue-app：新建项目文件夹；输入 .：在当前目录创建；支持相对或绝对路径' }) || 'vue-project'
   options.features = await ask({ title: '选择可选功能', multiple: true, choices: Object.entries(featureLabels).map(([value, label]) => ({ value, label })), initial: options.features, hint: 'Space 勾选，Enter 确认；可全部不选或全部选择' })
   options.install = await ask({ title: '是否立即安装依赖？', choices: [{ value: false, label: '暂不安装' }, { value: true, label: '立即安装' }], initial: options.install })
   console.log(summary(options))

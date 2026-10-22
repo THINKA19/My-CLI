@@ -79,6 +79,7 @@ export function createPlan(input = {}, cwd = process.cwd()) {
   }
   files.set('.vscode/extensions.json', encode(extensions))
   pkg.name = name
+  pkg.version = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
   const scriptOrder = ['dev', 'build', 'preview', 'test:unit', 'test:e2e', 'build-only', 'type-check', 'lint', 'lint:oxlint', 'lint:eslint', 'format']
   pkg.scripts = Object.fromEntries(scriptOrder.filter(key => Object.hasOwn(pkg.scripts, key)).map(key => [key, pkg.scripts[key]]))
   for (const field of ['dependencies', 'devDependencies'])
