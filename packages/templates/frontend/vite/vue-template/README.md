@@ -62,4 +62,4 @@ node scripts/check-package.mjs
 
 `bin/`、`lib/`、`templates/`、README、CHANGELOG、LICENSE 与 package.json 随 npm 包发布。测试、预检脚本、AGENTS.md 和本地缓存仅用于仓库维护，不需要上传 npm。`_gitignore` 在生成项目时恢复为 `.gitignore`。
 
-未指定目录时默认创建 `vue-project`；指定目录时使用目录名作为包名。生成项目版本与本脚手架根 package.json 的版本一致。
+未指定目录时默认在当前目录 `.` 创建，生成包名为 `vue-project`；指定目录时使用目录名作为包名。生成项目版本与本脚手架根 package.json 的版本一致。

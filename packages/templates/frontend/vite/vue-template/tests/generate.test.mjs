@@ -110,7 +110,7 @@ test('current directory generation preserves .git and rejects occupied destinati
 })
 
 test('default project name', () => {
-  assert.equal(parseArgs(['--yes']).options.location, 'vue-project')
-  const plan = createPlan({}, os.tmpdir())
+  assert.equal(parseArgs(['--yes']).options.location, '.')
+  const plan = createPlan({}, path.join(os.tmpdir(), `vue-default-${process.pid}-${Date.now()}`))
   assert.equal(JSON.parse(plan.files.get('package.json')).name, 'vue-project')
 })

@@ -6,7 +6,7 @@ export function normalizeOptions(input = {}) {
   const features = input.features ?? []
   if (!Array.isArray(features) || features.some(f => !Object.hasOwn(featureLabels, f)))
     throw new Error('功能仅支持 code-quality、unit-test、e2e、jsx')
-  return { location: input.location || 'vue-project', features: Object.keys(featureLabels).filter(f => features.includes(f)), install: Boolean(input.install) }
+  return { location: input.location || '.', features: Object.keys(featureLabels).filter(f => features.includes(f)), install: Boolean(input.install) }
 }
 export function assertTarget(target) {
   let current = target
@@ -48,6 +48,6 @@ export function parseArgs(args) {
   }
   if (locations.length > 1)
     throw new Error('只能指定一个创建目录')
-  options.location = locations[0] || 'vue-project'
+  options.location = locations[0] || '.'
   return { options: normalizeOptions(options), yes }
 }
