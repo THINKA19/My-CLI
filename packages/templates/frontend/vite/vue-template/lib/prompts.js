@@ -25,8 +25,7 @@ import path from 'node:path'
  *
  * 终端兼容：
  *   多选符号曾使用 ☑ / ☐，在部分 Windows 终端字体里 ☑ 缺失，显示成空方块，
- *   导致已选和未选无法区分，因此改用 ◉ / ◯。若仍有显示问题，
- *   将下方 MARK_ON / MARK_OFF 改为 '[x]' / '[ ]' 即可。
+ *   多选统一使用 ASCII 字符 [+] / [ ]，单选保留圆形符号。
  */
 import readline from 'node:readline'
 import { featureLabels, normalizeOptions } from './options.js'
@@ -39,8 +38,8 @@ export class Cancelled extends Error {}
 // ---------------------------------------------------------------------------
 
 // 多选框符号（已选 / 未选）
-const MARK_ON = '◉'
-const MARK_OFF = '◯'
+const MARK_ON = '[+]'
+const MARK_OFF = '[ ]'
 // 单选框符号（当前项 / 其他项）
 const RADIO_ON = '●'
 const RADIO_OFF = '○'
