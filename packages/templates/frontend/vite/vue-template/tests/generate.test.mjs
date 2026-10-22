@@ -30,7 +30,8 @@ for (let mask = 0; mask < 16; mask++) {
       assert.equal(pkg.name, 'my-vue-app')
       assert.equal(Boolean(pkg.devDependencies['@vitejs/plugin-vue-jsx']), features.includes('jsx'))
       assert.equal(read('vite.config.ts').includes('vueJsx()'), features.includes('jsx'))
-      assert.equal(read('tsconfig.app.json').includes('"jsxImportSource": "vue"'), features.includes('jsx'))
+      assert.equal(read('tsconfig.app.json'), fs.readFileSync(new URL('../templates/base/tsconfig.app.json', import.meta.url), 'utf8'))
+      assert.equal(read('README.md').includes('已选功能：'), false)
       assert.deepEqual(Object.keys(pkg.devDependencies), Object.keys(pkg.devDependencies).sort())
       const order = ['dev', 'build', 'preview', 'test:unit', 'test:e2e', 'build-only', 'type-check', 'lint', 'lint:oxlint', 'lint:eslint', 'format']
       assert.deepEqual(Object.keys(pkg.scripts), order.filter(key => key in pkg.scripts))
@@ -54,7 +55,8 @@ for (let mask = 0; mask < 16; mask++) {
       if (quality) {
         assert.equal(read('eslint.config.ts').includes('pluginVitest'), unit)
         assert.equal(read('eslint.config.ts').includes('pluginPlaywright'), e2e)
-        assert.equal(JSON.parse(read('.oxlintrc.json')).plugins.includes('vitest'), unit)
+        assert.equal(read('.oxlintrc.json'), fs.readFileSync(new URL('../templates/features/code-quality/.oxlintrc.json', import.meta.url), 'utf8'))
+        assert.equal(read('.oxfmtrc.json'), fs.readFileSync(new URL('../templates/features/code-quality/.oxfmtrc.json', import.meta.url), 'utf8'))
       }
       const settings = JSON.parse(read('.vscode/settings.json'))
       assert.equal(Boolean(settings['editor.defaultFormatter']), quality)

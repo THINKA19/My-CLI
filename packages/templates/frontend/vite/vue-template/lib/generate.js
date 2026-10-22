@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { assertTarget, featureLabels, normalizeOptions } from './options.js'
+import { assertTarget, normalizeOptions } from './options.js'
 
 const templateDir = fileURLToPath(new URL('../templates/', import.meta.url))
 const skip = new Set(['node_modules', 'dist', '.npmignore', '.git', '.DS_Store', 'pnpm-lock.yaml', '.turbo'])
@@ -53,8 +53,6 @@ export function createPlan(input = {}, cwd = process.cwd()) {
   if (has('jsx')) {
     const vite = files.get('vite.config.ts').toString().replace(/\r\n/g, '\n').replace('import vue from \'@vitejs/plugin-vue\'', 'import vue from \'@vitejs/plugin-vue\'\nimport vueJsx from \'@vitejs/plugin-vue-jsx\'').replace('    vue(),', '    vue(),\n    vueJsx(),')
     files.set('vite.config.ts', vite)
-    const tsconfig = files.get('tsconfig.app.json').toString().replace('"compilerOptions": {', '"compilerOptions": {\n    "jsx": "preserve",\n    "jsxImportSource": "vue",')
-    files.set('tsconfig.app.json', tsconfig)
   }
   const extensions = parse('.vscode/extensions.json')
   if (has('unit-test')) {
@@ -75,10 +73,6 @@ export function createPlan(input = {}, cwd = process.cwd()) {
       }
     }
     files.set('eslint.config.ts', eslint)
-    const oxlint = parse('.oxlintrc.json')
-    if (!has('unit-test'))
-      oxlint.plugins = oxlint.plugins.filter(p => p !== 'vitest')
-    files.set('.oxlintrc.json', encode(oxlint))
     const settings = JSON.parse(fs.readFileSync(path.join(templateDir, 'features/code-quality/settings.fragment.json'), 'utf8'))
     files.set('.vscode/settings.json', encode({ ...parse('.vscode/settings.json'), ...settings }))
     extensions.recommendations.push('dbaeumer.vscode-eslint', 'EditorConfig.EditorConfig', 'oxc.oxc-vscode')
@@ -96,7 +90,7 @@ export function createPlan(input = {}, cwd = process.cwd()) {
     if (!has(feature))
       readme = readme.replace(new RegExp(`### ${title}[\\s\\S]*?(?=\\n### |$)`), '')
   }
-  files.set('README.md', `${readme.replace('# base', `# ${name}`).trimEnd()}\n\n已选功能：${options.features.map(f => featureLabels[f]).join('、') || '无'}\n`)
+  files.set('README.md', readme.replace('# base', `# ${name}`))
   return { target, options, files }
 }
 export function writePlan(plan) {
