@@ -1,5 +1,7 @@
 # core-js postinstall only prints a funding banner.
 allowBuilds:
+  '@parcel/watcher': true
+  vue-demi: true
   core-js: false
 
 overrides:

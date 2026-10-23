@@ -1,20 +1,27 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { defaultHttp, httpLibraries } from './http.js'
-import { defaultUi, uiLibraries } from './ui.js'
+import { defaultType, projectTypes } from './project-types.js'
+import { uiLibraries } from './ui.js'
 
 export const featureLabels = { 'code-quality': '代码规范', 'unit-test': '单元测试', 'e2e': '端到端测试', 'jsx': 'JSX 支持' }
 export function normalizeOptions(input = {}) {
   const http = input.http ?? defaultHttp
   if (typeof http !== 'string' || !Object.hasOwn(httpLibraries, http))
     throw new Error('HTTP 请求库必须单选：axios、alova')
-  const ui = input.ui ?? defaultUi
+  const type = input.type ?? defaultType
+  if (typeof type !== 'string' || !Object.hasOwn(projectTypes, type))
+    throw new Error('项目类型必须单选：mobile、admin')
+  const project = projectTypes[type]
+  const ui = input.ui ?? project.defaultUi
   if (typeof ui !== 'string' || !Object.hasOwn(uiLibraries, ui))
-    throw new Error('UI 组件库必须单选：vant、ant-design-vue、element-plus、naive-ui、tdesign-vue-next')
+    throw new Error(`UI 组件库必须单选：${project.ui.join('、')}`)
+  if (!project.ui.includes(ui))
+    throw new Error(`${project.label}不支持 ${ui}，支持：${project.ui.join('、')}`)
   const features = input.features ?? []
   if (!Array.isArray(features) || features.some(f => !Object.hasOwn(featureLabels, f)))
     throw new Error('功能仅支持 code-quality、unit-test、e2e、jsx')
-  return { http, ui, location: input.location || '.', features: Object.keys(featureLabels).filter(f => features.includes(f)), install: Boolean(input.install) }
+  return { type, http, ui, location: input.location || '.', features: Object.keys(featureLabels).filter(f => features.includes(f)), install: Boolean(input.install) }
 }
 export function assertTarget(target) {
   let current = target
@@ -34,7 +41,9 @@ export const help = `用法：create-vue-template [目录] [选项]
   --yes, -y           非交互创建
   --features=code-quality,unit-test,e2e,jsx  选择功能，默认全部不选
   --features=         全部不选
-  --ui=element-plus   UI 单选：vant、ant-design-vue、element-plus（默认）、naive-ui、tdesign-vue-next
+  --type=admin        项目类型单选：mobile（移动端 H5）、admin（PC 中后台，默认）
+  --ui=<包名>         mobile：vant（默认）、@nutui/nutui、tdesign-mobile-vue
+                      admin：ant-design-vue（默认）、element-plus、naive-ui、tdesign-vue-next
   --http=axios        HTTP 单选：axios（默认）、alova
   --install           安装依赖，默认不安装
   --help, -h          帮助
@@ -42,10 +51,11 @@ export const help = `用法：create-vue-template [目录] [选项]
 export function parseArgs(args) {
   if (args.includes('--help') || args.includes('-h'))
     return { help: true }
-  const options = normalizeOptions()
+  const options = {}
   const locations = []
   let yes = false
   let uiSpecified = false
+  let typeSpecified = false
   let httpSpecified = false
   for (const arg of args) {
     if (['--yes', '-y'].includes(arg)) {
@@ -53,6 +63,12 @@ export function parseArgs(args) {
     }
     else if (arg.startsWith('--features=')) {
       options.features = arg.slice('--features='.length) === '' ? [] : arg.slice('--features='.length).split(',')
+    }
+    else if (arg.startsWith('--type=')) {
+      if (typeSpecified)
+        throw new Error('项目类型只能指定一次')
+      typeSpecified = true
+      options.type = arg.slice('--type='.length)
     }
     else if (arg.startsWith('--ui=')) {
       if (uiSpecified)

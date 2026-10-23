@@ -1,7 +1,7 @@
 {
   "name": "@dengzhibo/create-vue-template",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "description": "Vue + Vite 应用脚手架，可选代码规范、单元测试和端到端测试",
   "main": "bin/index.js",

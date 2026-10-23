@@ -30,6 +30,7 @@ import path from 'node:path'
 import readline from 'node:readline'
 import { httpLibraries } from './http.js'
 import { featureLabels, normalizeOptions } from './options.js'
+import { projectTypes } from './project-types.js'
 import { uiLibraries } from './ui.js'
 
 /** 用户主动中断（Ctrl+C 或 Esc）时抛出，由调用方统一捕获 */
@@ -305,10 +306,14 @@ export function prompt({ title, choices, multiple = false, initial, defaultValue
 
 export async function collectOptions(previous = {}, ask = prompt) {
   const options = normalizeOptions(previous)
-  options.location = await ask({ title: '项目创建位置', initial: options.location === '.' ? '' : options.location, defaultValue: '.', hint: '输入 my-vue-app：新建项目文件夹；输入 .：在当前目录创建；支持相对或绝对路径' }) || '.'
-  options.ui = await ask({ title: '选择 UI 组件库（单选）', choices: Object.entries(uiLibraries).map(([value, library]) => ({ value, label: library.label })), initial: options.ui, hint: '↑↓ 选择一个组件库，Enter 确认；Vant 用于移动端' })
+  const type = await ask({ title: '选择项目类型（单选）', choices: Object.entries(projectTypes).map(([value, project]) => ({ value, label: project.label })), initial: options.type })
+  if (type !== options.type)
+    options.ui = projectTypes[type].defaultUi
+  options.type = type
+  options.ui = await ask({ title: '选择 UI 组件库（单选）', choices: projectTypes[type].ui.map(value => ({ value, label: uiLibraries[value].label })), initial: options.ui, hint: '↑↓ 选择一个组件库，Enter 确认' })
   options.http = await ask({ title: '选择 HTTP 请求库（单选）', choices: Object.entries(httpLibraries).map(([value, library]) => ({ value, label: library.label })), initial: options.http })
   options.features = await ask({ title: '选择可选功能', multiple: true, choices: Object.entries(featureLabels).map(([value, label]) => ({ value, label })), initial: options.features, hint: 'Space 勾选，Enter 确认；可全部不选或全部选择' })
+  options.location = await ask({ title: '项目创建位置', initial: options.location === '.' ? '' : options.location, defaultValue: '.', hint: '输入 my-vue-app：新建项目文件夹；输入 .：在当前目录创建；支持相对或绝对路径' }) || '.'
   options.install = await ask({ title: '是否立即安装依赖？', choices: [{ value: false, label: '暂不安装' }, { value: true, label: '立即安装' }], initial: options.install })
   console.log(summary(options))
   const action = await ask({ title: '确认配置', choices: [{ value: 'create', label: '开始创建' }, { value: 'edit', label: '返回修改' }, { value: 'cancel', label: '取消' }] })
@@ -317,5 +322,5 @@ export async function collectOptions(previous = {}, ask = prompt) {
   return action === 'create' ? normalizeOptions(options) : null
 }
 export function summary(options) {
-  return [`创建位置：${path.resolve(options.location)}`, `UI 组件库：${uiLibraries[options.ui].label}`, `HTTP 请求库：${httpLibraries[options.http].label}`, `可选功能：${options.features.map(f => featureLabels[f]).join('、') || '无'}`, `安装依赖：${options.install ? '立即安装' : '暂不安装'}`].join('\n')
+  return [`项目类型：${projectTypes[options.type].label}`, `创建位置：${path.resolve(options.location)}`, `UI 组件库：${uiLibraries[options.ui].label}`, `HTTP 请求库：${httpLibraries[options.http].label}`, `可选功能：${options.features.map(f => featureLabels[f]).join('、') || '无'}`, `安装依赖：${options.install ? '立即安装' : '暂不安装'}`].join('\n')
 }

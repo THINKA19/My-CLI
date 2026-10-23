@@ -7,7 +7,7 @@ describe('UI starter', () => {
     const wrapper = mount(HomeView)
     expect(wrapper.get('h1').text()).toContain('初始化完成')
     expect(wrapper.get('[role="status"]').text()).toBe('点击次数：0')
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('main').get('[role="button"], button').trigger('click')
     expect(wrapper.get('[role="status"]').text()).toBe('点击次数：1')
     wrapper.unmount()
   })
