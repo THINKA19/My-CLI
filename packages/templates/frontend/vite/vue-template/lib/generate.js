@@ -57,8 +57,9 @@ export function createPlan(input = {}, cwd = process.cwd()) {
   add(path.join(templateDir, 'platform', options.type))
   addModule(path.join(templateDir, 'ui', ui.template))
   addModule(path.join(templateDir, 'http', options.http))
+  const featureDirectory = feature => path.join(templateDir, 'features', featureModules[feature].group, featureModules[feature].directory)
   for (const feature of options.features)
-    addModule(path.join(templateDir, 'features', featureModules[feature].directory))
+    addModule(featureDirectory(feature))
   if (has('jsx')) {
     const vite = files.get('vite.config.ts').toString().replace(/\r\n/g, '\n').replace('import vue from \'@vitejs/plugin-vue\'', 'import vue from \'@vitejs/plugin-vue\'\nimport vueJsx from \'@vitejs/plugin-vue-jsx\'').replace('      vue(),', '      vue(),\n      vueJsx(),')
     files.set('vite.config.ts', vite)
@@ -130,7 +131,7 @@ export function createPlan(input = {}, cwd = process.cwd()) {
       }
     }
     files.set('eslint.config.ts', eslint)
-    const settings = JSON.parse(fs.readFileSync(path.join(templateDir, 'features/code-quality/settings.fragment.json'), 'utf8'))
+    const settings = JSON.parse(fs.readFileSync(path.join(featureDirectory('code-quality'), 'settings.fragment.json'), 'utf8'))
     files.set('.vscode/settings.json', encode({ ...parse('.vscode/settings.json'), ...settings }))
     extensions.recommendations.push('dbaeumer.vscode-eslint', 'EditorConfig.EditorConfig', 'oxc.oxc-vscode')
   }

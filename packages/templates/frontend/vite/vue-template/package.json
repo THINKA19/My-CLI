@@ -1,7 +1,7 @@
 {
   "name": "@dengzhibo/create-vue-template",
   "type": "module",
-  "version": "0.3.0-beta.0",
+  "version": "0.3.0",
   "private": false,
   "description": "Vue + Vite 脚手架，支持 H5/PC、UI/HTTP 单选与通用开发模块",
   "main": "bin/index.js",

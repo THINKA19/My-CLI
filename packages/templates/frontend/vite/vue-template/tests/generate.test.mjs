@@ -57,8 +57,8 @@ for (let mask = 0; mask < 16; mask++) {
       if (quality) {
         assert.equal(read('eslint.config.ts').includes('pluginVitest'), unit)
         assert.equal(read('eslint.config.ts').includes('pluginPlaywright'), e2e)
-        assert.equal(read('.oxlintrc.json'), fs.readFileSync(new URL('../templates/features/code-quality/.oxlintrc.json', import.meta.url), 'utf8'))
-        assert.equal(read('.oxfmtrc.json'), fs.readFileSync(new URL('../templates/features/code-quality/.oxfmtrc.json', import.meta.url), 'utf8'))
+        assert.equal(read('.oxlintrc.json'), fs.readFileSync(new URL('../templates/features/basic/code-quality/.oxlintrc.json', import.meta.url), 'utf8'))
+        assert.equal(read('.oxfmtrc.json'), fs.readFileSync(new URL('../templates/features/basic/code-quality/.oxfmtrc.json', import.meta.url), 'utf8'))
       }
       const settings = JSON.parse(read('.vscode/settings.json'))
       assert.equal(Boolean(settings['editor.defaultFormatter']), quality)
@@ -84,29 +84,33 @@ test('CLI defaults, flags and errors', () => {
   assert.throws(() => parseArgs(['a', 'b']))
 })
 test('location first, filtered UI, edit and cancellation', async () => {
-  const answers = ['my-vue-app', 'mobile', 'vant', 'alova', choices, true, 'edit', 'my-vue-app', 'admin', 'ant-design-vue', 'alova', [], false, 'create']
+  const answers = ['my-vue-app', 'mobile', 'vant', 'alova', choices, ['theme', 'tools'], true, 'edit', 'my-vue-app', 'admin', 'ant-design-vue', 'alova', [], [], false, 'create']
   const questions = []
   const result = await collectOptions({}, async (question) => {
     questions.push(question)
     return answers.shift()
   })
-  assert.deepEqual(questions.slice(0, 7).map(q => q.title), ['项目创建位置', '选择项目类型（单选）', '选择 UI 组件库（单选）', '选择 HTTP 请求库（单选）', '选择可选功能', '是否立即安装依赖？', '确认配置'])
+  assert.deepEqual(questions.slice(0, 8).map(q => q.title), ['项目创建位置', '选择项目类型（单选）', '选择 UI 组件库（单选）', '选择 HTTP 请求库（单选）', '选择基础开发配置', '选择通用功能增强', '是否立即安装依赖？', '确认配置'])
   assert.deepEqual(questions[2].choices.map(c => c.value), ['vant', '@nutui/nutui', 'tdesign-mobile-vue'])
   assert.equal(questions[2].initial, 'vant')
   assert.equal(questions[0].defaultValue, '.')
-  assert.equal(questions[7].initial, 'my-vue-app')
-  assert.deepEqual(questions[9].choices.map(c => c.value), ['ant-design-vue', 'element-plus', 'naive-ui', 'tdesign-vue-next'])
-  assert.equal(questions[9].initial, 'ant-design-vue')
-  assert.equal(questions[10].initial, 'alova')
-  assert.deepEqual(questions[11].initial, choices)
-  for (const i of [1, 2, 3, 8, 9, 10]) assert.notEqual(questions[i].multiple, true)
+  assert.equal(questions[8].initial, 'my-vue-app')
+  assert.deepEqual(questions[10].choices.map(c => c.value), ['ant-design-vue', 'element-plus', 'naive-ui', 'tdesign-vue-next'])
+  assert.equal(questions[10].initial, 'ant-design-vue')
+  assert.equal(questions[11].initial, 'alova')
+  assert.deepEqual(questions[12].initial, choices)
+  assert.deepEqual(questions[13].initial, ['theme', 'tools'])
+  assert.deepEqual(questions[4].choices.map(c => c.value), choices)
+  assert.deepEqual(questions[5].choices.map(c => c.value), ['theme', 'i18n', 'tools', 'analyze', 'diagnostics', 'deployment'])
+  for (const i of [4, 5, 12, 13]) assert.equal(questions[i].multiple, true)
+  for (const i of [1, 2, 3, 9, 10, 11]) assert.notEqual(questions[i].multiple, true)
   assert.deepEqual(result, { type: 'admin', http: 'alova', ui: 'ant-design-vue', location: 'my-vue-app', features: [], install: false })
-  const cancel = ['.', 'admin', 'ant-design-vue', 'axios', [], false, 'cancel']
+  const cancel = ['.', 'admin', 'ant-design-vue', 'axios', [], [], false, 'cancel']
   assert.equal(await collectOptions({}, async () => cancel.shift()), null)
 })
 
 test('editing the same type preserves the chosen UI', async () => {
-  const answers = ['.', 'admin', 'naive-ui', 'axios', [], false, 'edit', '.', 'admin', 'naive-ui', 'axios', [], false, 'create']
+  const answers = ['.', 'admin', 'naive-ui', 'axios', [], [], false, 'edit', '.', 'admin', 'naive-ui', 'axios', [], [], false, 'create']
   let uiQuestions = 0
   await collectOptions({}, async (question) => {
     if (question.title === '选择 UI 组件库（单选）')

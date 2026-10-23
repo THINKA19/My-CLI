@@ -23,7 +23,7 @@ pnpm create @dengzhibo/vue-template@latest my-vue-app --yes --features=
 
 项目名取目标目录名，支持 my-vue-app 等带连字符名称；目录参数可使用相对路径、绝对路径或当前目录 .。目标目录必须为空，允许保留 .git。
 
-向导顺序：创建位置 → 项目类型单选 → UI 组件库单选 → HTTP 请求库单选 → 功能多选 → 是否安装依赖 → 确认、返回修改或取消。
+向导顺序：创建位置 → 项目类型单选 → UI 组件库单选 → HTTP 请求库单选 → 基础开发配置多选 → 通用功能增强多选 → 是否安装依赖 → 确认、返回修改或取消。
 
 功能默认全部不选，Space 勾选，Enter 确认，可任意组合；命令行 --features=all 可全选：
 
@@ -153,7 +153,7 @@ NutUI 的选项与依赖包名仍为 `@nutui/nutui`，通过 lib/ui.js 的 templ
 | HTTP 基础 | src/http/errors.ts 分类；请求实例读取环境；取消、上传下载示例 |
 | 开发文档 | docs/DEVELOPMENT.md、MODULES.md、UPGRADING.md |
 
-新增可选功能：
+通用功能增强（独立多选）：
 
 | 参数 | 内容 |
 | --- | --- |
@@ -182,3 +182,14 @@ node bin/index.js my-h5 --config=presets/mobile.json --yes
 维护者可运行 `node scripts/verify-project.mjs <已安装依赖的生成项目目录>`，依次检查类型、构建、已选测试、代码规范与分析报告。
 
 生成项目不保留 .gitkeep 空占位目录。应用插件入口、示例聚合组件、主题包装及 Vite 扩展入口仅在有对应功能时输出，并同步移除未生成文件的引用。配置文件中的 location 必须是字符串，install 必须是布尔值。
+
+## 功能分类
+
+功能选择拆成两个连续的多选问题，均默认不选，各自可以全选或不选；确认页分别显示两类结果。返回修改时，两类各自保留已选项。
+
+- 基础开发配置：代码规范、单元测试、端到端测试、JSX 支持。
+- 通用功能增强：主题配置、国际化、通用工具与组合函数、构建分析、错误诊断、部署配置示例。
+
+源码目录按 `templates/features/basic/` 和 `templates/features/enhanced/` 分类，模块实现与生成项目目录保持原样。`lib/features.js` 集中维护分类名称、模块所属分类和模板目录。
+
+原有 `--features` 参数、`--features=all` 及 JSON 配置中的 features 数组保持兼容。分类不影响模块组合：例如基础类的单元测试和增强类的主题一起选择时，仍会生成主题测试。

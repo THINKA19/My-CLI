@@ -28,6 +28,7 @@ import path from 'node:path'
  *   多选统一使用 ASCII 字符 [+] / [ ]，单选保留圆形符号。
  */
 import readline from 'node:readline'
+import { featureGroups, featuresInGroup } from './features.js'
 import { httpLibraries } from './http.js'
 import { featureLabels, normalizeOptions } from './options.js'
 import { projectTypes } from './project-types.js'
@@ -313,7 +314,12 @@ export async function collectOptions(previous = {}, ask = prompt) {
   options.type = type
   options.ui = await ask({ title: '选择 UI 组件库（单选）', choices: projectTypes[type].ui.map(value => ({ value, label: uiLibraries[value].label })), initial: options.ui, hint: '↑↓ 选择一个组件库，Enter 确认' })
   options.http = await ask({ title: '选择 HTTP 请求库（单选）', choices: Object.entries(httpLibraries).map(([value, library]) => ({ value, label: library.label })), initial: options.http })
-  options.features = await ask({ title: '选择可选功能', multiple: true, choices: Object.entries(featureLabels).map(([value, label]) => ({ value, label })), initial: options.features, hint: 'Space 勾选，Enter 确认；可全部不选或全部选择' })
+  const selectedFeatures = []
+  for (const [group, label] of Object.entries(featureGroups)) {
+    const features = featuresInGroup(group)
+    selectedFeatures.push(...await ask({ title: `选择${label}`, multiple: true, choices: features.map(value => ({ value, label: featureLabels[value] })), initial: options.features.filter(feature => features.includes(feature)), hint: 'Space 勾选，Enter 确认；可全部不选或全部选择' }))
+  }
+  options.features = selectedFeatures
   options.install = await ask({ title: '是否立即安装依赖？', choices: [{ value: false, label: '暂不安装' }, { value: true, label: '立即安装' }], initial: options.install })
   console.log(summary(options))
   const action = await ask({ title: '确认配置', choices: [{ value: 'create', label: '开始创建' }, { value: 'edit', label: '返回修改' }, { value: 'cancel', label: '取消' }] })
@@ -322,5 +328,5 @@ export async function collectOptions(previous = {}, ask = prompt) {
   return action === 'create' ? normalizeOptions(options) : null
 }
 export function summary(options) {
-  return [`创建位置：${path.resolve(options.location)}`, `项目类型：${projectTypes[options.type].label}`, `UI 组件库：${uiLibraries[options.ui].label}`, `HTTP 请求库：${httpLibraries[options.http].label}`, `可选功能：${options.features.map(f => featureLabels[f]).join('、') || '无'}`, `安装依赖：${options.install ? '立即安装' : '暂不安装'}`].join('\n')
+  return [`创建位置：${path.resolve(options.location)}`, `项目类型：${projectTypes[options.type].label}`, `UI 组件库：${uiLibraries[options.ui].label}`, `HTTP 请求库：${httpLibraries[options.http].label}`, ...Object.entries(featureGroups).map(([group, label]) => `${label}：${options.features.filter(feature => featuresInGroup(group).includes(feature)).map(feature => featureLabels[feature]).join('、') || '无'}`), `安装依赖：${options.install ? '立即安装' : '暂不安装'}`].join('\n')
 }

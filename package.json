@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "description": "个人脚手架模板集合 - 仅用于集中管理代码，每个包独立发布",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint --config eslint.config.js .",
+    "lint:fix": "eslint --config eslint.config.js . --fix",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -17,7 +17,7 @@
     "lint-staged": "^17.5.1"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "eslint --fix"
+    "*.{js,ts,vue}": "eslint --config eslint.config.js --fix --no-warn-ignored"
   },
   "devEngines": {
     "packageManager": {

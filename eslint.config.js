@@ -24,6 +24,7 @@ export default antfu({
     '**/README.md', // 忽略项目中的 README 说明文件
     '**/*.md', // 忽略所有的 Markdown 格式文档
     '**/template/**', // 忽略脚手架模板生成目录（防止模板插值语法影响 Lint）
+    'packages/templates/**/templates/**', // 仅忽略内部模板，保留脚手架 lib、bin 等源码检查
     '**/node_modules/**', // 忽略第三方依赖包目录
     '**/dist/**', // 忽略构建产物输出目录
     '**/.vitepress/**', // 忽略 VitePress 文档站点的本地配置与缓存目录
