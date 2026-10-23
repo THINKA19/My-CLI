@@ -36,7 +36,7 @@ for (let mask = 0; mask < 16; mask++) {
       assert.deepEqual(Object.keys(pkg.devDependencies), Object.keys(pkg.devDependencies).sort())
       const order = ['dev', 'build', 'preview', 'test:unit', 'test:e2e', 'build-only', 'type-check', 'lint', 'lint:oxlint', 'lint:eslint', 'format']
       assert.deepEqual(Object.keys(pkg.scripts), order.filter(key => key in pkg.scripts))
-      for (const file of ['src/App.vue', 'vite.config.ts', 'tsconfig.app.json', '.gitignore']) assert.ok(has(file), file)
+      for (const file of ['src/app/App.vue', 'vite.config.ts', 'tsconfig.app.json', '.gitignore']) assert.ok(has(file), file)
       for (const file of ['.github', '.husky', 'deploy', 'docker', 'features', 'package.fragment.json']) assert.equal(has(file), false, file)
       assert.equal(has('eslint.config.ts'), quality)
       assert.equal(has('.editorconfig'), quality)
