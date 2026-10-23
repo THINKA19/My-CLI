@@ -83,28 +83,30 @@ test('CLI defaults, flags and errors', () => {
   assert.deepEqual(parseArgs(['--features=e2e,e2e']).options.features, ['e2e'])
   assert.throws(() => parseArgs(['a', 'b']))
 })
-test('project type first, filtered UI, edit and cancellation', async () => {
-  const answers = ['mobile', 'vant', 'alova', choices, 'my-vue-app', true, 'edit', 'admin', 'ant-design-vue', 'alova', [], 'my-vue-app', false, 'create']
+test('location first, filtered UI, edit and cancellation', async () => {
+  const answers = ['my-vue-app', 'mobile', 'vant', 'alova', choices, true, 'edit', 'my-vue-app', 'admin', 'ant-design-vue', 'alova', [], false, 'create']
   const questions = []
   const result = await collectOptions({}, async (question) => {
     questions.push(question)
     return answers.shift()
   })
-  assert.deepEqual(questions.slice(0, 7).map(q => q.title), ['选择项目类型（单选）', '选择 UI 组件库（单选）', '选择 HTTP 请求库（单选）', '选择可选功能', '项目创建位置', '是否立即安装依赖？', '确认配置'])
-  assert.deepEqual(questions[1].choices.map(c => c.value), ['vant', '@nutui/nutui', 'tdesign-mobile-vue'])
-  assert.equal(questions[1].initial, 'vant')
-  assert.deepEqual(questions[8].choices.map(c => c.value), ['ant-design-vue', 'element-plus', 'naive-ui', 'tdesign-vue-next'])
-  assert.equal(questions[8].initial, 'ant-design-vue')
-  assert.equal(questions[9].initial, 'alova')
-  assert.deepEqual(questions[10].initial, choices)
-  for (const i of [0, 1, 2, 7, 8, 9]) assert.notEqual(questions[i].multiple, true)
+  assert.deepEqual(questions.slice(0, 7).map(q => q.title), ['项目创建位置', '选择项目类型（单选）', '选择 UI 组件库（单选）', '选择 HTTP 请求库（单选）', '选择可选功能', '是否立即安装依赖？', '确认配置'])
+  assert.deepEqual(questions[2].choices.map(c => c.value), ['vant', '@nutui/nutui', 'tdesign-mobile-vue'])
+  assert.equal(questions[2].initial, 'vant')
+  assert.equal(questions[0].defaultValue, '.')
+  assert.equal(questions[7].initial, 'my-vue-app')
+  assert.deepEqual(questions[9].choices.map(c => c.value), ['ant-design-vue', 'element-plus', 'naive-ui', 'tdesign-vue-next'])
+  assert.equal(questions[9].initial, 'ant-design-vue')
+  assert.equal(questions[10].initial, 'alova')
+  assert.deepEqual(questions[11].initial, choices)
+  for (const i of [1, 2, 3, 8, 9, 10]) assert.notEqual(questions[i].multiple, true)
   assert.deepEqual(result, { type: 'admin', http: 'alova', ui: 'ant-design-vue', location: 'my-vue-app', features: [], install: false })
-  const cancel = ['admin', 'ant-design-vue', 'axios', [], '.', false, 'cancel']
+  const cancel = ['.', 'admin', 'ant-design-vue', 'axios', [], false, 'cancel']
   assert.equal(await collectOptions({}, async () => cancel.shift()), null)
 })
 
 test('editing the same type preserves the chosen UI', async () => {
-  const answers = ['admin', 'naive-ui', 'axios', [], '.', false, 'edit', 'admin', 'naive-ui', 'axios', [], '.', false, 'create']
+  const answers = ['.', 'admin', 'naive-ui', 'axios', [], false, 'edit', '.', 'admin', 'naive-ui', 'axios', [], false, 'create']
   let uiQuestions = 0
   await collectOptions({}, async (question) => {
     if (question.title === '选择 UI 组件库（单选）')

@@ -23,7 +23,7 @@ pnpm create @dengzhibo/vue-template@latest my-vue-app --yes --features=
 
 项目名取目标目录名，支持 my-vue-app 等带连字符名称；目录参数可使用相对路径、绝对路径或当前目录 .。目标目录必须为空，允许保留 .git。
 
-向导顺序：项目类型单选 → UI 组件库单选 → HTTP 请求库单选 → 功能多选 → 创建位置 → 是否安装依赖 → 确认、返回修改或取消。
+向导顺序：创建位置 → 项目类型单选 → UI 组件库单选 → HTTP 请求库单选 → 功能多选 → 是否安装依赖 → 确认、返回修改或取消。
 
 功能默认全部不选，Space 勾选，Enter 确认，可任意组合：
 
@@ -117,7 +117,7 @@ node bin/index.js my-app --yes --type=mobile --ui=vant --http=alova --install
 
 ## 项目类型与 UI 联动
 
-向导第一个问题为项目类型，提供移动端 H5（mobile）和 PC 中后台（admin，默认）。移动端 UI 顺序：Vant（默认）、NutUI、TDesign Mobile Vue；PC UI 顺序：Ant Design Vue（默认）、Element Plus、Naive UI、TDesign Vue Next。类型和 UI 均为单选。
+向导第一个问题为项目创建位置，第二个问题为项目类型，提供移动端 H5（mobile）和 PC 中后台（admin，默认）。移动端 UI 顺序：Vant（默认）、NutUI、TDesign Mobile Vue；PC UI 顺序：Ant Design Vue（默认）、Element Plus、Naive UI、TDesign Vue Next。类型和 UI 均为单选。
 
 非交互参数使用 `--type=mobile` 或 `--type=admin`。省略 UI 时按类型确定默认值；显式指定不匹配的 UI 会报错并列出支持项。参数顺序不影响结果。返回修改时，同类型保留 UI，切换类型重置为新类型的默认 UI；HTTP、可选功能及安装偏好保留。
 
