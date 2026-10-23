@@ -1,0 +1,8 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --app-bg: #111827;
+  --app-surface: #1f2937;
+  --app-text: #f3f4f6;
+  --app-border: #475569;
+  --app-brand: #93c5fd;
+}

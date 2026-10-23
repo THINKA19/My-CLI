@@ -1,11 +1,16 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { featureLabels } from './features.js'
 import { defaultHttp, httpLibraries } from './http.js'
 import { defaultType, projectTypes } from './project-types.js'
 import { uiLibraries } from './ui.js'
 
-export const featureLabels = { 'code-quality': '代码规范', 'unit-test': '单元测试', 'e2e': '端到端测试', 'jsx': 'JSX 支持' }
+export { featureLabels } from './features.js'
 export function normalizeOptions(input = {}) {
+  if (input.location !== undefined && typeof input.location !== 'string')
+    throw new Error('项目创建位置必须是字符串')
+  if (input.install !== undefined && typeof input.install !== 'boolean')
+    throw new Error('install 必须是布尔值')
   const http = input.http ?? defaultHttp
   if (typeof http !== 'string' || !Object.hasOwn(httpLibraries, http))
     throw new Error('HTTP 请求库必须单选：axios、alova')
@@ -20,7 +25,7 @@ export function normalizeOptions(input = {}) {
     throw new Error(`${project.label}不支持 ${ui}，支持：${project.ui.join('、')}`)
   const features = input.features ?? []
   if (!Array.isArray(features) || features.some(f => !Object.hasOwn(featureLabels, f)))
-    throw new Error('功能仅支持 code-quality、unit-test、e2e、jsx')
+    throw new Error(`功能仅支持 ${Object.keys(featureLabels).join('、')}`)
   return { type, http, ui, location: input.location || '.', features: Object.keys(featureLabels).filter(f => features.includes(f)), install: Boolean(input.install) }
 }
 export function assertTarget(target) {
@@ -40,7 +45,10 @@ export function assertTarget(target) {
 export const help = `用法：create-vue-template [目录] [选项]
   --yes, -y           非交互创建
   --features=code-quality,unit-test,e2e,jsx  选择功能，默认全部不选
-  --features=         全部不选
+  --features=         全部不选；--features=all 全选
+  --config=<文件>     读取 JSON 配置，显式参数覆盖配置文件
+  --dry-run           只预览文件清单，不创建或安装
+  --features=theme,i18n,tools,analyze,diagnostics,deployment  新增通用模块
   --type=admin        项目类型单选：mobile（移动端 H5）、admin（PC 中后台，默认）
   --ui=<包名>         mobile：vant（默认）、@nutui/nutui、tdesign-mobile-vue
                       admin：ant-design-vue（默认）、element-plus、naive-ui、tdesign-vue-next
@@ -52,8 +60,26 @@ export function parseArgs(args) {
   if (args.includes('--help') || args.includes('-h'))
     return { help: true }
   const options = {}
+  const configs = args.filter(arg => arg.startsWith('--config='))
+  if (configs.length > 1)
+    throw new Error('配置文件只能指定一次')
+  if (configs.length) {
+    const filename = configs[0].slice('--config='.length)
+    if (!filename)
+      throw new Error('配置文件路径不能为空')
+    const preset = JSON.parse(fs.readFileSync(path.resolve(filename), 'utf8'))
+    if (!preset || typeof preset !== 'object' || Array.isArray(preset))
+      throw new Error('配置必须是 JSON 对象')
+    const allowed = ['location', 'type', 'ui', 'http', 'features', 'install']
+    for (const key of Object.keys(preset)) {
+      if (!allowed.includes(key))
+        throw new Error(`未知配置字段：${key}`)
+    }
+    Object.assign(options, preset)
+  }
   const locations = []
   let yes = false
+  let dryRun = false
   let uiSpecified = false
   let typeSpecified = false
   let httpSpecified = false
@@ -61,8 +87,15 @@ export function parseArgs(args) {
     if (['--yes', '-y'].includes(arg)) {
       yes = true
     }
+    else if (arg.startsWith('--config=')) {
+      continue
+    }
+    else if (arg === '--dry-run') {
+      dryRun = true
+    }
     else if (arg.startsWith('--features=')) {
-      options.features = arg.slice('--features='.length) === '' ? [] : arg.slice('--features='.length).split(',')
+      const value = arg.slice('--features='.length)
+      options.features = value === 'all' ? Object.keys(featureLabels) : value === '' ? [] : value.split(',')
     }
     else if (arg.startsWith('--type=')) {
       if (typeSpecified)
@@ -94,6 +127,7 @@ export function parseArgs(args) {
   }
   if (locations.length > 1)
     throw new Error('只能指定一个创建目录')
-  options.location = locations[0] || '.'
-  return { options: normalizeOptions(options), yes }
+  if (locations.length)
+    options.location = locations[0]
+  return { options: normalizeOptions(options), yes, dryRun }
 }

@@ -25,7 +25,7 @@ pnpm create @dengzhibo/vue-template@latest my-vue-app --yes --features=
 
 向导顺序：创建位置 → 项目类型单选 → UI 组件库单选 → HTTP 请求库单选 → 功能多选 → 是否安装依赖 → 确认、返回修改或取消。
 
-功能默认全部不选，Space 勾选，Enter 确认，可任意组合：
+功能默认全部不选，Space 勾选，Enter 确认，可任意组合；命令行 --features=all 可全选：
 
 - 代码规范（code-quality）：ESLint + Oxlint + Oxfmt。
 - 单元测试（unit-test）：Vitest、Vue Test Utils 和现有测试示例。
@@ -37,7 +37,7 @@ Windows PowerShell 中，包含逗号的 `--features` 参数应加引号，如�
 
 未选择的功能不生成对应配置、依赖、脚本或编辑器推荐。测试的 ESLint 规则仅在代码规范与相应测试同时选择时生成。
 
-不生成 Git hooks、CI、Docker 或部署管理。保留 Vue、Router、Pinia 基础能力，移除默认欢迎页、Logo 和 About 示例。
+不生成 Git hooks、CI 或 Docker；部署示例由 deployment 选项生成，不会操作服务器。保留 Vue、Router、Pinia 基础能力，移除默认欢迎页、Logo 和 About 示例。
 
 CLI Node 要求见 package.json；生成应用的 Node 要求见 templates/base/package.json。
 
@@ -109,7 +109,7 @@ Axios（默认）与 Alova 独立单选，和 UI 库任意搭配。使用一次 
 node bin/index.js my-app --yes --type=mobile --ui=vant --http=alova --install
 ```
 
-`templates/http/axios`、`templates/http/alova` 各自维护 `package.fragment.json`、`src/http/client.ts`、`src/http/example.ts`，生成时只复制所选模块。实例设置 10 秒超时，请求路径遵循 Vite 的 BASE_URL，支持子目录部署。Alova 示例关闭 GET 缓存并将非成功 HTTP 状态转为异常。
+`templates/http/axios`、`templates/http/alova` 各自维护 `package.fragment.json`、`src/http/client.ts`、`src/http/example.ts`，生成时只复制所选模块。实例从环境配置读取 API 地址和超时，默认 10 秒。Mock 独立遵循 Vite BASE_URL，支持子目录部署。Alova 示例关闭 GET 缓存并将非成功 HTTP 状态转为异常。
 
 公共 `public/mock/hello.json` 是静态 JSON，开发及构建后均可访问，不是业务 Mock 服务。`src/app/components/HttpDemo.vue` 调用统一的示例函数 getExample，展示加载、成功、失败及重试；两个库各自实现请求，不提供业务请求封装或 Token 策略。勾选单元测试后，还会生成真实本地 HTTP 请求和页面状态测试。
 
@@ -139,3 +139,46 @@ templates/ui/
 ```
 
 NutUI 的选项与依赖包名仍为 `@nutui/nutui`，通过 lib/ui.js 的 template 字段映射到 `h5/nutui`。生成器统一读取该字段，不拼接 npm 包名或判断平台。分类只用于脚手架源码，生成项目仍为 `src/ui/setup.ts` 和 `src/ui/UiDemo.vue`。
+
+## 通用开发能力
+
+基础生成内容：
+
+| 能力 | 文件或入口 |
+| --- | --- |
+| 环境校验 | src/shared/config/validate.ts、env.ts；.env.example、.env.development、.env.production |
+| 开发代理 | config/environment.ts；DEV_PROXY_TARGET 启用 /api 代理，保留前缀 |
+| 平台适配 | templates/platform/mobile、admin；输出 src/ui/styles/platform.css |
+| 基础路由 | 标题元信息、懒加载、滚动恢复、404 返回首页 |
+| HTTP 基础 | src/http/errors.ts 分类；请求实例读取环境；取消、上传下载示例 |
+| 开发文档 | docs/DEVELOPMENT.md、MODULES.md、UPGRADING.md |
+
+新增可选功能：
+
+| 参数 | 内容 |
+| --- | --- |
+| theme | 浅色、深色、跟随系统、偏好持久化与公共设计变量 |
+| i18n | Vue I18n，中英文文案、日期、数字格式与语言持久化 |
+| tools | 可取消防抖、节流、命名空间存储校验、作用域自动清理的组合函数 |
+| analyze | pnpm analyze 生成 stats.html，普通构建不输出报告 |
+| diagnostics | Vue/window/Promise 错误入口、版本标识、脱敏、可替换 reporter，默认无网络上报 |
+| deployment | 根路径和 /app/ 子目录 Nginx 示例、SPA 路由回退及资源缓存说明 |
+
+```sh
+node bin/index.js my-app --yes --features=all
+node bin/index.js my-app --yes --features=theme,i18n,tools,analyze,diagnostics,deployment
+node bin/index.js my-app --config=presets/admin.json --dry-run
+node bin/index.js my-h5 --config=presets/mobile.json --yes
+```
+
+配置文件为 JSON，支持 location、type、ui、http、features、install；显式命令行参数覆盖同名配置。--dry-run 输出目标与完整文件清单，不创建目录、不安装依赖。交互确认页保留返回修改和取消。
+
+环境变量在构建时确定，VITE_ 前缀均属于公开配置；密钥不应写入。开发代理仅用于 Vite 开发服务，生产 API 由托管环境反向代理或独立服务提供。环境与代理、Mock 与业务 API 的边界见生成项目 docs/DEVELOPMENT.md。
+
+功能注册统一维护在 lib/features.js，应用安装入口、展示示例和 Vite 插件入口由生成器组合。部署模块只生成配置示例和说明，实际托管参数按环境配置。
+
+模块检查采用基础组合、全部新模块的 64 种组合和代表性全量项目验证。勾选单元测试后，按已选模块生成对应测试，不会引用未选模块。新增模块按 docs/MODULES.md 的边界维护；升级到新模板参考 docs/UPGRADING.md。
+
+维护者可运行 `node scripts/verify-project.mjs <已安装依赖的生成项目目录>`，依次检查类型、构建、已选测试、代码规范与分析报告。
+
+生成项目不保留 .gitkeep 空占位目录。应用插件入口、示例聚合组件、主题包装及 Vite 扩展入口仅在有对应功能时输出，并同步移除未生成文件的引用。配置文件中的 location 必须是字符串，install 必须是布尔值。

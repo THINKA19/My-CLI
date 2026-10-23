@@ -1,0 +1,5 @@
+html { -webkit-text-size-adjust: 100%; }
+body { min-width: 320px; min-height: 100vh; min-height: 100dvh; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+button, [role="button"] { touch-action: manipulation; }
+input, textarea, select { font-size: 16px; }
+.starter { width: min(100% - 24px, 640px); padding: 16px; margin-block: 16px; }

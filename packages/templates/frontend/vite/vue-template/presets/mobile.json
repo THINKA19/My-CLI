@@ -1,0 +1,14 @@
+{
+  "type": "mobile",
+  "ui": "vant",
+  "http": "alova",
+  "features": [
+    "code-quality",
+    "unit-test",
+    "theme",
+    "i18n",
+    "tools",
+    "diagnostics"
+  ],
+  "install": false
+}

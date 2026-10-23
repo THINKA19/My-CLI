@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "analyze": "node scripts/analyze.mjs"
+  },
+  "devDependencies": {
+    "rollup-plugin-visualizer": "^6.0.0"
+  }
+}

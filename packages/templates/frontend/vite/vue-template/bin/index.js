@@ -12,14 +12,19 @@ async function main() {
     console.log(help)
     return
   }
-  if (!parsed.yes && (!process.stdin.isTTY || !process.stdout.isTTY))
+  if (!parsed.yes && !parsed.dryRun && (!process.stdin.isTTY || !process.stdout.isTTY))
     throw new Error('非交互环境请使用 --yes')
-  const options = parsed.yes ? parsed.options : await collectOptions(parsed.options)
+  const options = parsed.yes || parsed.dryRun ? parsed.options : await collectOptions(parsed.options)
   if (!options) {
     console.log('已取消，未创建项目。')
     return
   }
-  const target = writePlan(createPlan(options))
+  const plan = createPlan(options)
+  if (parsed.dryRun) {
+    console.log(`预览目标：${plan.target}\n${[...plan.files.keys()].sort().join('\n')}\n共 ${plan.files.size} 个文件，未创建项目。`)
+    return
+  }
+  const target = writePlan(plan)
   console.log(`✔ 项目已创建：${target}`)
   if (options.install) {
     try {

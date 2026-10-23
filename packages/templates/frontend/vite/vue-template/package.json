@@ -1,9 +1,9 @@
 {
   "name": "@dengzhibo/create-vue-template",
   "type": "module",
-  "version": "0.2.2",
+  "version": "0.3.0-beta.0",
   "private": false,
-  "description": "Vue + Vite 应用脚手架，可选代码规范、单元测试和端到端测试",
+  "description": "Vue + Vite 脚手架，支持 H5/PC、UI/HTTP 单选与通用开发模块",
   "main": "bin/index.js",
   "bin": {
     "create-vue-template": "./bin/index.js"
@@ -19,7 +19,8 @@
     "CHANGELOG.md",
     "README.md",
     "LICENSE",
-    "lib"
+    "lib",
+    "presets"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",

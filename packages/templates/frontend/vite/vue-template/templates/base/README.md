@@ -63,7 +63,7 @@ pnpm test:e2e
 # Runs the tests only on Chromium
 pnpm test:e2e --project=chromium
 # Runs the tests of a specific file
-pnpm test:e2e tests/example.spec.ts
+pnpm test:e2e e2e/common.spec.ts
 # Runs the tests in debug mode
 pnpm test:e2e --debug
 ```

@@ -1,0 +1,16 @@
+{
+  "type": "admin",
+  "ui": "ant-design-vue",
+  "http": "axios",
+  "features": [
+    "code-quality",
+    "unit-test",
+    "theme",
+    "i18n",
+    "tools",
+    "analyze",
+    "diagnostics",
+    "deployment"
+  ],
+  "install": false
+}

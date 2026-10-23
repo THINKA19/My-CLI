@@ -3,13 +3,16 @@ import { createServer } from 'node:http'
 import { afterAll, beforeAll, expect, it, vi } from 'vitest'
 
 let status = 200
+let delay = 0
 let requests = 0
 const paths: string[] = []
 const server = createServer((request, response) => {
   requests++
   paths.push(request.url || '')
-  response.writeHead(status, { 'Content-Type': 'application/json' })
-  response.end(JSON.stringify({ message: '本地 Mock 请求成功' }))
+  setTimeout(() => {
+    response.writeHead(status, { 'Content-Type': 'application/json' })
+    response.end(JSON.stringify({ message: '本地 Mock 请求成功' }))
+  }, delay)
 })
 
 beforeAll(async () => {
@@ -34,4 +37,17 @@ it('requests fresh data under the base path and recovers after an HTTP error', a
   status = 200
   expect(await getExample()).toEqual({ message: '本地 Mock 请求成功' })
   expect(paths).toEqual(Array(4).fill('/nested/mock/hello.json'))
+})
+
+
+it('cancels a pending request using the selected library', async () => {
+  const { createExampleRequest } = await import('../example')
+  delay = 100
+  const request = createExampleRequest()
+  const arrived = new Promise<void>(resolve => server.once('request', () => resolve()))
+  const pending = request.send()
+  await arrived
+  request.cancel()
+  await expect(pending).rejects.toMatchObject({ kind: 'cancelled' })
+  delay = 0
 })

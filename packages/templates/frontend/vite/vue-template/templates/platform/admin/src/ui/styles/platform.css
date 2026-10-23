@@ -1,0 +1,4 @@
+html, body, #app { min-height: 100%; }
+#app { min-width: 768px; }
+body { min-height: 100vh; }
+.starter { min-width: 0; }

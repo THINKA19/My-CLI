@@ -34,7 +34,7 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('../', import.meta.url))
 
 // 必须完整发布的核心目录：模板、核心逻辑、CLI 入口
-const REQUIRED_DIRS = ['templates', 'lib', 'bin']
+const REQUIRED_DIRS = ['templates', 'lib', 'bin', 'presets']
 
 // 本地产物、缓存、敏感文件：node_modules / dist / .vercel / .turbo、
 // 本地缓存、.env*.local 和非目标包管理器锁文件。
