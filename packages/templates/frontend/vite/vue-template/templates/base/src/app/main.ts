@@ -1,3 +1,4 @@
+import '@/ui/setup'
 import '@/ui/styles/main.css'
 
 import { createApp } from 'vue'

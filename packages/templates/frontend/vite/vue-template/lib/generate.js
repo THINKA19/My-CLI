@@ -1,7 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { httpLibraries } from './http.js'
 import { assertTarget, normalizeOptions } from './options.js'
+import { uiLibraries } from './ui.js'
 
 const templateDir = fileURLToPath(new URL('../templates/', import.meta.url))
 const skip = new Set(['node_modules', 'dist', '.npmignore', '.git', '.DS_Store', 'pnpm-lock.yaml', '.turbo'])
@@ -37,8 +39,8 @@ export function createPlan(input = {}, cwd = process.cwd()) {
   add(path.join(templateDir, 'base'))
   const parse = file => JSON.parse(files.get(file).toString())
   const pkg = parse('package.json')
-  for (const feature of options.features) {
-    const directory = path.join(templateDir, 'features', ({ 'unit-test': 'Vitest', 'jsx': 'JSX' })[feature] || feature)
+  const ui = uiLibraries[options.ui]
+  function addModule(directory) {
     add(directory)
     const fragment = JSON.parse(fs.readFileSync(path.join(directory, 'package.fragment.json'), 'utf8'))
     for (const field of ['scripts', 'dependencies', 'devDependencies']) {
@@ -50,6 +52,10 @@ export function createPlan(input = {}, cwd = process.cwd()) {
       }
     }
   }
+  addModule(path.join(templateDir, 'ui', options.ui))
+  addModule(path.join(templateDir, 'http', options.http))
+  for (const feature of options.features)
+    addModule(path.join(templateDir, 'features', ({ 'unit-test': 'Vitest', 'jsx': 'JSX' })[feature] || feature))
   if (has('jsx')) {
     const vite = files.get('vite.config.ts').toString().replace(/\r\n/g, '\n').replace('import vue from \'@vitejs/plugin-vue\'', 'import vue from \'@vitejs/plugin-vue\'\nimport vueJsx from \'@vitejs/plugin-vue-jsx\'').replace('    vue(),', '    vue(),\n    vueJsx(),')
     files.set('vite.config.ts', vite)
@@ -91,7 +97,7 @@ export function createPlan(input = {}, cwd = process.cwd()) {
     if (!has(feature))
       readme = readme.replace(new RegExp(`### ${title}[\\s\\S]*?(?=\\n### |$)`), '')
   }
-  files.set('README.md', readme.replace('# base', `# ${name}`))
+  files.set('README.md', `${readme.replace('# base', `# ${name}`)}\n## UI 组件库\n\n已初始化 ${ui.label}，只安装这一个 UI 库。运行 pnpm dev 后，首页按钮可增加计数。\n示例：src/ui/UiDemo.vue；组件在示例中显式导入，初始化入口为 src/ui/setup.ts，由 src/app/main.ts 统一加载（Naive UI 自动注入样式）。\n\n## HTTP 请求库\n\n已初始化 ${httpLibraries[options.http].label}。src/http/client.ts 创建请求实例，src/http/example.ts 请求 public/mock/hello.json，首页展示加载、成功和失败状态。该 JSON 是本地静态示例，不是业务 API；请求地址遵循 Vite BASE_URL。\n`)
   return { target, options, files }
 }
 export function writePlan(plan) {

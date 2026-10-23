@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
 
-// See here how to get started:
-// https://playwright.dev/docs/intro
-test('visits the app root url', async ({ page }) => {
+test('selected UI button works', async ({ page }) => {
   await page.goto('/')
-  await expect(page.locator('h1')).toHaveText('You did it!')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('初始化完成')
+  await expect(page.getByRole('status')).toHaveText('点击次数：0')
+  await page.getByRole('button', { name: '点击体验' }).click()
+  await expect(page.getByRole('status')).toHaveText('点击次数：1')
 })
