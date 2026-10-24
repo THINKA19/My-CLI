@@ -1,7 +1,7 @@
 {
   "name": "@dengzhibo/create-monorepo-template",
   "type": "module",
-  "version": "0.5.1",
+  "version": "0.6.0-alpha.1",
   "private": false,
   "description": "基于 pnpm workspace + Turborepo 的 Monorepo 基础脚手架，支持工程规范与可维护的多平台部署目标",
   "main": "bin/index.js",

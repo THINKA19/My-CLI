@@ -198,3 +198,7 @@ TypeScript
 
 * monorepo-template/lib
 * templates/features/docker
+
+## 0.6.0-alpha.1 (2026-10-24) 
+
+* 百分百还原 vben5.0
